@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>592</width>
     <height>875</height>
    </rect>
   </property>
@@ -28,30 +28,12 @@
   <property name="windowTitle">
    <string>DDTM_GenerationRapport</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <widget class="QWidget" name="main_container" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item alignment="Qt::AlignTop">
-       <widget class="QLabel" name="titre1">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+    <widget class="QWidget" name="container_formulaires" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QWidget" name="container_scenario" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -61,28 +43,69 @@
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>212</height>
+          <height>16777215</height>
          </size>
         </property>
-        <property name="text">
-         <string>Saisissez l'indice de retour pour chaque bassin versant</string>
-        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item alignment="Qt::AlignTop">
+          <widget class="QLabel" name="titre1">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>212</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Saisissez l'indice de retour pour chaque bassin versant</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QFormLayout" name="formulaire_scenario"/>
+         </item>
+        </layout>
        </widget>
       </item>
       <item>
-       <layout class="QFormLayout" name="formulaire_scenario"/>
-      </item>
-      <item>
-       <widget class="QPushButton" name="valider">
-        <property name="cursor">
-         <cursorShape>ArrowCursor</cursorShape>
-        </property>
-        <property name="text">
-         <string>Valider</string>
-        </property>
+       <widget class="QWidget" name="container_sensibilite" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item alignment="Qt::AlignHCenter|Qt::AlignTop">
+          <widget class="QLabel" name="titre2">
+           <property name="text">
+            <string>Saisissez les etablissements sensibles 
+à faire apparaitre sur le rapport</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QFormLayout" name="formLayout"/>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="valider">
+     <property name="text">
+      <string>Valider</string>
+     </property>
     </widget>
    </item>
   </layout>
@@ -90,5 +113,3 @@
  <resources/>
  <connections/>
 </ui>
-
-
