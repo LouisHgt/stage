@@ -73,16 +73,9 @@ class DDTM_GenerationRapportDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def setupFormulaireScenario(self):
         """Setup du formulaire de scenario."""
-        # Recuperation du projet actif QGis
-        if not QgsProject.instance().mapLayers():
-            print("Aucun projet actif QGis.")
-            sleep(1)
-            self.close()
-            return
-            
-        
-        try:
 
+        try:
+            # Recuperation du projet actif QGis
             project = QgsProject.instance()
             
             
@@ -93,11 +86,7 @@ class DDTM_GenerationRapportDialog(QtWidgets.QDialog, FORM_CLASS):
             
             # Recuperation des indices depuis le fichier de config
             indices = self.getFromConfig('indices')
-            if not indices:
-                print("Aucun indice de retour trouvé dans le fichier de config.")
-                sleep(1)
-                self.close()
-                return
+
             
             # Recuperation des bassins depuis la couche QGis
             nom_couche_bassins = self.getFromConfig('nom_couche_bassins')[0]
@@ -134,17 +123,18 @@ class DDTM_GenerationRapportDialog(QtWidgets.QDialog, FORM_CLASS):
         except Exception as e:
             print(f"Une erreur s'est produite dans setupFormulaireScenario : {e}")
             self.close()
+            raise
         
     def __init__(self, parent=None):
         """Constructor."""
         super(DDTM_GenerationRapportDialog, self).__init__(parent)
-        # Set up the user interface from Designer through FORM_CLASS.
-        # After self.setupUi() you can access any designer object by doing
-        # self.<objectname>, and you can use autoconnect slots - see
-        # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
-        # #widgets-and-dialogs-with-auto-connect
+        
         self.setupUi(self)
-        self.setupFormulaireScenario()
-
+        try:
+            self.setupFormulaireScenario()
+        except Exception as e:  
+            print(f"Une erreur s'est produite dans le constructeur : {e}")
+            self.close()
+            raise
 
 
