@@ -73,66 +73,67 @@ class DDTM_GenerationRapportDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def setupFormulaireScenario(self):
         """Setup du formulaire de scenario."""
-        
         # Recuperation du projet actif QGis
-        project = QgsProject.instance()
-        
-        # Recuperation du conteneur principal QT
-        main_container = self.findChild(QtWidgets.QWidget, 'main_container')
-        
-        
-        # --------------------- Choix de l'indice de retour par bassin. -------------------
-        
-        # Recuperation des indices depuis le fichier de config
-        indices = self.getFromConfig('indices')
-        if not indices:
-            print("Aucun indice de retour trouvé dans le fichier de config.")
+        if not QgsProject.instance().mapLayers():
+            print("Aucun projet actif QGis.")
             sleep(1)
             self.close()
             return
-        
-        # Recuperation des bassins depuis la couche QGis
-        nom_couche_bassins = self.getFromConfig('nom_couche_bassins')[0]
-        print(nom_couche_bassins)
-        libelle_bassins = self.getFromConfig('libelle_couche_bassins')[0]
-        
-        # Recupération de la couche Bassins_versants
-        bassins_versants = project.mapLayersByName(nom_couche_bassins)[0]
-        
-        # Verification de l'existence de la couche
-        if not bassins_versants:
-            print("La couche '" + nom_couche_bassins + "' n'a pas été trouvée dans le projet QGIS.")
-            self.close()
-            return
-
-
-        bassins = []
-        # On parcourt la liste des couches pour récupérer leur noms
-        for feature in bassins_versants.getFeatures():
-            bassin = feature[libelle_bassins]
-            bassins.append(bassin)
-        
-        # Ajout d'un formulaire de scenario
-        formulaire = main_container.findChild(QtWidgets.QFormLayout, 'formulaire_scenario')
-        
-        hauteur_minimum_ligne_formulaire = 25
-        for bassin in bassins:
-            # Ajout d'un label pour chaque bassin
-            label = QtWidgets.QLabel(bassin)
-            label.setMinimumHeight(hauteur_minimum_ligne_formulaire)
-            # Ajout d'un combobox pour chaque bassin
-            comboBox = QtWidgets.QComboBox()
-            comboBox.setMinimumHeight(hauteur_minimum_ligne_formulaire)
-            comboBox.addItems(indices)
             
-            formulaire.addRow(label, comboBox)
+        
+        try:
 
-        boutonValider = main_container.findChild(QtWidgets.QPushButton, 'valider')
-        boutonValider.clicked.connect(self.pressed)
+            project = QgsProject.instance()
+            
+            
+            # Recuperation du conteneur principal QT
+            main_container = self.findChild(QtWidgets.QWidget, 'main_container')
+            
+            # --------------------- Choix de l'indice de retour par bassin. -------------------
+            
+            # Recuperation des indices depuis le fichier de config
+            indices = self.getFromConfig('indices')
+            if not indices:
+                print("Aucun indice de retour trouvé dans le fichier de config.")
+                sleep(1)
+                self.close()
+                return
+            
+            # Recuperation des bassins depuis la couche QGis
+            nom_couche_bassins = self.getFromConfig('nom_couche_bassins')[0]
+            libelle_bassins = self.getFromConfig('libelle_couche_bassins')[0]
+            
+            # Recupération de la couche Bassins_versants
+            bassins_versants = project.mapLayersByName(nom_couche_bassins)[0]
+            
+            bassins = []
+            # On parcourt la liste des couches pour récupérer leur noms
+            for feature in bassins_versants.getFeatures():
+                bassin = feature[libelle_bassins]
+                bassins.append(bassin)
+            
+            # Ajout d'un formulaire de scenario
+            formulaire = main_container.findChild(QtWidgets.QFormLayout, 'formulaire_scenario')
+            
+            hauteur_minimum_ligne_formulaire = 25
+            print(len(bassins))
+            for bassin in bassins:
+                # Ajout d'un label pour chaque bassin
+                label = QtWidgets.QLabel(bassin)
+                label.setMinimumHeight(hauteur_minimum_ligne_formulaire)
+                # Ajout d'un combobox pour chaque bassin
+                comboBox = QtWidgets.QComboBox()
+                comboBox.setMinimumHeight(hauteur_minimum_ligne_formulaire)
+                comboBox.addItems(indices)
+                
+                formulaire.addRow(label, comboBox)
+
+            boutonValider = main_container.findChild(QtWidgets.QPushButton, 'valider')
+            boutonValider.clicked.connect(self.pressed)
         
-    
-        
-        
+        except Exception as e:
+            print(f"Une erreur s'est produite dans setupFormulaireScenario : {e}")
+            self.close()
         
     def __init__(self, parent=None):
         """Constructor."""
