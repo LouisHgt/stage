@@ -78,7 +78,7 @@
         </layout>
        </widget>
       </item>
-      <item>
+      <item alignment="Qt::AlignVCenter">
        <widget class="QWidget" name="container_sensibilite" native="true">
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item alignment="Qt::AlignHCenter|Qt::AlignTop">
@@ -93,7 +93,7 @@
           </widget>
          </item>
          <item>
-          <layout class="QFormLayout" name="formLayout"/>
+          <layout class="QFormLayout" name="formulaire_sensibilite"/>
          </item>
         </layout>
        </widget>

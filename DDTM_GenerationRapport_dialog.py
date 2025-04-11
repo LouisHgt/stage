@@ -44,6 +44,7 @@ class DDTM_GenerationRapportDialog(QtWidgets.QDialog, FORM_CLASS):
     def setupFormulaires(self):
         setup_helper.setupFormulaireScenario(self)
         setup_helper.setupFormulaireSensibilite(self)
+        setup_helper.setupButtons(self)
 
 
     def __init__(self, parent=None):
