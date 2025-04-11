@@ -47,9 +47,16 @@ def getComboBoxValues(dialog):
         values[bassin] = comboBox.currentText()
     return values
 
+def getCheckboxValues(dialog): 
+    values = {}
+    for type, checkBox in dialog.checkboxes.items():
+        values[type] = checkBox.isChecked()
+    return values
+
 def pressed(dialog):
     print("Bouton valider presse")
-    getComboBoxValues(dialog)
+    print(getComboBoxValues(dialog))
+    print(getCheckboxValues(dialog))
     dialog.close()
 
 def setupFormulaireScenario(dialog):
@@ -112,15 +119,14 @@ def setupFormulaireScenario(dialog):
         raise
 
 
-def mapTypesSites(couche_sites):
-    colonne_site = getFromConfig('type_couche_sites')[0]
+def mapTypes(couche_type):
+    colonne_id = "id"
+    colonne_nom = "nom"
     
     
-    types = []
-    for feature in couche_sites.getFeatures():
-        if feature[colonne_site] not in types and feature[colonne_site] != None:
-            types.append(feature[colonne_site])
-            print(feature[colonne_site])
+    types = {}
+    for feature in couche_type.getFeatures():
+        types[feature[colonne_id]] = feature[colonne_nom]
 
     return types
     
@@ -132,21 +138,28 @@ def setupFormulaireSensibilite(dialog):
         formulaire = container_sensibilite.findChild(QtWidgets.QFormLayout, 'formulaire_sensibilite')
         
         # Recuperation des sites depuis la couche QGis
-        nom_couche_sites = getFromConfig('nom_couche_sites')[0]
+        nom_couche_type = getFromConfig('nom_couche_type')[0]
         
-        couche_sites = project.mapLayersByName(nom_couche_sites)[0]
-        print(couche_sites.getFeatures())
+        couche_types = project.mapLayersByName(nom_couche_type)[0]
+        print(couche_types.getFeatures())
         
-        types = mapTypesSites(couche_sites)
+        types = mapTypes(couche_types)
         print(types)
         
-        for type in types:
+        # Dictionnaire pour stocker l'etat des checkboxes en fonction du type
+        dialog.checkboxes = {}
+        
+        # On parcours les types de la couche "type" pour créer le formulaire
+        for id, nom in types.items():
             # Ajout d'un label pour chaque type de site
-            label = QtWidgets.QLabel(type)
+            label = QtWidgets.QLabel(nom)
             label.setMinimumHeight(25)
             # Ajout d'un checkbox pour chaque type de site
             checkBox = QtWidgets.QCheckBox()
             checkBox.setMinimumHeight(25)
+            
+            # Stockage de la checkbox dans le dictionnaire
+            dialog.checkboxes[id] = checkBox
             
             # Ajout du label et du combobox au formulaire
             formulaire.addRow(checkBox, label)
