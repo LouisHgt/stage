@@ -24,7 +24,7 @@
 
 import os
 from time import sleep
-from . import setup_helper
+from .formBuilder import formBuilder
 
 
 # --- Imports QGIS ---
@@ -42,14 +42,15 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 class DDTM_GenerationRapportDialog(QtWidgets.QDialog, FORM_CLASS):
     
     def setupFormulaires(self):
-        setup_helper.setupFormulaireScenario(self)
-        setup_helper.setupFormulaireSensibilite(self)
-        setup_helper.setupButtons(self)
-
+        """Configure les formulaires."""
+        self.formBuilder.setupFormulaireScenario()
+        self.formBuilder.setupFormulaireSensibilite()
+        self.formBuilder.setupButtons()
 
     def __init__(self, parent=None):
         """Constructor."""
         super(DDTM_GenerationRapportDialog, self).__init__(parent)
+        self.formBuilder = formBuilder(self)
         
         self.setupUi(self)
         try:
