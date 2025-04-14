@@ -42,6 +42,7 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
         print("Bouton valider presse")
         print(self.getComboBoxValues())
         print(self.getCheckboxValues())
+        self.coucheManager.createStatusSensibilite(self.getCheckboxValues())
         self.dialog.close()
 
     def setupFormulaireScenario(self):
