@@ -1,7 +1,7 @@
 import os
 from .configManager import configManager
-from qgis.core import QgsFields, QgsVectorFileWriter, QgsField, QgsWkbTypes, QgsCoordinateReferenceSystem, QgsFeature
-from qgis.PyQt.QtCore import QVariant
+from qgis.core import QgsFields, QgsVectorFileWriter, QgsField, QgsWkbTypes, QgsCoordinateReferenceSystem, QgsFeature # type: ignore
+from qgis.PyQt.QtCore import QVariant # type: ignore
 
 class coucheManager():
     
@@ -82,4 +82,5 @@ class coucheManager():
             raise
                 
         
-        
+    def createStatusScenario(self, data):
+        print(data)

@@ -5,11 +5,11 @@ from .configManager import configManager
 
 
 # --- Imports QGIS ---
-from qgis.core import QgsProject, QgsVectorLayer, QgsMessageLog, Qgis
+from qgis.core import QgsProject, QgsVectorLayer, QgsMessageLog, Qgis # type: ignore
 
 # --- Imports Qt ---
-from qgis.PyQt import uic
-from qgis.PyQt import QtWidgets
+from qgis.PyQt import uic # type: ignore
+from qgis.PyQt import QtWidgets # type: ignore
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'DDTM_GenerationRapport_dialog_base.ui'))
@@ -119,7 +119,7 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
             container_sensibilite = self.dialog.findChild(QtWidgets.QWidget, 'container_formulaires').findChild(QtWidgets.QWidget, 'container_sensibilite')
             formulaire = container_sensibilite.findChild(QtWidgets.QFormLayout, 'formulaire_sensibilite')
             
-            # Recuperation des sites depuis la couche QGis
+            # Recuperation des types utilisés depuis la couche QGis
             nom_couche_type = self.configManager.getFromConfig('nom_couche_type')[0]
             
             couche_types = project.mapLayersByName(nom_couche_type)[0]
