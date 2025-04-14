@@ -65,8 +65,8 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
 
     def pressed(self):
         print("Bouton valider presse")
-        print(self.getComboBoxValues(self.dialog))
-        print(self.getCheckboxValues(self.dialog))
+        print(self.getComboBoxValues())
+        print(self.getCheckboxValues())
         self.dialog.close()
 
     def setupFormulaireScenario(self):
@@ -181,4 +181,4 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
     def setupButtons(self):
         """Setup des boutons de la fenetre QT."""
         boutonValider = self.dialog.findChild(QtWidgets.QPushButton, 'valider')
-        boutonValider.clicked.connect(lambda: self.pressed(self.dialog))
+        boutonValider.clicked.connect(lambda: self.pressed())
