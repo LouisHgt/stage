@@ -75,7 +75,7 @@ class coucheManager():
                 
             # Ecrire dans le fichier de sortie
             del writer
-            print("Fichier {couche_path} créé avec succès.")
+            print("Fichier " + couche_path + " créé avec succès.")
 
         except Exception as e:
             print("Erreur lors de la création de la couche : {e}")
@@ -131,7 +131,7 @@ class coucheManager():
                 
             # Ecrire dans le fichier de sortie
             del writer
-            print("Fichier {couche_path} créé avec succès.")
+            print("Fichier " + couche_path + " créé avec succès.")
             
         except Exception as e:
             print("Erreur lors de la création de la couche : {e}")

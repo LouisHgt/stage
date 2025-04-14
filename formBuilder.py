@@ -126,8 +126,13 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
             formulaire = container_sensibilite.findChild(QtWidgets.QFormLayout, 'formulaire_sensibilite')
             
             # Recuperation des types utilisés depuis la couche QGis
-            nom_couche_type = self.configManager.getFromConfig('nom_couche_type')[0]
+            nom_couche_type = self.configManager.getFromConfig('nom_couche_type')
+            if nom_couche_type[0] == "":  # Si getFromConfig ne renvoie rien
+                nom_couche_type = "type_etendu"  # Valeur par défaut
+            else:
+                nom_couche_type = nom_couche_type[0]  # Récupérer la première valeur
             
+            print(nom_couche_type)
             couche_types = project.mapLayersByName(nom_couche_type)[0]
             print(couche_types.getFeatures())
             
@@ -145,6 +150,7 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
                 # Ajout d'un checkbox pour chaque type de site
                 checkBox = QtWidgets.QCheckBox()
                 checkBox.setMinimumHeight(25)
+                checkBox.setChecked(True)
                 
                 # Stockage de la checkbox dans le dictionnaire
                 self.dialog.checkboxes[id] = checkBox
