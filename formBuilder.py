@@ -2,6 +2,7 @@ from time import sleep
 import os
 from .coucheManager import coucheManager
 from .configManager import configManager
+from .rapportBuilder import rapportBuilder
 
 
 # --- Imports QGIS ---
@@ -22,6 +23,8 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
         self.dialog = dialog
         self.coucheManager = coucheManager(QgsProject.instance())
         self.configManager = configManager()
+        self.rapportBuilder = rapportBuilder()
+        self.dialog.fileType = "docx"
         
         
 
@@ -41,6 +44,7 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
     def pressed(self):
         """
             Affiche les données et les inscrit dans des couches
+            Crée le rapport docx
             Ferme la boite de dialogue
         """
         
@@ -49,6 +53,9 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
         print(self.getCheckboxValues())
         self.coucheManager.createStatusSensibilite(self.getCheckboxValues())
         self.coucheManager.createStatusScenario(self.getComboBoxValues())
+        
+        self.rapportBuilder.buildRapport(self.dialog.fileType)
+        
         self.dialog.close()
 
     def setupFormulaireScenario(self):
