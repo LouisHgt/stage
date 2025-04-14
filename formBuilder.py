@@ -1,7 +1,7 @@
 from time import sleep
-import configparser
 import os
 from .coucheManager import coucheManager
+from .configManager import configManager
 
 
 # --- Imports QGIS ---
@@ -21,34 +21,9 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
         """Constructor."""
         self.dialog = dialog
         self.coucheManager = coucheManager(QgsProject.instance())
+        self.configManager = configManager()
         
         
-    def getFromConfig(self, key):        
-        """Recupere les indices de retour depuis le fichier de config.
-
-        Retourne :
-            liste des indices de retour
-        """
-
-        #Emplacement du fichier de config
-        config_path = os.path.join(os.path.dirname(__file__), 'etc', 'Config.cfg')
-
-        #Instance d'un parseur de config
-        config = configparser.ConfigParser()
-
-        #Liste des indices retour
-        liste = []
-        if os.path.exists(config_path):
-            config.read(config_path)
-            if 'Datas' in config and key in config['Datas']:
-                liste = config['Datas'][key].split(',')
-            else:
-                print("Aucun indice de retour trouvé dans le fichier de config.")
-        else:
-            print("Le fichier de config n'existe pas.")
-
-        print(liste)
-        return liste
 
     def getComboBoxValues(self):
         """Récupère les valeurs sélectionnées dans les QComboBox."""
@@ -74,19 +49,18 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
 
         try:
             
-            
             # Recuperation du conteneur principal QT
             container_scenario = self.dialog.findChild(QtWidgets.QWidget, 'container_formulaires').findChild(QtWidgets.QWidget, 'container_scenario')
             
             # --------------------- Choix de l'indice de retour par bassin. -------------------
             
             # Recuperation des indices depuis le fichier de config
-            indices = self.getFromConfig('indices')
+            indices = self.configManager.getFromConfig('indices')
 
             
             # Recuperation des bassins depuis la couche QGis
-            nom_couche_bassins = self.getFromConfig('nom_couche_bassins')[0]
-            libelle_bassins = self.getFromConfig('libelle_couche_bassins')[0]
+            nom_couche_bassins = self.configManager.getFromConfig('nom_couche_bassins')[0]
+            libelle_bassins = self.configManager.getFromConfig('libelle_couche_bassins')[0]
             
             # Recupération de la couche Bassins_versants
             bassins_versants = self.coucheManager.getCoucheFromNom(nom_couche_bassins)
@@ -145,7 +119,7 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
             formulaire = container_sensibilite.findChild(QtWidgets.QFormLayout, 'formulaire_sensibilite')
             
             # Recuperation des sites depuis la couche QGis
-            nom_couche_type = self.getFromConfig('nom_couche_type')[0]
+            nom_couche_type = self.configManager.getFromConfig('nom_couche_type')[0]
             
             couche_types = project.mapLayersByName(nom_couche_type)[0]
             print(couche_types.getFeatures())
