@@ -39,10 +39,16 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
         return values
 
     def pressed(self):
+        """
+            Affiche les données et les inscrit dans des couches
+            Ferme la boite de dialogue
+        """
+        
         print("Bouton valider presse")
         print(self.getComboBoxValues())
         print(self.getCheckboxValues())
         self.coucheManager.createStatusSensibilite(self.getCheckboxValues())
+        self.coucheManager.createStatusScenario(self.getComboBoxValues())
         self.dialog.close()
 
     def setupFormulaireScenario(self):
