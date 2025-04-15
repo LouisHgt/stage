@@ -52,6 +52,8 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
         print("Bouton valider presse")
         print(self.getComboBoxValues())
         print(self.getCheckboxValues())
+        
+        self.coucheManager.clearTmpFolder()
         self.coucheManager.createStatusSensibilite(self.getCheckboxValues())
         self.coucheManager.createStatusScenario(self.getComboBoxValues())
         
@@ -59,9 +61,8 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
         
         output = os.path.join(os.path.dirname(__file__), 'tmp')
         
-        self.coucheManager.clearTmpFolder()
-        
         self.dialog.close()
+        
 
     def setupFormulaireScenario(self):
         """Setup du formulaire de scenario."""

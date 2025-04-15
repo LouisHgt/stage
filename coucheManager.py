@@ -1,17 +1,22 @@
 import os
 from .configManager import configManager
-from qgis import processing # type: ignore
-from qgis.core import QgsFields, QgsVectorFileWriter, QgsField, QgsWkbTypes, QgsCoordinateReferenceSystem, QgsFeature # type: ignore
-from qgis.PyQt.QtCore import QVariant # type: ignore
+from qgis import processing
+# Ajout pour QgsGeometry et QgsPointXY si on teste avec une géométrie non nulle
+from qgis.core import (
+    QgsFields, QgsVectorFileWriter, QgsField, QgsWkbTypes,
+    QgsCoordinateReferenceSystem, QgsFeature, QgsVectorLayer,
+    QgsProject, QgsGeometry, QgsPointXY # Ajout QgsProject, QgsGeometry, QgsPointXY
+)
+from qgis.PyQt.QtCore import QVariant
 
 class coucheManager():
-    
-    def __init__(self, project):
+
+    def __init__(self, project: QgsProject): # Typage explicite
         """Constructor"""
         self.project = project
         self.configManager = configManager()
-        
-    
+
+
     def getCoucheFromNom(self, nom_couche):
         """Recupere la couche Qgis depuis son nom."""
         couche = self.project.mapLayersByName(nom_couche)
@@ -19,59 +24,51 @@ class coucheManager():
             return couche[0]
         else:
             return None
-    
+
     def clearTmpFolder(self):
         """Supprime tous les fichiers du dossier tmp."""
         tmp_path = os.path.join(os.path.dirname(__file__), 'tmp')
-        
-        # Vérifie si le dossier tmp existe
+
         if os.path.exists(tmp_path):
+            print(f"Nettoyage du dossier: {tmp_path}")
             for file_name in os.listdir(tmp_path):
                 file_path = os.path.join(tmp_path, file_name)
                 try:
-                    if os.path.isfile(file_path):  # Vérifie si c'est un fichier
-                        os.remove(file_path)  # Supprime le fichier
-                        print(f"Fichier supprimé : {file_path}")
+                    if os.path.isfile(file_path):
+                        os.remove(file_path)
+                        print(f" Fichier supprimé : {file_path}")
                 except Exception as e:
-                    print(f"Erreur lors de la suppression du fichier {file_path} : {e}")
+                    print(f" Erreur lors de la suppression du fichier {file_path} : {e}")
         else:
-            print(f"Le dossier {tmp_path} n'existe pas.")
-            
-    
+            print(f"Le dossier tmp {tmp_path} n'existe pas, création...")
+            try:
+                os.makedirs(tmp_path)
+            except OSError as e:
+                 print(f"Erreur lors de la création du dossier {tmp_path} : {e}")
+
     def createStatusSensibilite(self, data):
-        """Crée une couche de statut de sensibilite.
-        
-        Elle stocke pour chaque type de site si il est selectionné ou pas.
-        
-        Elle recoit des données du type : 
-        {
-            1: True,
-            2: False,
-            3: True
-        }
-        """
-        
-        
-        # Construction du path de la couche à créer
+        """Crée une couche de statut de sensibilite."""
         emplacement_couche = self.configManager.getFromConfig('emplacement_couche_status_sensibilite')[0]
-        nom_couche = self.configManager.getFromConfig('nom_couche_status_sensibilite')[0]
-        
-        couche_path = os.path.join(os.path.dirname(__file__), emplacement_couche, nom_couche)
-        
+        nom_couche_config = self.configManager.getFromConfig('nom_couche_status_sensibilite')[0]
+        nom_couche_base, _ = os.path.splitext(nom_couche_config)
+        nom_couche_shp = nom_couche_base + '.shp'
+        couche_path = os.path.join(os.path.dirname(__file__), emplacement_couche, nom_couche_shp)
+        print(f"Préparation de la création de : {couche_path}")
 
-
-                
-        # Creation de la couche 
-        
         fields = QgsFields()
-        
-        fields.append(QgsField("id_type", QVariant.Int, "Integer")) # id du type de site correspondant à la table nom_couche_type du fichier config
-        fields.append(QgsField("etat_type", QVariant.Bool, "Boolean"))      # Selectionné ou pas
-        fields.append(QgsField("categorie", QVariant.String, "String", 10)) # Ajout de la colonne categorie (String de longueur 10 par ex.)
-        
+        fields.append(QgsField("id_type", QVariant.Int, "Integer"))
+        fields.append(QgsField("etat_type", QVariant.Bool, "Boolean"))
+        fields.append(QgsField("categorie", QVariant.String, "String", 10))
+
         crs = QgsCoordinateReferenceSystem("EPSG:4326")
-        
+
+        # Supprimer les fichiers existants avant de commencer
+        print(f"Tentative de suppression des fichiers existants pour: {couche_path}")
+        QgsVectorFileWriter.deleteShapeFile(couche_path) # Ne retourne rien, lance une exception si échoue?
+
+        writer = None # Initialiser à None
         try:
+            # --- Création du Writer ---
             writer = QgsVectorFileWriter(
                 couche_path,
                 "UTF-8",
@@ -80,57 +77,74 @@ class coucheManager():
                 crs,
                 driverName="ESRI Shapefile"
             )
-            
+            if writer.hasError() != QgsVectorFileWriter.NoError:
+                 error_msg = f"Erreur lors de la création du writer pour {couche_path}: {writer.errorMessage()}"
+                 print(error_msg)
+                 raise Exception(error_msg)
+            print("Writer créé avec succès.")
+
+            # --- Ajout des entités ---
             feature = QgsFeature()
-            feature.setFields(fields, True) # Initialiser la structure de l'entité
-            
+            feature.setFields(fields, True)
+            # *** TEST: Mettre une géométrie non nulle pour forcer la création correcte SHP/SHX ***
+            default_geom = QgsGeometry.fromPointXY(QgsPointXY(0, 0))
+
             for id_key, etat_value in data.items():
-                
-                # Assigner les valeurs aux attributs de l'entité
+                # feature.setGeometry(None) # Ancienne méthode
+                feature.setGeometry(default_geom) # *** Nouvelle méthode (TEST) ***
                 feature["id_type"] = id_key
                 feature["etat_type"] = etat_value
-                # !! A CHANGER !! 
-                feature["categorie"] = "0" # 0 par défaut car on ne connait pas encore la categorie avec le formulaire
-                
-                writer.addFeature(feature)
-                
-            # Ecrire dans le fichier de sortie
-            del writer
-            print("Fichier " + couche_path + " créé avec succès.")
+                feature["categorie"] = "0"
+
+                if not writer.addFeature(feature):
+                    # Si une erreur survient ici, le fichier peut rester incomplet
+                    print(f"ERREUR lors de l'ajout de l'entité {id_key} dans {couche_path}: {writer.errorMessage()}")
+                    # On pourrait choisir de lever une exception ici pour arrêter
+                    # raise Exception(f"Échec d'ajout feature {id_key}: {writer.errorMessage()}")
+                # else: # Debug
+                #    print(f"Entité {id_key} ajoutée.")
+
+            print("Ajout des entités terminé.")
 
         except Exception as e:
-            print("Erreur lors de la création de la couche : {e}")
+            print(f"ERREUR GLOBALE lors de la création de la couche {couche_path} : {e}")
+            # Lever à nouveau pour que l'appelant sache qu'il y a eu un problème
             raise
-                
-        
+        finally:
+            # --- Finalisation (ESSENTIEL) ---
+            if writer is not None:
+                print(f"Finalisation de l'écriture pour {couche_path} (del writer)...")
+                del writer
+                print("Writer finalisé.")
+            else:
+                print("Aucun writer à finaliser.")
+
+            # Vérification post-écriture
+            print("Vérification des fichiers après écriture:")
+            for ext in ['.shp', '.shx', '.dbf', '.prj', '.cpg']:
+                fpath = couche_path.replace('.shp', ext)
+                print(f" {fpath} existe: {os.path.exists(fpath)}")
+
+
     def createStatusScenario(self, data):
-        """Crée une couche de statut de scenario.
-        
-        Elle stocke pour chaque bassin versant son indice de retour annuel.
-        
-        Elle recoit des données du type : 
-        {
-            'BEVERA': 'Q10',
-            'LITTORAL ESTEREL': 'Qex',
-            'CAGNE': 'AZI'
-        }
-        """
-        
-        # Construction du path de la couche à créer
+        """Crée une couche de statut de scenario."""
         emplacement_couche = self.configManager.getFromConfig('emplacement_couche_status_scenario')[0]
-        nom_couche = self.configManager.getFromConfig('nom_couche_status_scenario')[0]
-        
-        couche_path = os.path.join(os.path.dirname(__file__), emplacement_couche, nom_couche)
-        
-        
-        # Creation de la couche 
+        nom_couche_config = self.configManager.getFromConfig('nom_couche_status_scenario')[0]
+        nom_couche_base, _ = os.path.splitext(nom_couche_config)
+        nom_couche_shp = nom_couche_base + '.shp'
+        couche_path = os.path.join(os.path.dirname(__file__), emplacement_couche, nom_couche_shp)
+        print(f"Préparation de la création de : {couche_path}")
+
         fields = QgsFields()
-        
-        fields.append(QgsField("nom_bassin", QVariant.String, "String")) # Nom du bassin et identifiant
-        fields.append(QgsField("indide_retour", QVariant.String, "String", 10)) # Indice de retour associé
-        
+        fields.append(QgsField("nom_bassin", QVariant.String, "String"))
+        fields.append(QgsField("indide_retour", QVariant.String, "String", 10))
+
         crs = QgsCoordinateReferenceSystem("EPSG:4326")
-        
+
+        print(f"Tentative de suppression des fichiers existants pour: {couche_path}")
+        QgsVectorFileWriter.deleteShapeFile(couche_path)
+
+        writer = None
         try:
             writer = QgsVectorFileWriter(
                 couche_path,
@@ -140,55 +154,85 @@ class coucheManager():
                 crs,
                 driverName="ESRI Shapefile"
             )
-            
+            if writer.hasError() != QgsVectorFileWriter.NoError:
+                 error_msg = f"Erreur lors de la création du writer pour {couche_path}: {writer.errorMessage()}"
+                 print(error_msg)
+                 raise Exception(error_msg)
+            print("Writer créé avec succès.")
+
             feature = QgsFeature()
-            feature.setFields(fields, True) # Initialiser la structure de l'entité
-            
+            feature.setFields(fields, True)
+            default_geom = QgsGeometry.fromPointXY(QgsPointXY(0, 0)) # Test géom non nulle
+
             for nom_bassin, indice_retour in data.items():
-                
-                # Assigner les valeurs aux attributs de l'entité
+                feature.setGeometry(default_geom) # Test géom non nulle
                 feature["nom_bassin"] = nom_bassin
                 feature["indide_retour"] = indice_retour
-                                
-                writer.addFeature(feature)
-                
-            # Ecrire dans le fichier de sortie
-            del writer
-            print("Fichier " + couche_path + " créé avec succès.")
-            
+
+                if not writer.addFeature(feature):
+                    print(f"ERREUR lors de l'ajout de l'entité {nom_bassin} dans {couche_path}: {writer.errorMessage()}")
+
+            print("Ajout des entités terminé.")
+
         except Exception as e:
-            print("Erreur lors de la création de la couche : {e}")
+            print(f"ERREUR GLOBALE lors de la création de la couche {couche_path} : {e}")
             raise
-        
-        
+        finally:
+            if writer is not None:
+                print(f"Finalisation de l'écriture pour {couche_path} (del writer)...")
+                del writer
+                print("Writer finalisé.")
+            else:
+                print("Aucun writer à finaliser.")
+            # Vérification post-écriture
+            print("Vérification des fichiers après écriture:")
+            for ext in ['.shp', '.shx', '.dbf', '.prj', '.cpg']:
+                fpath = couche_path.replace('.shp', ext)
+                print(f" {fpath} existe: {os.path.exists(fpath)}")
+
+
     def createSiteRetenu(self):
-        
-        # Construction du path de la couche à créer
-        emplacement_couche = self.configManager.getFromConfig('emplacement_couche_site_retenu')[0]
-        nom_couche = self.configManager.getFromConfig('nom_couche_site_retenu')[0]
-        
-        couche_path = os.path.join(os.path.dirname(__file__), emplacement_couche, nom_couche)
-        
-        emplacement_couche_status_sensibilite = self.configManager.getFromConfig('emplacement_couche_status_sensibilite')[0]
-        nom_couche_status_sensibilite = self.configManager.getFromConfig('nom_couche_status_sensibilite')[0] + ".shp"
-        input_path = os.path.join(os.path.dirname(__file__), emplacement_couche_status_sensibilite, nom_couche_status_sensibilite)
-        
-        print(input_path)
-        # Creation de la couche avec la requete SQL
-        requete = "SELECT id_type, etat_type, categorie FROM input1"
-        
-        processing.runAndLoadResults(
-            "qgis:executesql",
-            {
-                'INPUT_DATASOURCES': [input_path],  # Fichier d'entrée
-                'INPUT_QUERY': requete,            # Requête SQL
-                'INPUT_UID_FIELD': '',             # Aucun champ UID
-                'INPUT_GEOMETRY_FIELD': '',        # Pas de champ géométrique
-                'INPUT_GEOMETRY_TYPE': 0,          # Pas de géométrie
-                'INPUT_GEOMETRY_CRS': None,        # Pas de CRS
-                'OUTPUT': couche_path              # Chemin de sortie
-            }
-        )
-        
-        
-        
+        """Crée la couche site_retenu via requête SQL."""
+
+        # --- Chemins ---
+        emplacement_couche_out = self.configManager.getFromConfig('emplacement_couche_site_retenu')[0]
+        nom_couche_out_config = self.configManager.getFromConfig('nom_couche_site_retenu')[0]
+        nom_couche_out_base, _ = os.path.splitext(nom_couche_out_config)
+        nom_couche_out_shp = nom_couche_out_base + '.shp'
+        output_path = os.path.join(os.path.dirname(__file__), emplacement_couche_out, nom_couche_out_shp)
+
+        emplacement_couche_in = self.configManager.getFromConfig('emplacement_couche_status_sensibilite')[0]
+        nom_couche_in_config = self.configManager.getFromConfig('nom_couche_status_sensibilite')[0]
+        nom_couche_in_base, _ = os.path.splitext(nom_couche_in_config)
+        input_layer_name_shp = nom_couche_in_base + ".shp"
+        input_path = os.path.join(os.path.dirname(__file__), emplacement_couche_in, input_layer_name_shp)
+
+        print(f"--- Création Site Retenu ---")
+        print(f"Input path for SQL: {input_path}")
+        print(f"Output path for SQL: {output_path}")
+
+
+        # --- Requête SQL ---
+        requete = "SELECT id_type, etat_type, categorie, geometry FROM input1"
+        print(f"Exécution de la requête: {requete}")
+
+        try:
+            result = processing.run(
+                "qgis:executesql",
+                {
+                    'INPUT_DATASOURCES': [input_path],
+                    'INPUT_QUERY': requete,
+                    'INPUT_UID_FIELD': '',
+                    'INPUT_GEOMETRY_FIELD': '', # Laisser vide pour détection auto
+                    'INPUT_GEOMETRY_TYPE': 0,   # 0 = Automatique
+                    'INPUT_GEOMETRY_CRS': None, # None = Détection auto
+                    'OUTPUT': output_path
+                }
+            )
+            print(f"Algorithme processing.run terminé.")
+
+        except Exception as e:
+            print(f"ERREUR lors de l'exécution de processing.run('qgis:executesql') sur {input_path} : {e}")
+            import traceback
+            print(traceback.format_exc())
+            raise
