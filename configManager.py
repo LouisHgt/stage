@@ -24,10 +24,11 @@ class configManager():
             self.config.read(self.config_path)
             if 'Datas' in self.config and key in self.config['Datas']:
                 liste = self.config['Datas'][key].split(',')
+            elif 'SQL' in self.config and key in self.config['SQL']:
+                liste = self.config['SQL'][key]
             else:
                 print("Aucun element de retour trouvé dans le fichier de config.")
         else:
             print("Le fichier de config n'existe pas.")
 
-        print(liste)
         return liste
