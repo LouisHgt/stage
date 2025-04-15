@@ -1,5 +1,6 @@
 import os
 from .configManager import configManager
+from qgis import processing # type: ignore
 from qgis.core import QgsFields, QgsVectorFileWriter, QgsField, QgsWkbTypes, QgsCoordinateReferenceSystem, QgsFeature # type: ignore
 from qgis.PyQt.QtCore import QVariant # type: ignore
 
@@ -18,6 +19,24 @@ class coucheManager():
             return couche[0]
         else:
             return None
+    
+    def clearTmpFolder(self):
+        """Supprime tous les fichiers du dossier tmp."""
+        tmp_path = os.path.join(os.path.dirname(__file__), 'tmp')
+        
+        # Vérifie si le dossier tmp existe
+        if os.path.exists(tmp_path):
+            for file_name in os.listdir(tmp_path):
+                file_path = os.path.join(tmp_path, file_name)
+                try:
+                    if os.path.isfile(file_path):  # Vérifie si c'est un fichier
+                        os.remove(file_path)  # Supprime le fichier
+                        print(f"Fichier supprimé : {file_path}")
+                except Exception as e:
+                    print(f"Erreur lors de la suppression du fichier {file_path} : {e}")
+        else:
+            print(f"Le dossier {tmp_path} n'existe pas.")
+            
     
     def createStatusSensibilite(self, data):
         """Crée une couche de statut de sensibilite.
@@ -136,3 +155,36 @@ class coucheManager():
         except Exception as e:
             print("Erreur lors de la création de la couche : {e}")
             raise
+        
+        
+    def createSiteRetenu(self):
+        
+        # Construction du path de la couche à créer
+        emplacement_couche = self.configManager.getFromConfig('emplacement_couche_site_retenu')[0]
+        nom_couche = self.configManager.getFromConfig('nom_couche_site_retenu')[0]
+        
+        couche_path = os.path.join(os.path.dirname(__file__), emplacement_couche, nom_couche)
+        
+        emplacement_couche_status_sensibilite = self.configManager.getFromConfig('emplacement_couche_status_sensibilite')[0]
+        nom_couche_status_sensibilite = self.configManager.getFromConfig('nom_couche_status_sensibilite')[0] + ".dbf"
+        input_path = os.path.join(os.path.dirname(__file__), emplacement_couche_status_sensibilite, nom_couche_status_sensibilite)
+        
+        print(input_path)
+        # Creation de la couche avec la requete SQL
+        requete = "SELECT * FROM input1"
+        
+        processing.runAndLoadResults(
+            "qgis:executesql",
+            {
+                'INPUT_DATASOURCES': [input_path],  # Fichier d'entrée
+                'INPUT_QUERY': requete,            # Requête SQL
+                'INPUT_UID_FIELD': '',             # Aucun champ UID
+                'INPUT_GEOMETRY_FIELD': '',        # Pas de champ géométrique
+                'INPUT_GEOMETRY_TYPE': 0,          # Pas de géométrie
+                'INPUT_GEOMETRY_CRS': None,        # Pas de CRS
+                'OUTPUT': couche_path              # Chemin de sortie
+            }
+        )
+        
+        
+        

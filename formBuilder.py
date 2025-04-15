@@ -20,10 +20,11 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
     
     def __init__(self, dialog):
         """Constructor."""
+        project = QgsProject.instance()
         self.dialog = dialog
-        self.coucheManager = coucheManager(QgsProject.instance())
+        self.coucheManager = coucheManager(project)
         self.configManager = configManager()
-        self.rapportBuilder = rapportBuilder()
+        self.rapportBuilder = rapportBuilder(project)
         self.dialog.fileType = "docx"
         
         
@@ -55,6 +56,10 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
         self.coucheManager.createStatusScenario(self.getComboBoxValues())
         
         self.rapportBuilder.buildRapport(self.dialog.fileType)
+        
+        output = os.path.join(os.path.dirname(__file__), 'tmp')
+        
+        self.coucheManager.clearTmpFolder()
         
         self.dialog.close()
 

@@ -1,22 +1,25 @@
 import docx
 import os
 from .configManager import configManager
+from .coucheManager import coucheManager
 from docx2pdf import convert
 
 class rapportBuilder():
-    def __init__(self):
+    def __init__(self, project):
         self.configManager = configManager()
+        self.coucheManager = coucheManager(project)
 
-    def buildRapport(self, fileType):
+    def buildRapport(self, fileType1, fileType2 = None):
+        """Recupere les données d'entrée de la table 'site retenu' et crée un docx avec
+
+        Args:
+            Prend entre 1 et deux types de documents de sortie
+        """
         
-        # On vérifie que le type de fichier est docx ou pdf
-        if(fileType != "docx" or fileType != "pdf"):
-            print("Erreur : le type de fichier n'est pas reconnu (pdf ou docx)")
-            return
+        # On regarde quel type de document est choisis :
+        self.coucheManager.createSiteRetenu()
+        print("rapport fait")
         
-        self.buildDocx()
-        if(fileType == "pdf"):
-            self.convertToPdf()
         
         
         
@@ -34,6 +37,6 @@ class rapportBuilder():
         rapport.save(rapport_path)
 
     def convertToPdf(self):
-        fichier_docx_entree = "votre_document.docx"   # Remplacez par le chemin de votre fichier DOCX
-        fichier_pdf_sortie = "votre_document.pdf"    # Remplacez par le nom souhaité pour le fichier PDF
+        fichier_docx_entree = "votre_document.docx"
+        fichier_pdf_sortie = "votre_document.pdf" 
         #Todo : conversion du fichier docx créé en pdf
