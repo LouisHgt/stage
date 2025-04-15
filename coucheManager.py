@@ -69,14 +69,16 @@ class coucheManager():
         fields.append(QgsField("etat_type", QVariant.Bool, "Boolean"))      # Selectionné ou pas
         fields.append(QgsField("categorie", QVariant.String, "String", 10)) # Ajout de la colonne categorie (String de longueur 10 par ex.)
         
+        crs = QgsCoordinateReferenceSystem("EPSG:4326")
+        
         try:
             writer = QgsVectorFileWriter(
-                couche_path,                  # Chemin du fichier de sortie
-                "UTF-8",                      # Encodage du fichier
-                fields,                       # Structure des champs définis ci-dessus
-                QgsWkbTypes.NoGeometry,       # Important: Pas de géométrie
-                QgsCoordinateReferenceSystem(),
-                driverName="ESRI Shapefile"   # Driver pour créer le .dbf
+                couche_path,
+                "UTF-8",
+                fields,
+                QgsWkbTypes.Point,
+                crs,
+                driverName="ESRI Shapefile"
             )
             
             feature = QgsFeature()
@@ -127,14 +129,16 @@ class coucheManager():
         fields.append(QgsField("nom_bassin", QVariant.String, "String")) # Nom du bassin et identifiant
         fields.append(QgsField("indide_retour", QVariant.String, "String", 10)) # Indice de retour associé
         
+        crs = QgsCoordinateReferenceSystem("EPSG:4326")
+        
         try:
-            writer = writer = QgsVectorFileWriter(
-                couche_path,                  # Chemin du fichier de sortie
-                "UTF-8",                      # Encodage du fichier
-                fields,                       # Structure des champs définis ci-dessus
-                QgsWkbTypes.NoGeometry,       # Important: Pas de géométrie
-                QgsCoordinateReferenceSystem(),
-                driverName="ESRI Shapefile"   # Driver pour créer le .dbf
+            writer = QgsVectorFileWriter(
+                couche_path,
+                "UTF-8",
+                fields,
+                QgsWkbTypes.Point,
+                crs,
+                driverName="ESRI Shapefile"
             )
             
             feature = QgsFeature()
@@ -166,12 +170,12 @@ class coucheManager():
         couche_path = os.path.join(os.path.dirname(__file__), emplacement_couche, nom_couche)
         
         emplacement_couche_status_sensibilite = self.configManager.getFromConfig('emplacement_couche_status_sensibilite')[0]
-        nom_couche_status_sensibilite = self.configManager.getFromConfig('nom_couche_status_sensibilite')[0] + ".dbf"
+        nom_couche_status_sensibilite = self.configManager.getFromConfig('nom_couche_status_sensibilite')[0] + ".shp"
         input_path = os.path.join(os.path.dirname(__file__), emplacement_couche_status_sensibilite, nom_couche_status_sensibilite)
         
         print(input_path)
         # Creation de la couche avec la requete SQL
-        requete = "SELECT * FROM input1"
+        requete = "SELECT id_type, etat_type, categorie FROM input1"
         
         processing.runAndLoadResults(
             "qgis:executesql",
