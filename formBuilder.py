@@ -56,6 +56,7 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
         self.coucheManager.clearTmpFolder()
         self.coucheManager.createStatusSensibilite(self.getCheckboxValues())
         self.coucheManager.createStatusScenario(self.getComboBoxValues())
+        self.coucheManager.createSiteRetenu()
         
         self.rapportBuilder.buildRapport(self.dialog.fileType)
         

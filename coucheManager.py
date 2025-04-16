@@ -196,7 +196,7 @@ class coucheManager():
             raise FileNotFoundError(f"Fichier d'entrée pour SQL non trouvé: {status_sentibilite_path}")
 
 
-        requete_path = os.path.join(os.path.dirname(__file__), 'sql', self.configManager.getFromConfig('requete'))
+        requete_path = os.path.join(os.path.dirname(__file__), 'sql', self.configManager.getFromConfig('requete_formulaire'))
         
         requete = self.getSqlQuery(requete_path)
         

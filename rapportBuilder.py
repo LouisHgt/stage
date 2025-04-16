@@ -16,14 +16,6 @@ class rapportBuilder():
             Prend entre 1 et deux types de documents de sortie
         """
         
-        # On regarde quel type de document est choisis :
-        self.coucheManager.createSiteRetenu()
-        print("rapport fait")
-        
-        
-        
-        
-    def buildDocx(self):
         # Recuparation de l'emplacement du rapport et de son nom
         emplacement_rapport = self.configManager.getFromConfig("emplacement_rapport")[0]
         nom_rapport = self.configManager.getFromConfig("nom_rapport")[0]
@@ -31,10 +23,30 @@ class rapportBuilder():
         rapport_path = os.path.join(os.path.dirname(__file__), emplacement_rapport, nom_rapport)
 
         rapport = docx.Document()
+        # On regarde quel type de document est choisis :
         
-        p = rapport.add_paragraph("Bonjour")
+        liste = []
         
-        rapport.save(rapport_path)
+        rapport = self.buildDocx(rapport, liste)
+        
+        print("rapport fait")
+        
+        
+        
+        
+    def buildDocx(self, document,  liste_elements, niveau):
+        """Fonction recursive qui parcours pour un elt d'un niveau les elt du niveau +1"""
+        if not liste_elements:
+            return document
+        
+        for elt in liste_elements:
+            
+            document.addHeading(elt, niveau)
+            
+            # On rappelle la fonction pour parcourir la sous liste
+            document = self.buildDocx(document, liste_elements[elt], niveau + 1)
+        
+        return document
 
     def convertToPdf(self):
         fichier_docx_entree = "votre_document.docx"

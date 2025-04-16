@@ -3,7 +3,7 @@ SELECT
     sc.nom_bassin as nv0, -- Bassin
     es.commune as nv1,    -- Commune
     te.nom as nv2,        -- Type
-    es.NOM as nom_site,   -- Nom de site
+    es.NOM as nv3,        -- Nom de site
     es.geometry           -- Inclure la geometry pour que le fichier se forme bien avec qgis:run
 FROM
     input1 AS es
