@@ -38,6 +38,21 @@ class coucheManager():
             print(f"La couche '{nom_couche}' est introuvable.")
             return None
 
+    def getSqlQuery(self, requete_path):
+        try:
+
+            with open(requete_path, 'r', encoding='utf-8') as f:
+                sql_query = f.read()
+
+        except FileNotFoundError:
+            print("Erreur: Le fichier SQL '{sql_file_path_str}' n'a pas été trouvé.")
+            raise
+        except Exception as e:
+            print("Erreur lors de la lecture du fichier SQL: {e}")
+            raise
+            
+        return sql_query
+        
     def clearTmpFolder(self):
         """Supprime tous les fichiers du dossier tmp."""
         tmp_path = os.path.join(os.path.dirname(__file__), 'tmp')
@@ -180,34 +195,12 @@ class coucheManager():
         if not os.path.exists(status_sentibilite_path):
             raise FileNotFoundError(f"Fichier d'entrée pour SQL non trouvé: {status_sentibilite_path}")
 
-        # Requête SQL incluant la géométrie (nécessaire pour sortie SHP)
-        # requete = (
-        #     "SELECT "
-        #     "ROW_NUMBER() OVER() as id, "  # Génère un ID séquentiel pour les lignes retournées
-        #     "sc.nom_bassin as nv0, "  # Bassin
-        #     "es.commune as nv1, "  # Commune
-        #     "te.nom as nv2, "  # Type
-        #     "es.NOM as nom_site, "  # Nom de site
-        #     "es.geometry "  # Inclure la geometry pour que le fichier se forme bien avec qgis:run
-        #     "FROM "
-        #     "input1 AS es "
-        #     "INNER JOIN input2 AS te ON te.code = es.TYPE "  # Jointure Type <-> Etablissement
-        #     "INNER JOIN input3 AS se ON te.id = se.id_type "  # Jointure Type <-> Statut Sensibilité
-        #     "INNER JOIN input4 AS sc ON sc.nom_bassin = es.SECT_INOND "  # Jointure Scénario <-> Etablissement (via bassin)
-        #     "WHERE "
-        #     "se.etat_type = 1 "  # Filtrer sur le statut de sensibilité
-        #     "AND ("
-        #     "(sc.indice_ret = 'Q10' AND (es.FREQ_INOND = 9 OR es.FREQ_INOND = 10)) OR "
-        #     "(sc.indice_ret = 'Q20' AND es.FREQ_INOND = 20) OR "
-        #     "(sc.indice_ret = 'Q30' AND es.FREQ_INOND = 30) OR "
-        #     "(sc.indice_ret = 'Q50' AND es.FREQ_INOND = 50) OR "
-        #     "(sc.indice_ret = 'Q100' AND es.FREQ_INOND = 100) OR "
-        #     "(sc.indice_ret = 'Qex' AND es.FREQ_INOND = 1000) OR "
-        #     "(sc.indice_ret = 'AZI' AND es.FREQ_INOND = 10000 OR es.FREQ_INOND = 999999) "  # A changer par indice_retour
-        #     ")"
-        # )
-        requete = self.configManager.getFromConfig('requete')
-        print(requete)
+
+        requete_path = os.path.join(os.path.dirname(__file__), 'sql', self.configManager.getFromConfig('requete'))
+        
+        requete = self.getSqlQuery(requete_path)
+        
+        # print(requete)
 
 
         try:
@@ -230,7 +223,6 @@ class coucheManager():
                 }
             )
             
-            #processing.run("qgis:executesql", {'INPUT_DATASOURCES':['C:/RDI06/SIG_RDI/enjeux/ERP/SITES_BASES_SDIS.shp|layerid=0|subset="VISU_RDI" = \'1\'','C:/Users/louis.huguet/Travail/Plugins/DDTM06_GenerationRapport/couches/type_etendu.shp','C:/Users/louis.huguet/Travail/Plugins/DDTM06_GenerationRapport/tmp/status_sensibilite.shp','C:/Users/louis.huguet/Travail/Plugins/DDTM06_GenerationRapport/tmp/status_scenario.shp'],'INPUT_QUERY':"\nSELECT\n    ROW_NUMBER() OVER() as id, -- Génère un ID séquentiel pour les lignes retournées\n    sc.nom_bassin as nv0, -- Bassin\n    es.commune as nv1,    -- Commune\n    te.nom as nv2,        -- Type\n    es.NOM as nom_site,   -- Nom de site\n    es.geometry           -- Inclure la geometry pour que le fichier se forme bien avec qgis:run\nFROM\n    input1 AS es\nINNER JOIN\n    input2 AS te ON te.code = es.TYPE             -- Jointure Type <-> Etablissement\nINNER JOIN\n    input3 AS se ON te.id = se.id_type     -- Jointure Type <-> Statut Sensibilité\nINNER JOIN\n    input4 AS sc ON sc.nom_bassin = es.SECT_INOND -- Jointure Scénario <-> Etablissement (via bassin)\nWHERE\n    se.etat_type = 1      -- Filtrer sur le statut de sensibilité\n    AND (\n        (sc.indide_ret = 'Q10' AND (es.FREQ_INOND = 9 OR es.FREQ_INOND = 10)) OR\n        (sc.indide_ret = 'Q20' AND es.FREQ_INOND = 20) OR\n        (sc.indide_ret = 'Q30' AND es.FREQ_INOND = 30) OR\n        (sc.indide_ret = 'Q50' AND es.FREQ_INOND = 50) OR\n        (sc.indide_ret = 'Q100' AND es.FREQ_INOND = 100) OR\n        (sc.indide_ret = 'Qex' AND es.FREQ_INOND = 1000) OR\n        (sc.indide_ret = 'AZI' AND es.FREQ_INOND = 10000 OR es.FREQ_INOND = 999999) -- A changer par indice_retour\n    )\n",'INPUT_UID_FIELD':'','INPUT_GEOMETRY_FIELD':'','INPUT_GEOMETRY_TYPE':0,'INPUT_GEOMETRY_CRS':None,'OUTPUT':'TEMPORARY_OUTPUT'})
 
         except Exception as e:
             print(f"ERREUR execution SQL sur {status_sentibilite_path} vers {site_retenu_path}: {e}")
