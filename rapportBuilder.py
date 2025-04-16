@@ -41,7 +41,7 @@ class rapportBuilder():
         
         for elt in liste_elements:
             
-            document.addHeading(elt, niveau)
+            document.add_heading(elt, niveau)
             
             # On rappelle la fonction pour parcourir la sous liste
             document = self.buildDocx(document, liste_elements[elt], niveau + 1)

@@ -38,6 +38,13 @@ class coucheManager():
             print(f"La couche '{nom_couche}' est introuvable.")
             return None
 
+    def getColoneWithoutDoubles(self, nom_couche, nom_colonne):
+        liste_elt = []
+        
+        
+        
+        return liste_elt
+        
     def getSqlQuery(self, requete_path):
         try:
 
