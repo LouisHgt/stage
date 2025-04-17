@@ -1,15 +1,17 @@
-import docx
+
 import os
 from .configManager import configManager
 from .coucheManager import coucheManager
 from docx2pdf import convert
 
 class rapportBuilder():
-    def __init__(self, project):
+    def __init__(self, coucheManager):
         self.configManager = configManager()
-        self.coucheManager = coucheManager(project)
+        self.coucheManager = coucheManager
 
-    def buildRapport(self, fileType1, fileType2 = None):
+    def buildRapport(self, fileType1):
+        # On importe docx dans la methode pour eviter les conflits avec le garbage collector
+        import docx
         """Recupere les données d'entrée de la table 'site retenu' et crée un docx avec
 
         Args:
@@ -20,16 +22,19 @@ class rapportBuilder():
         emplacement_rapport = self.configManager.getFromConfig("emplacement_rapport")[0]
         nom_rapport = self.configManager.getFromConfig("nom_rapport")[0]
         
-        rapport_path = os.path.join(os.path.dirname(__file__), emplacement_rapport, nom_rapport)
+        rapport_path = os.path.join(os.path.dirname(__file__), emplacement_rapport, nom_rapport) + fileType1
 
         rapport = docx.Document()
-        # On regarde quel type de document est choisis :
+        rapport.add_heading("coucou", 0)
+        # # On regarde quel type de document est choisis :
         
-        liste = []
+
+        rapport = self.buildDocx(rapport, self.coucheManager.getColoneWithoutDoubles(0))
         
-        rapport = self.buildDocx(rapport, liste)
-        
+        rapport.save(rapport_path)
+        del rapport
         print("rapport fait")
+
         
         
         
@@ -44,7 +49,7 @@ class rapportBuilder():
             document.add_heading(elt, niveau)
             
             # On rappelle la fonction pour parcourir la sous liste
-            document = self.buildDocx(document, liste_elements[elt], niveau + 1)
+            document = self.buildDocx(document, self.coucheManager.getColoneWithoutDoubles("nv" + niveau), niveau + 1)
         
         return document
 

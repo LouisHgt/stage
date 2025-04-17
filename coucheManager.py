@@ -5,7 +5,7 @@ from qgis import processing # type: ignore
 from qgis.core import ( # type: ignore
     QgsFields, QgsVectorFileWriter, QgsField, QgsWkbTypes,
     QgsCoordinateReferenceSystem, QgsFeature, QgsVectorLayer,
-    QgsProject, QgsGeometry, QgsPointXY
+    QgsProject, QgsGeometry, QgsPointXY, QgsFeatureRequest
 )
 from qgis.PyQt.QtCore import QVariant # type: ignore
 
@@ -38,12 +38,28 @@ class coucheManager():
             print(f"La couche '{nom_couche}' est introuvable.")
             return None
 
-    def getColoneWithoutDoubles(self, nom_couche, nom_colonne):
-        liste_elt = []
+    def getColoneWithoutDoubles(self, niveau):
         
+        # Recuperation de la couche site_retenu
+        emplacement_couche_site_retenu = self.configManager.getFromConfig('emplacement_couche_site_retenu')[0]
+        nom_couche_site_retenu = self.configManager.getFromConfig('nom_couche_site_retenu')[0]
+        path_site_retenu = os.path.join(os.path.dirname(__file__), emplacement_couche_site_retenu, nom_couche_site_retenu) + ".shp"
         
+        nom_colonne = "nv" + niveau
+        # Creation d'une couche temporaire à partir du fichier shp
+        couche = QgsVectorLayer(path_site_retenu, "site_retenu", "ogr")
+        #Construction d'une requete pour n'acceder qu'à une colonne
+        request = QgsFeatureRequest().setSubsetOfAttributes([nom_colonne], couche.fields())
         
-        return liste_elt
+        # On stocke les elements dansun set pour supprimer les doublons
+        liste_sans_doublon = set()
+        liste_elt = couche.getFeatures(request) # recuperation avec la requete pour ignorer les elements qu'on ne veut pas
+        
+        for feature in liste_elt:
+            liste_sans_doublon.add(feature[nom_colonne])
+        
+    
+        return list(liste_sans_doublon) # Conversion en liste
         
     def getSqlQuery(self, requete_path):
         try:

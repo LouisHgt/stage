@@ -25,6 +25,7 @@
 import os
 from time import sleep
 from .formBuilder import formBuilder
+from .coucheManager import coucheManager
 
 
 # --- Imports QGIS ---

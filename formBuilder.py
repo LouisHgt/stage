@@ -24,8 +24,7 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
         self.dialog = dialog
         self.coucheManager = coucheManager(project)
         self.configManager = configManager()
-        self.rapportBuilder = rapportBuilder(project)
-        self.dialog.fileType = "docx"
+        self.rapportBuilder = rapportBuilder(self.coucheManager)
         
         
 
@@ -58,11 +57,16 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
         self.coucheManager.createStatusScenario(self.getComboBoxValues())
         self.coucheManager.createSiteRetenu()
         
-        self.rapportBuilder.buildRapport(self.dialog.fileType)
-        
+        self.rapportBuilder.buildRapport(".docx")
+        print("apres buildrapport")
         output = os.path.join(os.path.dirname(__file__), 'tmp')
         
-        self.dialog.close()
+        # SUppression des objets non referencés
+        import gc
+        gc.collect()
+        
+        
+        self.dialog.accept()
         
 
     def setupFormulaireScenario(self):
