@@ -25,7 +25,7 @@ class rapportBuilder():
         rapport_path = os.path.join(os.path.dirname(__file__), emplacement_rapport, nom_rapport) + fileType1
 
         self.rapport = docx.Document()
-        # # On regarde quel type de document est choisis :
+        # On regarde quel type de document est choisis :
         
         niveau = 0
         self.buildDocx(self.coucheManager.getColoneWithoutDoubles(str(niveau)), 0)
@@ -40,9 +40,10 @@ class rapportBuilder():
         
     def buildDocx(self, liste_elements, niveau):
         """Fonction recursive qui parcours pour un elt d'un niveau les elt du niveau +1"""
-        if not liste_elements:
-            return
+        # if not liste_elements:
+        #     return
         
+        print(liste_elements)
         for elt in liste_elements:
             
             print(elt, niveau)
@@ -50,11 +51,11 @@ class rapportBuilder():
             
             nv_liste = self.coucheManager.getColoneWithoutDoubles(str(niveau + 1), elt)
         
-            #On vérifie si on est à une feuille 
-            if not nv_liste:
-                break
-            # On rappelle la fonction pour parcourir la sous liste
-            self.buildDocx(nv_liste, niveau + 1)
+            # On vérifie si on est à une feuille 
+            if nv_liste:# On rappelle la fonction pour parcourir la sous liste
+                self.buildDocx(nv_liste, niveau + 1)
+            
+            
         
 
     def convertToPdf(self):

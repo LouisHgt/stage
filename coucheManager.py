@@ -38,7 +38,7 @@ class coucheManager():
             print(f"La couche '{nom_couche}' est introuvable.")
             return None
 
-    def getColoneWithoutDoubles(self, niveau, elts_superieurs = None):
+    def getColoneWithoutDoubles(self, niveau, elt_superieur = None):
         
         # Recuperation de la couche site_retenu
         emplacement_couche_site_retenu = self.configManager.getFromConfig('emplacement_couche_site_retenu')[0]
@@ -46,8 +46,8 @@ class coucheManager():
         path_site_retenu = os.path.join(os.path.dirname(__file__), emplacement_couche_site_retenu, nom_couche_site_retenu) + ".shp"
         
         nom_colonne = "nv" + niveau
-
-                
+        if elt_superieur: # Construction du nom de la colonne du dessus si elle existe
+            non_colonne_superieur = "nv" + str(int(niveau) - 1)
         # Creation d'une couche temporaire à partir du fichier shp
         couche = QgsVectorLayer(path_site_retenu, "site_retenu", "ogr")
         
@@ -62,9 +62,7 @@ class coucheManager():
         # On verifie que la couche possede l'attribut (nv) actuel
         if(couche.fields().lookupField(nom_colonne)) == -1:
             return None
-        
-        print(couche.fields())
-        
+        ### Deplacer la verification en dehors de la recursivite
         
         for feature in liste_elt:
             
@@ -74,7 +72,7 @@ class coucheManager():
                 liste_sans_doublon.add(feature[nom_colonne])
 
 
-            
+        print(liste_sans_doublon)
         return list(liste_sans_doublon) # Conversion en liste
         
     def getSqlQuery(self, requete_path):
