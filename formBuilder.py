@@ -61,7 +61,7 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
         print("apres buildrapport")
         output = os.path.join(os.path.dirname(__file__), 'tmp')
         
-        # SUppression des objets non referencés
+        # Suppression des objets non referencés
         import gc
         gc.collect()
         

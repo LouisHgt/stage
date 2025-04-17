@@ -38,7 +38,7 @@ class coucheManager():
             print(f"La couche '{nom_couche}' est introuvable.")
             return None
 
-    def getColoneWithoutDoubles(self, niveau):
+    def getColoneWithoutDoubles(self, niveau, elts_superieurs = None):
         
         # Recuperation de la couche site_retenu
         emplacement_couche_site_retenu = self.configManager.getFromConfig('emplacement_couche_site_retenu')[0]
@@ -46,19 +46,35 @@ class coucheManager():
         path_site_retenu = os.path.join(os.path.dirname(__file__), emplacement_couche_site_retenu, nom_couche_site_retenu) + ".shp"
         
         nom_colonne = "nv" + niveau
+
+                
         # Creation d'une couche temporaire à partir du fichier shp
         couche = QgsVectorLayer(path_site_retenu, "site_retenu", "ogr")
+        
         #Construction d'une requete pour n'acceder qu'à une colonne
         request = QgsFeatureRequest().setSubsetOfAttributes([nom_colonne], couche.fields())
         
         # On stocke les elements dansun set pour supprimer les doublons
         liste_sans_doublon = set()
-        liste_elt = couche.getFeatures(request) # recuperation avec la requete pour ignorer les elements qu'on ne veut pas
+        liste_elt = couche.getFeatures()
+        
+        
+        # On verifie que la couche possede l'attribut (nv) actuel
+        if(couche.fields().lookupField(nom_colonne)) == -1:
+            return None
+        
+        print(couche.fields())
+        
         
         for feature in liste_elt:
-            liste_sans_doublon.add(feature[nom_colonne])
-        
-    
+            
+            if elt_superieur and elt_superieur == feature[non_colonne_superieur]:
+                liste_sans_doublon.add(feature[nom_colonne])
+            elif not elt_superieur:
+                liste_sans_doublon.add(feature[nom_colonne])
+
+
+            
         return list(liste_sans_doublon) # Conversion en liste
         
     def getSqlQuery(self, requete_path):
