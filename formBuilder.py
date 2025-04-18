@@ -48,9 +48,8 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
             Ferme la boite de dialogue
         """
         
-        print("Bouton valider presse")
-        print(self.getComboBoxValues())
-        print(self.getCheckboxValues())
+        # print(self.getComboBoxValues())
+        # print(self.getCheckboxValues())
         
         self.coucheManager.clearTmpFolder()
         self.coucheManager.createStatusSensibilite(self.getCheckboxValues())
@@ -58,7 +57,6 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
         self.coucheManager.createSiteRetenu()
         
         self.rapportBuilder.buildRapport(".docx")
-        print("apres buildrapport")
         output = os.path.join(os.path.dirname(__file__), 'tmp')
         
         # Suppression des objets non referencés

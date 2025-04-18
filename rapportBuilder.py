@@ -25,7 +25,6 @@ class rapportBuilder():
         rapport_path = os.path.join(os.path.dirname(__file__), emplacement_rapport, nom_rapport) + fileType1
 
         self.rapport = docx.Document()
-        # On regarde quel type de document est choisis :
         
         # Recuperation de la couche site_retenu
         emplacement_couche_site_retenu = self.configManager.getFromConfig('emplacement_couche_site_retenu')[0]
@@ -36,14 +35,13 @@ class rapportBuilder():
         
         
         self.niveau = self.coucheManager.getNbrAttributsCouche(couche)
-        #print(self.coucheManager.getFilteredNiveau(couche))
-        self.list = []
+        self.list = [] # Liste dans laquelle on stocke les elements servants au filtre
         self.buildDocx(couche, self.coucheManager.getFilteredNiveau(couche))
         
         
         self.rapport.save(rapport_path)
         del self.rapport
-        print("rapport fait")
+        print("rapport ecrit")
 
         
         
@@ -51,18 +49,19 @@ class rapportBuilder():
         
     def buildDocx(self, couche,  liste_elements):
         """Fonction recursive qui parcours pour un elt d'un niveau les elt du niveau +1"""
-        print(len(self.list))
-        print(self.niveau)
         # Condition d'arret
         if len(self.list) >= self.niveau - 1:
+            for elt in liste_elements:
+                self.rapport.add_heading(elt, 1)
             return
         
-        print(liste_elements)
         for elt in liste_elements:
             
+                        
             self.list.append(elt)
-            print(self.list)
             self.rapport.add_heading(elt, 1)
+            
+            
             
             # On filtre
             nv_liste = self.coucheManager.getFilteredNiveau(couche, self.list)

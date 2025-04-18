@@ -44,7 +44,6 @@ class coucheManager():
     def getNbrAttributsCouche(self, couche):
         i = 0
         for field in couche.fields():
-            print(field)
             i += 1
         
         return i
@@ -69,7 +68,6 @@ class coucheManager():
         nv = len(liste_elt)
         
         current_attribut = 'nv' + str(nv)
-        print(current_attribut)
         filtered_nv = set()
         
         
@@ -87,16 +85,13 @@ class coucheManager():
                 request = QgsFeatureRequest().setFilterExpression(expression)
                     
                 for f in couche.getFeatures(request):
-                    print(f[current_attribut])
-
                     filtered_nv.add(f[current_attribut])
                     
             else:
 
                 for f in couche.getFeatures():
-                    print(f[current_attribut])
-
                     filtered_nv.add(f[current_attribut])
+        
         except Exception as e:
             print(f"Une erreur s'est produite dans getFilteredNiveau : {e}")
             raise
