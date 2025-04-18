@@ -2,6 +2,7 @@ from time import sleep
 import os
 from .coucheManager import coucheManager
 from .configManager import configManager
+from .rapportBuilder import rapportBuilder
 
 
 # --- Imports QGIS ---
@@ -19,9 +20,11 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
     
     def __init__(self, dialog):
         """Constructor."""
+        project = QgsProject.instance()
         self.dialog = dialog
-        self.coucheManager = coucheManager(QgsProject.instance())
+        self.coucheManager = coucheManager(project)
         self.configManager = configManager()
+        self.rapportBuilder = rapportBuilder(self.coucheManager)
         
         
 
@@ -41,15 +44,30 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
     def pressed(self):
         """
             Affiche les données et les inscrit dans des couches
+            Crée le rapport docx
             Ferme la boite de dialogue
         """
         
         print("Bouton valider presse")
         print(self.getComboBoxValues())
         print(self.getCheckboxValues())
+        
+        self.coucheManager.clearTmpFolder()
         self.coucheManager.createStatusSensibilite(self.getCheckboxValues())
         self.coucheManager.createStatusScenario(self.getComboBoxValues())
-        self.dialog.close()
+        self.coucheManager.createSiteRetenu()
+        
+        self.rapportBuilder.buildRapport(".docx")
+        print("apres buildrapport")
+        output = os.path.join(os.path.dirname(__file__), 'tmp')
+        
+        # Suppression des objets non referencés
+        import gc
+        gc.collect()
+        
+        
+        self.dialog.accept()
+        
 
     def setupFormulaireScenario(self):
         """Setup du formulaire de scenario."""
@@ -150,7 +168,7 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
                 # Ajout d'un checkbox pour chaque type de site
                 checkBox = QtWidgets.QCheckBox()
                 checkBox.setMinimumHeight(25)
-                checkBox.setChecked(True)
+                checkBox.setChecked(False)
                 
                 # Stockage de la checkbox dans le dictionnaire
                 self.dialog.checkboxes[id] = checkBox

@@ -24,12 +24,14 @@
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication # type: ignore
 from qgis.PyQt.QtGui import QIcon # type: ignore
 from qgis.PyQt.QtWidgets import QAction # type: ignore
+from qgis.core import QgsProject # type: ignore
 
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
 from .DDTM_GenerationRapport_dialog import DDTM_GenerationRapportDialog
 import os.path
+from .coucheManager import coucheManager
 
 
 class DDTM_GenerationRapport:
@@ -66,6 +68,8 @@ class DDTM_GenerationRapport:
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
+        
+        self.coucheManager = coucheManager(QgsProject.instance())
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -178,6 +182,8 @@ class DDTM_GenerationRapport:
                 self.tr(u'&DDTM_GenerationRapport'),
                 action)
             self.iface.removeToolBarIcon(action)
+        
+        self.coucheManager.clearTmpFolder()
 
 
     def run(self):
@@ -192,11 +198,13 @@ class DDTM_GenerationRapport:
             self.dlg.show()
             # Run the dialog event loop
             result = self.dlg.exec_()
+            
             # See if OK was pressed
             if result:
                 # Do something useful here - delete the line containing pass and
                 # substitute with your code.
                 pass
+                
         except Exception as e:
             print(f"Une erreur s'est produite dans la méthode run : {e}")
             return
