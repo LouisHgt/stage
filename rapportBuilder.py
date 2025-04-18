@@ -27,8 +27,18 @@ class rapportBuilder():
         self.rapport = docx.Document()
         # On regarde quel type de document est choisis :
         
-        niveau = 0
-        self.buildDocx(self.coucheManager.getColoneWithoutDoubles(str(niveau)), 0)
+        # Recuperation de la couche site_retenu
+        emplacement_couche_site_retenu = self.configManager.getFromConfig('emplacement_couche_site_retenu')[0]
+        nom_couche_site_retenu = self.configManager.getFromConfig('nom_couche_site_retenu')[0]
+        path_site_retenu = os.path.join(os.path.dirname(__file__), emplacement_couche_site_retenu, nom_couche_site_retenu) + ".shp"
+        couche = self.coucheManager.getCoucheFromFile(path_site_retenu, "site_retenu")
+
+        
+        
+        niveau = self.coucheManager.getNbrAttributsCouche(couche)
+        print(self.coucheManager.getFilteredNiveau(couche))
+        #self.buildDocx(couche, self.coucheManager.getFilteredNiveau(couche))
+        
         
         self.rapport.save(rapport_path)
         del self.rapport
@@ -38,22 +48,23 @@ class rapportBuilder():
         
         
         
-    def buildDocx(self, liste_elements, niveau):
+    def buildDocx(self, couche,  liste_elements):
         """Fonction recursive qui parcours pour un elt d'un niveau les elt du niveau +1"""
-        # if not liste_elements:
-        #     return
+        # Condition d'arret
+        if len(liste_elements) > 3:
+            return
         
         print(liste_elements)
         for elt in liste_elements:
             
-            print(elt, niveau)
-            self.rapport.add_heading(elt, niveau)
+            self.rapport.add_heading(elt, 1)
             
-            nv_liste = self.coucheManager.getColoneWithoutDoubles(str(niveau + 1), elt)
-        
-            # On vérifie si on est à une feuille 
-            if nv_liste:# On rappelle la fonction pour parcourir la sous liste
-                self.buildDocx(nv_liste, niveau + 1)
+            # On filtre
+            nv_liste = self.coucheManager.getFilteredNiveau(couche, liste_elements)
+            # On rappelle avec la nouvelle liste
+            self.buildDocx(couche, nv_liste)
+            
+
             
             
         

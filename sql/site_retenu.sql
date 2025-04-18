@@ -1,5 +1,4 @@
 SELECT
-    ROW_NUMBER() OVER() as id, -- Génère un ID séquentiel pour les lignes retournées
     sc.nom_bassin as nv0, -- Bassin
     es.commune as nv1,    -- Commune
     te.nom as nv2,        -- Type

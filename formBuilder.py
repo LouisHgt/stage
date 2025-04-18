@@ -62,8 +62,8 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
         output = os.path.join(os.path.dirname(__file__), 'tmp')
         
         # Suppression des objets non referencés
-        # import gc
-        # gc.collect()
+        import gc
+        gc.collect()
         
         
         self.dialog.accept()

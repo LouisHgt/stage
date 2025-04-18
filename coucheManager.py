@@ -38,42 +38,61 @@ class coucheManager():
             print(f"La couche '{nom_couche}' est introuvable.")
             return None
 
-    def getColoneWithoutDoubles(self, niveau, elt_superieur = None):
+    def getCoucheFromFile(self, path_couche, nom_couche):
+        return QgsVectorLayer(path_couche, nom_couche, "ogr")
+
+    def getNbrAttributsCouche(self, couche):
+        i = 0
+        for field in couche.fields():
+            print(field)
+            i += 1
         
-        # Recuperation de la couche site_retenu
-        emplacement_couche_site_retenu = self.configManager.getFromConfig('emplacement_couche_site_retenu')[0]
-        nom_couche_site_retenu = self.configManager.getFromConfig('nom_couche_site_retenu')[0]
-        path_site_retenu = os.path.join(os.path.dirname(__file__), emplacement_couche_site_retenu, nom_couche_site_retenu) + ".shp"
+        return i
+    
+    def remove_and(self, text):
+        """
+        Supprime la sous-chaîne " AND " de la fin d'une chaîne, si elle est présente.
+        """
         
-        nom_colonne = "nv" + niveau
-        if elt_superieur: # Construction du nom de la colonne du dessus si elle existe
-            non_colonne_superieur = "nv" + str(int(niveau) - 1)
-        # Creation d'une couche temporaire à partir du fichier shp
-        couche = QgsVectorLayer(path_site_retenu, "site_retenu", "ogr")
+        suffix = " AND "
+        if text.endswith(suffix):
+            # Retourne la chaîne jusqu'au début du suffixe trouvé
+            return text[:-len(suffix)]
+        else:
+            # Retourne la chaîne originale si elle ne se termine pas par le suffixe
+            return text
+    
+    def getFilteredNiveau(self, couche, liste_elt = []):
         
-        #Construction d'une requete pour n'acceder qu'à une colonne
-        request = QgsFeatureRequest().setSubsetOfAttributes([nom_colonne], couche.fields())
+        # Récupération du niveau actuel
+        nv = len(liste_elt)
         
-        # On stocke les elements dansun set pour supprimer les doublons
-        liste_sans_doublon = set()
-        liste_elt = couche.getFeatures()
+        current_attribut = 'nv' + str(nv)
+        print(current_attribut)
+        filtered_nv = set()
         
+        expression = ''
         
-        # On verifie que la couche possede l'attribut (nv) actuel
-        if(couche.fields().lookupField(nom_colonne)) == -1:
-            return None
-        ### Deplacer la verification en dehors de la recursivite
-        
-        for feature in liste_elt:
+        if nv != 0:
+            # Construction de l'expression pour le filtre
+            i = 0
+            for elt in liste_elt:
+                expression += 'nv' + str(i) + ' = \'' + elt + '\' AND '
+                i +=1
             
-            if elt_superieur and elt_superieur == feature[non_colonne_superieur]:
-                liste_sans_doublon.add(feature[nom_colonne])
-            elif not elt_superieur:
-                liste_sans_doublon.add(feature[nom_colonne])
+        
+        expression = self.remove_and(expression) # On supprimme le dernier AND
+        
+        print(expression)
+        
+        request = QgsFeatureRequest().setFilterExpression(expression)
+        
+        for f in couche.getFeatures(request):
+            print(f)
 
+            filtered_nv.add(f[current_attribut])
 
-        print(liste_sans_doublon)
-        return list(liste_sans_doublon) # Conversion en liste
+        return list(filtered_nv) # Conversion en liste
         
     def getSqlQuery(self, requete_path):
         try:
