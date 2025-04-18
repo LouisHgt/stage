@@ -64,6 +64,7 @@ class coucheManager():
     
     def getFilteredNiveau(self, couche, liste_elt = []):
         
+        
         # Récupération du niveau actuel
         nv = len(liste_elt)
         
@@ -71,28 +72,37 @@ class coucheManager():
         print(current_attribut)
         filtered_nv = set()
         
-        expression = ''
         
-        if nv != 0:
-            # Construction de l'expression pour le filtre
-            i = 0
-            for elt in liste_elt:
-                expression += 'nv' + str(i) + ' = \'' + elt + '\' AND '
-                i +=1
+        try:
+            if nv != 0:
+                # Construction de l'expression pour le filtre
+                expression = ''
+                i = 0
+                for elt in liste_elt:
+                    expression += 'nv' + str(i) + ' = \'' + elt + '\' AND '
+                    i +=1
+                
+                expression = self.remove_and(expression) # On supprimme le dernier AND
             
-        
-        expression = self.remove_and(expression) # On supprimme le dernier AND
-        
-        print(expression)
-        
-        request = QgsFeatureRequest().setFilterExpression(expression)
-        
-        for f in couche.getFeatures(request):
-            print(f)
+                request = QgsFeatureRequest().setFilterExpression(expression)
+                    
+                for f in couche.getFeatures(request):
+                    print(f[current_attribut])
 
-            filtered_nv.add(f[current_attribut])
+                    filtered_nv.add(f[current_attribut])
+                    
+            else:
 
-        return list(filtered_nv) # Conversion en liste
+                for f in couche.getFeatures():
+                    print(f[current_attribut])
+
+                    filtered_nv.add(f[current_attribut])
+        except Exception as e:
+            print(f"Une erreur s'est produite dans getFilteredNiveau : {e}")
+            raise
+        
+        finally:
+            return list(filtered_nv) # Conversion en liste
         
     def getSqlQuery(self, requete_path):
         try:

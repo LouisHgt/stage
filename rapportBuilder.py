@@ -35,9 +35,10 @@ class rapportBuilder():
 
         
         
-        niveau = self.coucheManager.getNbrAttributsCouche(couche)
-        print(self.coucheManager.getFilteredNiveau(couche))
-        #self.buildDocx(couche, self.coucheManager.getFilteredNiveau(couche))
+        self.niveau = self.coucheManager.getNbrAttributsCouche(couche)
+        #print(self.coucheManager.getFilteredNiveau(couche))
+        self.list = []
+        self.buildDocx(couche, self.coucheManager.getFilteredNiveau(couche))
         
         
         self.rapport.save(rapport_path)
@@ -50,19 +51,24 @@ class rapportBuilder():
         
     def buildDocx(self, couche,  liste_elements):
         """Fonction recursive qui parcours pour un elt d'un niveau les elt du niveau +1"""
+        print(len(self.list))
+        print(self.niveau)
         # Condition d'arret
-        if len(liste_elements) > 3:
+        if len(self.list) >= self.niveau - 1:
             return
         
         print(liste_elements)
         for elt in liste_elements:
             
+            self.list.append(elt)
+            print(self.list)
             self.rapport.add_heading(elt, 1)
             
             # On filtre
-            nv_liste = self.coucheManager.getFilteredNiveau(couche, liste_elements)
+            nv_liste = self.coucheManager.getFilteredNiveau(couche, self.list)
             # On rappelle avec la nouvelle liste
             self.buildDocx(couche, nv_liste)
+            self.list.pop()
             
 
             
