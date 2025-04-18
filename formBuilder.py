@@ -148,12 +148,9 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
             else:
                 nom_couche_type = nom_couche_type[0]  # Récupérer la première valeur
             
-            print(nom_couche_type)
             couche_types = project.mapLayersByName(nom_couche_type)[0]
-            print(couche_types.getFeatures())
             
             types = self.mapTypes(couche_types)
-            print(types)
             
             # Dictionnaire pour stocker l'etat des checkboxes en fonction du type
             self.dialog.checkboxes = {}
@@ -166,7 +163,7 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
                 # Ajout d'un checkbox pour chaque type de site
                 checkBox = QtWidgets.QCheckBox()
                 checkBox.setMinimumHeight(25)
-                checkBox.setChecked(False)
+                checkBox.setChecked(True)
                 
                 # Stockage de la checkbox dans le dictionnaire
                 self.dialog.checkboxes[id] = checkBox

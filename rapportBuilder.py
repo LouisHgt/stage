@@ -53,7 +53,6 @@ class rapportBuilder():
         """Fonction recursive qui parcours pour un elt d'un niveau les elt du niveau +1"""
         
         current_nv = len(self.list)
-        print(current_nv)
         # Condition d'arret
         if current_nv >= self.niveau - 1:
             for elt in liste_elements:
@@ -86,9 +85,6 @@ class rapportBuilder():
         """
         # --- Références rapides ---
         para_format = paragraph.paragraph_format
-        # La plupart des formatages de police s'appliquent aux 'runs'.
-        # On suppose que le texte principal est dans le premier run.
-        # Attention si le paragraphe est vide initialement ou a plusieurs runs.
         font = None
         if paragraph.runs:
             font = paragraph.runs[0].font
@@ -97,6 +93,8 @@ class rapportBuilder():
         if level == 0:  # Niveau Bassin Versant (Titre Principal)
             try:
                 paragraph.style = 'Heading 1' # Style Word intégré
+                paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+                font.color.rgb = RGBColor(255, 0, 0)
             except KeyError:
                 print("Avertissement: Style 'Heading 1' non trouvé, utilisation de formatage direct.")
                 if font:
@@ -112,6 +110,7 @@ class rapportBuilder():
         elif level == 1: # Niveau Commune (Sous-titre 1)
             try:
                 paragraph.style = 'Heading 2'
+                font.color.rgb = RGBColor(6, 0, 157)
             except KeyError:
                 print("Avertissement: Style 'Heading 2' non trouvé.")
                 if font:
@@ -126,6 +125,7 @@ class rapportBuilder():
         elif level == 2: # Niveau Type de site (Sous-titre 2)
             try:
                 paragraph.style = 'Heading 3'
+                para_format.first_line_indent = Cm(1.27)
             except KeyError:
                 print("Avertissement: Style 'Heading 3' non trouvé.")
                 if font:
@@ -140,11 +140,8 @@ class rapportBuilder():
 
         elif level == 3: # Niveau Site (Élément de liste)
             try:
-                # Utiliser un style de liste est idéal
                 paragraph.style = 'List Bullet'
-                # On peut ajuster l'indentation si nécessaire
-                # para_format.left_indent = Cm(1.25) # Exemple d'indentation pour les puces
-                # para_format.first_line_indent = Cm(-0.63) # Indentation négative pour la puce
+                para_format.first_line_indent = Cm(1.27)
             except KeyError:
                 print("Avertissement: Style 'List Bullet' non trouvé, utilisation formatage simple.")
                 if font:
@@ -153,9 +150,7 @@ class rapportBuilder():
                     font.bold = False
                 # Ajouter un retrait manuel si le style n'existe pas
                 para_format.left_indent = Cm(0.75)
-                # Ajouter un tiret ou un symbole manuellement si besoin
-                # paragraph.text = "- " + paragraph.text # Attention, modifie le texte
-            # Espacement standard pour liste
+            # Espacement entre les elements de la liste
             para_format.space_before = Pt(0)
             para_format.space_after = Pt(4)
             para_format.keep_with_next = False # Permet les coupures entre les items

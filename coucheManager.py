@@ -76,12 +76,20 @@ class coucheManager():
                 # Construction de l'expression pour le filtre
                 expression = ''
                 i = 0
+                
+                
+                
                 for elt in liste_elt:
-                    expression += 'nv' + str(i) + ' = \'' + elt + '\' AND '
+                    
+                    escaped_elt = elt.replace("'", "''") # Remplacer ' par ''
+
+                    expression += 'nv' + str(i) + ' = \'' + escaped_elt + '\' AND '
                     i +=1
                 
                 expression = self.remove_and(expression) # On supprimme le dernier AND
-            
+                
+                
+                print(expression)
                 request = QgsFeatureRequest().setFilterExpression(expression)
                     
                 for f in couche.getFeatures(request):
