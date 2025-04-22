@@ -151,11 +151,16 @@ class formView():
     def setupProgressBar(self):
         containerValidation = self.dialog.findChild(QtWidgets.QVBoxLayout, 'container_validation')
         
-        progressBar = QtWidgets.QProgressBar()
-        progressBar.setValue(0)
+        self.progressBar = QtWidgets.QProgressBar()
+        self.progressBar.setMinimum(0)
+        self.progressBar.setMaximum(6)
+        self.progressBar.setValue(0)
         
-        containerValidation.addWidget(progressBar)
+        containerValidation.addWidget(self.progressBar)
     
+    def setProgressBarValue(self, value):
+        self.progressBar.setValue(value)
+        
     def setupButtons(self, formController):
         """Setup des boutons de la fenetre QT."""
         boutonValider = self.dialog.findChild(QtWidgets.QPushButton, 'valider')

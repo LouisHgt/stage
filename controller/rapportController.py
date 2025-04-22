@@ -1,6 +1,5 @@
 
 import os
-import docx
 import time
 from docx.shared import Pt, RGBColor, Cm # Pour les unités et couleurs
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT # Pour l'alignement (si besoin)
@@ -28,6 +27,7 @@ class rapportController():
         
         rapport_path = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + fileType1
 
+        import docx # !! IMPORT LOCAL !!
         self.rapport = docx.Document()
         
         # Recuperation de la couche site_retenu
