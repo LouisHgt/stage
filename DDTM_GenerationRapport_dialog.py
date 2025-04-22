@@ -37,18 +37,17 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 class DDTM_GenerationRapportDialog(QtWidgets.QDialog, FORM_CLASS):
 
-    def __init__(self, parent=None):
-        """Constructor."""
-        super(DDTM_GenerationRapportDialog, self).__init__(parent)
-        
-        self.formController = formController(self) 
-        #self.formView = formView(self)
-        
+    def __init__(self, couche_model_inst, config_model_inst, rapport_controller_inst, parent=None):
+        super().__init__(parent)
         self.setupUi(self)
+
+        # Instancier le contrôleur en passant les instances
+        self.formController = formController(self, couche_model_inst, config_model_inst, rapport_controller_inst)
+
         try:
             self.formController.setupFormulaires()
-        except Exception as e:  
-            print(f"Une erreur s'est produite dans le constructeur : {e}")
+        except Exception as e:
+            print(f"Erreur constructeur Dialog: {e}")
             self.close()
             raise
 

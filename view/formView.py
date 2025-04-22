@@ -2,7 +2,6 @@ from time import sleep
 import os
 from ..model.coucheModel import coucheModel
 from ..model.configModel import configModel
-from ..controller.rapportController import rapportController
 
 
 # --- Imports QGIS ---
@@ -15,17 +14,14 @@ from qgis.PyQt import QtWidgets # type: ignore
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), '..\DDTM_GenerationRapport_dialog_base.ui'))
 
-class formView(QtWidgets.QDialog, FORM_CLASS):
+class formView():
     
-    
-    def __init__(self, dialog, coucheModel, configModel):
-        """Constructor."""
-        
-        self.dialog = dialog
-        self.coucheModel = coucheModel
-        self.configModel = configModel
-        self.rapportController = rapportController(self.coucheModel)
-        
+    def __init__(self, dialog, couche_model_inst, config_model_inst, rapport_controller_inst):
+        self.dialog = dialog # Référence à la fenêtre UI
+        # Stocker les instances si la vue en a DIRECTEMENT besoin (sinon, inutile)
+        self.coucheModel = couche_model_inst
+        self.configModel = config_model_inst
+
         
 
     def getComboBoxValues(self):
@@ -156,4 +152,4 @@ class formView(QtWidgets.QDialog, FORM_CLASS):
     def setupButtons(self, formController):
         """Setup des boutons de la fenetre QT."""
         boutonValider = self.dialog.findChild(QtWidgets.QPushButton, 'valider')
-        boutonValider.clicked.connect(lambda: self.formController.pressed())
+        boutonValider.clicked.connect(lambda: formController.pressed())

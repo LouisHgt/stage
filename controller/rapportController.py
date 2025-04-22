@@ -7,10 +7,11 @@ from ..model.configModel import configModel
 from docx2pdf import convert
 
 class rapportController():
-    def __init__(self, coucheModel):
-        self.configModel = configModel()
-        self.coucheModel = coucheModel
-
+    def __init__(self, config_model_inst, couche_model_inst):
+        self.configModel = config_model_inst
+        self.coucheModel = couche_model_inst
+        
+        
     def buildRapport(self, fileType1):
         # On importe docx dans la methode pour eviter les conflits avec le garbage collector
         

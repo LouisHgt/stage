@@ -32,6 +32,8 @@ from .resources import *
 from .DDTM_GenerationRapport_dialog import DDTM_GenerationRapportDialog
 import os.path
 from .model.coucheModel import coucheModel
+from .model import configModel
+from .controller import rapportController
 
 
 class DDTM_GenerationRapport:
@@ -69,7 +71,10 @@ class DDTM_GenerationRapport:
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
         
+        # Instanciation des objets MVC
+        self.configModel = configModel()
         self.coucheModel = coucheModel()
+        self.rapportController = rapportController(self.configModel, self.coucheModel)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -192,7 +197,7 @@ class DDTM_GenerationRapport:
         try:
             # Create the dialog with elements (after translation) and keep reference
             # Only create GUI ONCE in callback, so that it will only load when the plugin is started
-            self.dlg = DDTM_GenerationRapportDialog()
+            self.dlg = DDTM_GenerationRapportDialog(self.coucheModel, self.configModel, self.rapportController, parent=self.iface.mainWindow())
             print("Lancement du plugin DDTM_GenerationRapport")
             # show the dialog
             self.dlg.show()
