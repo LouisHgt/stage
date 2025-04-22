@@ -32,8 +32,8 @@ from .resources import *
 from .DDTM_GenerationRapport_dialog import DDTM_GenerationRapportDialog
 import os.path
 from .model.coucheModel import coucheModel
-from .model import configModel
-from .controller import rapportController
+from .model.configModel import configModel
+from .controller.rapportController import rapportController
 
 
 class DDTM_GenerationRapport:
