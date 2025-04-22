@@ -1,6 +1,0 @@
-Elements ignores lors de la copie vers C:\Users\louis.huguet\Travail\Plugins\DDTM06_GenerationRapport 
---------------------------------------------------- 
-Dossier: .git  (Exclu par defaut dans le script) 
-Fichier: journal.txt (Exclu par defaut dans le script) 
- 
-Ce fichier a ete genere par le script %~nx0 le 22/04/2025 a 10:59:56,54 
