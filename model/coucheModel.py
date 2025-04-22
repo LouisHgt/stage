@@ -1,6 +1,6 @@
 import os
 
-from .configManager import configManager
+from .configModel import configModel
 from qgis import processing # type: ignore
 from qgis.core import ( # type: ignore
     QgsFields, QgsVectorFileWriter, QgsField, QgsWkbTypes,
@@ -9,12 +9,12 @@ from qgis.core import ( # type: ignore
 )
 from qgis.PyQt.QtCore import QVariant # type: ignore
 
-class coucheManager():
+class coucheModel():
 
     def __init__(self, project: QgsProject):
         """Constructeur."""
         self.project = project
-        self.configManager = configManager()
+        self.configModel = configModel()
 
     def getCoucheFromNom(self, nom_couche):
         """Récupère la couche QGIS depuis son nom."""
@@ -124,7 +124,7 @@ class coucheManager():
         
     def clearTmpFolder(self):
         """Supprime tous les fichiers du dossier tmp."""
-        tmp_path = os.path.join(os.path.dirname(__file__), 'tmp')
+        tmp_path = os.path.join(os.path.dirname(__file__), '..',  'tmp')
         if os.path.exists(tmp_path):
             for file_name in os.listdir(tmp_path):
                 file_path = os.path.join(tmp_path, file_name)
@@ -142,11 +142,11 @@ class coucheManager():
 
     def createStatusSensibilite(self, data):
         """Crée la couche shapefile de statut de sensibilité."""
-        emplacement_couche = self.configManager.getFromConfig('emplacement_couche_status_sensibilite')[0]
-        nom_couche_config = self.configManager.getFromConfig('nom_couche_status_sensibilite')[0]
+        emplacement_couche = self.configModel.getFromConfig('emplacement_couche_status_sensibilite')[0]
+        nom_couche_config = self.configModel.getFromConfig('nom_couche_status_sensibilite')[0]
         nom_couche_base, _ = os.path.splitext(nom_couche_config)
         nom_couche_shp = nom_couche_base + '.shp'
-        couche_path = os.path.join(os.path.dirname(__file__), emplacement_couche, nom_couche_shp)
+        couche_path = os.path.join(os.path.dirname(__file__), '..',  emplacement_couche, nom_couche_shp)
 
         fields = QgsFields()
         fields.append(QgsField("id_type", QVariant.Int, "Integer"))
@@ -191,11 +191,11 @@ class coucheManager():
 
     def createStatusScenario(self, data):
         """Crée la couche shapefile de statut de scénario."""
-        emplacement_couche = self.configManager.getFromConfig('emplacement_couche_status_scenario')[0]
-        nom_couche_config = self.configManager.getFromConfig('nom_couche_status_scenario')[0]
+        emplacement_couche = self.configModel.getFromConfig('emplacement_couche_status_scenario')[0]
+        nom_couche_config = self.configModel.getFromConfig('nom_couche_status_scenario')[0]
         nom_couche_base, _ = os.path.splitext(nom_couche_config)
         nom_couche_shp = nom_couche_base + '.shp'
-        couche_path = os.path.join(os.path.dirname(__file__), emplacement_couche, nom_couche_shp)
+        couche_path = os.path.join(os.path.dirname(__file__), '..',  emplacement_couche, nom_couche_shp)
 
         fields = QgsFields()
         fields.append(QgsField("nom_bassin", QVariant.String, "String"))
@@ -240,21 +240,24 @@ class coucheManager():
         # Chemin de sortie
         site_retenu_path = os.path.join(
             os.path.dirname(__file__),
-            self.configManager.getFromConfig('emplacement_couche_site_retenu')[0],
-            self.configManager.getFromConfig('nom_couche_site_retenu')[0] + '.shp'
+            '..', 
+            self.configModel.getFromConfig('emplacement_couche_site_retenu')[0],
+            self.configModel.getFromConfig('nom_couche_site_retenu')[0] + '.shp'
         )
 
         # Chemins d'entrée
         status_sentibilite_path = os.path.join(
             os.path.dirname(__file__),
-            self.configManager.getFromConfig('emplacement_couche_status_sensibilite')[0],
-            self.configManager.getFromConfig('nom_couche_status_sensibilite')[0] + '.shp'
+            '..',
+            self.configModel.getFromConfig('emplacement_couche_status_sensibilite')[0],
+            self.configModel.getFromConfig('nom_couche_status_sensibilite')[0] + '.shp'
         )
         
         status_scenario_path = os.path.join(
             os.path.dirname(__file__),
-            self.configManager.getFromConfig('emplacement_couche_status_scenario')[0],
-            self.configManager.getFromConfig('nom_couche_status_scenario')[0] + '.shp'
+            '..',
+            self.configModel.getFromConfig('emplacement_couche_status_scenario')[0],
+            self.configModel.getFromConfig('nom_couche_status_scenario')[0] + '.shp'
         )
         
         
@@ -265,7 +268,7 @@ class coucheManager():
             raise FileNotFoundError(f"Fichier d'entrée pour SQL non trouvé: {status_sentibilite_path}")
 
 
-        requete_path = os.path.join(os.path.dirname(__file__), 'sql', self.configManager.getFromConfig('requete_formulaire'))
+        requete_path = os.path.join(os.path.dirname(__file__), '..', 'sql', self.configModel.getFromConfig('requete_formulaire'))
         
         requete = self.getSqlQuery(requete_path)
         

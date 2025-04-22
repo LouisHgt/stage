@@ -31,7 +31,7 @@ from .resources import *
 # Import the code for the dialog
 from .DDTM_GenerationRapport_dialog import DDTM_GenerationRapportDialog
 import os.path
-from .coucheManager import coucheManager
+from .model.coucheModel import coucheModel
 
 
 class DDTM_GenerationRapport:
@@ -69,7 +69,7 @@ class DDTM_GenerationRapport:
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
         
-        self.coucheManager = coucheManager(QgsProject.instance())
+        self.coucheModel = coucheModel(QgsProject.instance())
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -183,7 +183,7 @@ class DDTM_GenerationRapport:
                 action)
             self.iface.removeToolBarIcon(action)
         
-        self.coucheManager.clearTmpFolder()
+        self.coucheModel.clearTmpFolder()
 
 
     def run(self):

@@ -24,8 +24,9 @@
 
 import os
 from time import sleep
-from .formBuilder import formBuilder
-from .coucheManager import coucheManager
+from .view.formBuilder import formBuilder
+from .model.coucheModel import coucheModel
+from .controller.formController import formController
 
 
 # --- Imports QGIS ---
@@ -41,21 +42,17 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 
 class DDTM_GenerationRapportDialog(QtWidgets.QDialog, FORM_CLASS):
-    
-    def setupFormulaires(self):
-        """Configure les formulaires."""
-        self.formBuilder.setupFormulaireScenario()
-        self.formBuilder.setupFormulaireSensibilite()
-        self.formBuilder.setupButtons()
 
     def __init__(self, parent=None):
         """Constructor."""
         super(DDTM_GenerationRapportDialog, self).__init__(parent)
-        self.formBuilder = formBuilder(self)
+        
+        self.formController = formController(self) 
+        #self.formBuilder = formBuilder(self)
         
         self.setupUi(self)
         try:
-            self.setupFormulaires()
+            self.formController.setupFormulaires()
         except Exception as e:  
             print(f"Une erreur s'est produite dans le constructeur : {e}")
             self.close()
