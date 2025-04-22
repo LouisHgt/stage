@@ -3,14 +3,15 @@ import os
 import docx
 from docx.shared import Pt, RGBColor, Cm # Pour les unités et couleurs
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT # Pour l'alignement (si besoin)
-from .configManager import configManager
+from ..model.configModel import configModel
 from docx2pdf import convert
 
-class rapportBuilder():
-    def __init__(self, coucheManager):
-        self.configManager = configManager()
-        self.coucheManager = coucheManager
-
+class rapportController():
+    def __init__(self, config_model_inst, couche_model_inst):
+        self.configModel = config_model_inst
+        self.coucheModel = couche_model_inst
+        
+        
     def buildRapport(self, fileType1):
         # On importe docx dans la methode pour eviter les conflits avec le garbage collector
         
@@ -21,24 +22,24 @@ class rapportBuilder():
         """
         
         # Recuparation de l'emplacement du rapport et de son nom
-        emplacement_rapport = self.configManager.getFromConfig("emplacement_rapport")[0]
-        nom_rapport = self.configManager.getFromConfig("nom_rapport")[0]
+        emplacement_rapport = self.configModel.getFromConfig("emplacement_rapport")[0]
+        nom_rapport = self.configModel.getFromConfig("nom_rapport")[0]
         
-        rapport_path = os.path.join(os.path.dirname(__file__), emplacement_rapport, nom_rapport) + fileType1
+        rapport_path = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + fileType1
 
         self.rapport = docx.Document()
         
         # Recuperation de la couche site_retenu
-        emplacement_couche_site_retenu = self.configManager.getFromConfig('emplacement_couche_site_retenu')[0]
-        nom_couche_site_retenu = self.configManager.getFromConfig('nom_couche_site_retenu')[0]
-        path_site_retenu = os.path.join(os.path.dirname(__file__), emplacement_couche_site_retenu, nom_couche_site_retenu) + ".shp"
-        couche = self.coucheManager.getCoucheFromFile(path_site_retenu, "site_retenu")
+        emplacement_couche_site_retenu = self.configModel.getFromConfig('emplacement_couche_site_retenu')[0]
+        nom_couche_site_retenu = self.configModel.getFromConfig('nom_couche_site_retenu')[0]
+        path_site_retenu = os.path.join(os.path.dirname(__file__), '..', emplacement_couche_site_retenu, nom_couche_site_retenu) + ".shp"
+        couche = self.coucheModel.getCoucheFromFile(path_site_retenu, "site_retenu")
 
         
         
-        self.niveau = self.coucheManager.getNbrAttributsCouche(couche)
+        self.niveau = self.coucheModel.getNbrAttributsCouche(couche)
         self.list = [] # Liste dans laquelle on stocke les elements servants au filtre
-        self.buildDocxRecursive(couche, self.coucheManager.getFilteredNiveau(couche))
+        self.buildDocxRecursive(couche, self.coucheModel.getFilteredNiveau(couche))
         
         
         self.rapport.save(rapport_path)
@@ -72,7 +73,7 @@ class rapportBuilder():
             
             
             # On filtre
-            nv_liste = self.coucheManager.getFilteredNiveau(couche, self.list)
+            nv_liste = self.coucheModel.getFilteredNiveau(couche, self.list)
             # On rappelle avec la nouvelle liste
             self.buildDocxRecursive(couche, nv_liste)
             self.list.pop()
