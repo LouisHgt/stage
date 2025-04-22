@@ -69,7 +69,7 @@ class DDTM_GenerationRapport:
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
         
-        self.coucheModel = coucheModel(QgsProject.instance())
+        self.coucheModel = coucheModel()
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -183,8 +183,8 @@ class DDTM_GenerationRapport:
                 action)
             self.iface.removeToolBarIcon(action)
         
-        self.coucheModel.clearTmpFolder()
 
+        self.coucheModel.clearTmpFolder()
 
     def run(self):
         """Run method that performs all the real work"""

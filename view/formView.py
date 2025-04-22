@@ -15,15 +15,15 @@ from qgis.PyQt import QtWidgets # type: ignore
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), '..\DDTM_GenerationRapport_dialog_base.ui'))
 
-class formBuilder(QtWidgets.QDialog, FORM_CLASS):
+class formView(QtWidgets.QDialog, FORM_CLASS):
     
     
-    def __init__(self, dialog):
+    def __init__(self, dialog, coucheModel, configModel):
         """Constructor."""
-        project = QgsProject.instance()
+        
         self.dialog = dialog
-        self.coucheModel = coucheModel(project)
-        self.configModel = configModel()
+        self.coucheModel = coucheModel
+        self.configModel = configModel
         self.rapportController = rapportController(self.coucheModel)
         
         
@@ -40,31 +40,6 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
         for type, checkBox in self.dialog.checkboxes.items():
             values[type] = checkBox.isChecked()
         return values
-
-    def pressed(self):
-        """
-            Affiche les données et les inscrit dans des couches
-            Crée le rapport docx
-            Ferme la boite de dialogue
-        """
-        
-        # print(self.getComboBoxValues())
-        # print(self.getCheckboxValues())
-        
-        self.coucheModel.clearTmpFolder()
-        self.coucheModel.createStatusSensibilite(self.getCheckboxValues())
-        self.coucheModel.createStatusScenario(self.getComboBoxValues())
-        self.coucheModel.createSiteRetenu()
-        
-        self.rapportController.buildRapport(".docx")
-        output = os.path.join(os.path.dirname(__file__), 'tmp')
-        
-        # Suppression des objets non referencés
-        import gc
-        gc.collect()
-        
-        
-        self.dialog.accept()
         
 
     def setupFormulaireScenario(self):
@@ -178,7 +153,7 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
             raise
         
         
-    def setupButtons(self):
+    def setupButtons(self, formController):
         """Setup des boutons de la fenetre QT."""
         boutonValider = self.dialog.findChild(QtWidgets.QPushButton, 'valider')
-        boutonValider.clicked.connect(lambda: self.pressed())
+        boutonValider.clicked.connect(lambda: self.formController.pressed())

@@ -11,9 +11,9 @@ from qgis.PyQt.QtCore import QVariant # type: ignore
 
 class coucheModel():
 
-    def __init__(self, project: QgsProject):
+    def __init__(self):
         """Constructeur."""
-        self.project = project
+        self.project = QgsProject.instance()
         self.configModel = configModel()
 
     def getCoucheFromNom(self, nom_couche):

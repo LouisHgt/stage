@@ -24,13 +24,7 @@
 
 import os
 from time import sleep
-from .view.formBuilder import formBuilder
-from .model.coucheModel import coucheModel
 from .controller.formController import formController
-
-
-# --- Imports QGIS ---
-from qgis.core import QgsProject, QgsVectorLayer, QgsMessageLog, Qgis # type: ignore
 
 # --- Imports Qt ---
 from qgis.PyQt import uic # type: ignore 
@@ -48,7 +42,7 @@ class DDTM_GenerationRapportDialog(QtWidgets.QDialog, FORM_CLASS):
         super(DDTM_GenerationRapportDialog, self).__init__(parent)
         
         self.formController = formController(self) 
-        #self.formBuilder = formBuilder(self)
+        #self.formView = formView(self)
         
         self.setupUi(self)
         try:
