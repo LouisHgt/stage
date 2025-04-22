@@ -35,7 +35,6 @@ class GenerationRapportTask(QgsTask):
         
         
     def run(self):
-        print("dans run")
         """Le code exécuté en arrière-plan. DOIT retourner True en cas de succès, False sinon."""
         QgsMessageLog.logMessage("Début de la tâche de génération du rapport.", "MonPlugin", Qgis.Info)
         try:
@@ -107,6 +106,7 @@ class GenerationRapportTask(QgsTask):
 
         if result:
             self.rapport_controller.buildRapport(".docx")
+            #gc.collect()
             # La tâche s'est terminée avec succès (run a retourné True)
             QgsMessageLog.logMessage("Tâche terminée avec succès, fermeture de la fenêtre.", "MonPlugin", Qgis.Info)
             # Fermer la dialogue
