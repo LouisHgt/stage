@@ -1,4 +1,5 @@
 import os
+import time
 
 from .configModel import configModel
 from qgis import processing # type: ignore
@@ -71,6 +72,12 @@ class coucheModel():
         filtered_nv = set()
         
         
+        fields = couche.fields()
+        attributs = []
+        for field in fields.names():
+            attributs.append(field)
+        
+        
         try:
             if nv != 0:
                 # Construction de l'expression pour le filtre
@@ -89,15 +96,19 @@ class coucheModel():
                 expression = self.remove_and(expression) # On supprimme le dernier AND
                 
                 
-                print(expression)
                 request = QgsFeatureRequest().setFilterExpression(expression)
-                    
+                request.setSubsetOfAttributes(attributs, fields)
+                
+                
                 for f in couche.getFeatures(request):
                     filtered_nv.add(f[current_attribut])
+                
                     
             else:
 
-                for f in couche.getFeatures():
+
+                request = QgsFeatureRequest().setSubsetOfAttributes(attributs, fields)
+                for f in couche.getFeatures(request):
                     filtered_nv.add(f[current_attribut])
         
         except Exception as e:

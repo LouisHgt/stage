@@ -78,7 +78,20 @@
         </layout>
        </widget>
       </item>
-      <item alignment="Qt::AlignVCenter">
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
        <widget class="QWidget" name="container_sensibilite" native="true">
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item alignment="Qt::AlignHCenter|Qt::AlignTop">
@@ -102,11 +115,15 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="valider">
-     <property name="text">
-      <string>Valider</string>
-     </property>
-    </widget>
+    <layout class="QVBoxLayout" name="container_validation">
+     <item>
+      <widget class="QPushButton" name="valider">
+       <property name="text">
+        <string>Valider</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

@@ -1,6 +1,7 @@
 
 import os
 import docx
+import time
 from docx.shared import Pt, RGBColor, Cm # Pour les unités et couleurs
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT # Pour l'alignement (si besoin)
 from ..model.configModel import configModel
@@ -39,8 +40,8 @@ class rapportController():
         
         self.niveau = self.coucheModel.getNbrAttributsCouche(couche)
         self.list = [] # Liste dans laquelle on stocke les elements servants au filtre
-        self.buildDocxRecursive(couche, self.coucheModel.getFilteredNiveau(couche))
         
+        self.buildDocxRecursive(couche, self.coucheModel.getFilteredNiveau(couche))
         
         self.rapport.save(rapport_path)
         del self.rapport

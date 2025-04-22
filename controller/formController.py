@@ -3,6 +3,7 @@ from ..view.formView import formView
 from ..model.coucheModel import coucheModel
 from ..model import configModel
 
+
 class formController():
     def __init__(self, dialog, couche_model_inst, config_model_inst, rapport_controller_inst):
         self.dialog = dialog
@@ -23,7 +24,7 @@ class formController():
         self.formView.setupFormulaireSensibilite()
         self.formView.setupButtons(self)
         
-    def pressed(self):
+    def pressed(self, boutonValider):
         """
             Affiche les données et les inscrit dans des couches
             Crée le rapport docx
@@ -32,7 +33,11 @@ class formController():
         
         # print(self.getComboBoxValues())
         # print(self.getCheckboxValues())
-        
+           
+        boutonValider.setEnabled(False)
+        boutonValider.setText('Validé')
+        self.formView.setupProgressBar()
+             
         self.coucheModel.clearTmpFolder()
         self.coucheModel.createStatusSensibilite(self.formView.getCheckboxValues())
         self.coucheModel.createStatusScenario(self.formView.getComboBoxValues())

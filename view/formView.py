@@ -148,8 +148,15 @@ class formView():
             self.dialog.close()
             raise
         
+    def setupProgressBar(self):
+        containerValidation = self.dialog.findChild(QtWidgets.QVBoxLayout, 'container_validation')
         
+        progressBar = QtWidgets.QProgressBar()
+        progressBar.setValue(0)
+        
+        containerValidation.addWidget(progressBar)
+    
     def setupButtons(self, formController):
         """Setup des boutons de la fenetre QT."""
         boutonValider = self.dialog.findChild(QtWidgets.QPushButton, 'valider')
-        boutonValider.clicked.connect(lambda: formController.pressed())
+        boutonValider.clicked.connect(lambda: formController.pressed(boutonValider))
