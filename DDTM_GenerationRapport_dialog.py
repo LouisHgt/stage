@@ -41,6 +41,7 @@ class DDTM_GenerationRapportDialog(QtWidgets.QDialog, FORM_CLASS):
         super().__init__(parent)
         self.setupUi(self)
 
+        
         # Instancier le contrôleur en passant les instances
         self.formController = formController(self, couche_model_inst, config_model_inst, rapport_controller_inst)
 

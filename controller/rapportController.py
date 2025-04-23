@@ -1,16 +1,26 @@
 
 import os
 import time
+import docx
 from docx.shared import Pt, RGBColor, Cm # Pour les unités et couleurs
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT # Pour l'alignement (si besoin)
 from ..model.configModel import configModel
+from .rapportTask import rapportTask
 from docx2pdf import convert
+
+from qgis.core import QgsTask, QgsApplication, QgsMessageLog, Qgis # type: ignore
+
 
 class rapportController():
     def __init__(self, config_model_inst, couche_model_inst):
         self.configModel = config_model_inst
         self.coucheModel = couche_model_inst
         
+    def setFormView(self, formView):
+        self.formView = formView
+        
+    def setDialog(self, dialog):
+        self.dialog = dialog
         
     def buildRapport(self, fileType1):
         # On importe docx dans la methode pour eviter les conflits avec le garbage collector
@@ -27,7 +37,9 @@ class rapportController():
         
         rapport_path = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + fileType1
 
-        import docx # !! IMPORT LOCAL !!
+        import gc
+        gc.enable()
+        gc.set_debug(gc.DEBUG_COLLECTABLE)
         self.rapport = docx.Document()
         
         # Recuperation de la couche site_retenu
@@ -44,7 +56,9 @@ class rapportController():
         self.buildDocxRecursive(couche, self.coucheModel.getFilteredNiveau(couche))
         
         self.rapport.save(rapport_path)
+
         del self.rapport
+        gc.disable()
         print("rapport ecrit")
 
         
@@ -174,3 +188,21 @@ class rapportController():
         fichier_docx_entree = "votre_document.docx"
         fichier_pdf_sortie = "votre_document.pdf" 
         #Todo : conversion du fichier docx créé en pdf
+        
+        
+    def handleFormTaskFinished(self, success):
+        """
+            Quand formTask est fini, pour appeler rapportTask
+        """
+
+        if success and self.formView:
+            description = "Tâche de generation de rapport en fcontion des données créées par le formulaire"
+            self.current_task = rapportTask(
+                description,
+                self,
+                self.formView,
+                self.dialog
+            )
+            QgsApplication.taskManager().addTask(self.current_task)
+        else:
+            print("echec de la tache formulaire, ou formView n'est pa dans rapportController")

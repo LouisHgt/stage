@@ -45,4 +45,12 @@ pour clean les données. Enfin le formulaire en lui meme ne remplit pas toutes l
 
 
 22/04 - AUjourd'hui j'ai prevu de revoir l'architecture de mon programme. C'est de la programmation objet et je gere une interface
-graphique, j'ai donc choisis que mon code ait une architecture MVC.
+graphique, j'ai donc choisis que mon code ait une architecture MVC. J'ai donc réparti mes classes dans 3 dossiers, modele, vue, controller.
+
+Aussi, j'ai revu la facon dont mon plugin s'executait. Je voulais pouvoir afficher des choses pendant
+que mon programme fais des taches longues (afficher une barre de progression)
+Il a donc fallut que j'introduise des threads dans mon plugin. Desormais, quand on valide le formulaire,
+un thread se lance et il fera les action de traitement de données en arriere plan. Ainsi je peux afficher des choses pendant
+les actions lentes.
+
+23/04
