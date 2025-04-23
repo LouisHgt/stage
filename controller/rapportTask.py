@@ -1,4 +1,3 @@
-import gc
 
 from qgis.core import QgsTask, QgsApplication, QgsMessageLog, Qgis # type: ignore
 from qgis.PyQt import QtWidgets # type: ignore
@@ -34,7 +33,6 @@ class rapportTask(QgsTask):
             # Étape finale: Garbage Collection
             if self.isCanceled(): return False
             QgsMessageLog.logMessage("Nettoyage mémoire...", "MonPlugin", Qgis.Info)
-            print(gc.collect())
             current_step += 1
             self.formView.setProgressBarValue(current_step + 4)
 

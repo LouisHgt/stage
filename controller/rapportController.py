@@ -4,9 +4,11 @@ import time
 import docx
 from docx.shared import Pt, RGBColor, Cm # Pour les unités et couleurs
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT # Pour l'alignement (si besoin)
+from docx.enum.style import WD_STYLE_TYPE # Ajoutez cet import en haut du fichier si pas déjà fait
 from ..model.configModel import configModel
 from .rapportTask import rapportTask
 from docx2pdf import convert
+from docx.styles.styles import Styles # Importer Styles peut aider pour le type hinting
 
 from qgis.core import QgsTask, QgsApplication, QgsMessageLog, Qgis # type: ignore
 
@@ -37,10 +39,11 @@ class rapportController():
         
         rapport_path = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + fileType1
 
-        import gc
-        gc.enable()
-        gc.set_debug(gc.DEBUG_COLLECTABLE)
+        emplacement_template = os.path.join(os.path.dirname(__file__), '..', 'etc', 'template_rapport.docx')
+        self.rapport2 = docx.Document(emplacement_template)
         self.rapport = docx.Document()
+        
+        
         
         # Recuperation de la couche site_retenu
         emplacement_couche_site_retenu = self.configModel.getFromConfig('emplacement_couche_site_retenu')[0]
@@ -58,7 +61,6 @@ class rapportController():
         self.rapport.save(rapport_path)
 
         del self.rapport
-        gc.disable()
         print("rapport ecrit")
 
         
@@ -72,7 +74,8 @@ class rapportController():
         # Condition d'arret
         if current_nv >= self.niveau - 1:
             for elt in liste_elements:
-                p = self.rapport.add_heading(elt, 1)
+                pass
+                p = self.rapport.add_paragraph(elt)
                 self.apply_style_to_paragraph(p, current_nv)
             return
         
@@ -83,6 +86,8 @@ class rapportController():
             
             
             p = self.rapport.add_paragraph(elt)
+            
+            
             self.apply_style_to_paragraph(p, current_nv)
             
             
@@ -108,7 +113,7 @@ class rapportController():
         # --- Application des styles/formats par niveau ---
         if level == 0:  # Niveau Bassin Versant (Titre Principal)
             try:
-                paragraph.style = 'Heading 1' # Style Word intégré
+                paragraph.style = 'Heading1' # Style Word intégré
                 paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
                 font.color.rgb = RGBColor(255, 0, 0)
             except KeyError:
@@ -125,7 +130,7 @@ class rapportController():
 
         elif level == 1: # Niveau Commune (Sous-titre 1)
             try:
-                paragraph.style = 'Heading 2'
+                paragraph.style = 'Heading2'
                 font.color.rgb = RGBColor(6, 0, 157)
             except KeyError:
                 print("Avertissement: Style 'Heading 2' non trouvé.")
@@ -140,7 +145,7 @@ class rapportController():
 
         elif level == 2: # Niveau Type de site (Sous-titre 2)
             try:
-                paragraph.style = 'Heading 3'
+                paragraph.style = 'Heading3'
                 para_format.first_line_indent = Cm(1.27)
             except KeyError:
                 print("Avertissement: Style 'Heading 3' non trouvé.")
