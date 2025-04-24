@@ -89,7 +89,7 @@ class formulaireTask(QgsTask):
 
         if result:
             QgsMessageLog.logMessage("Tâche terminée avec succès, fermeture de la fenêtre.", "MonPlugin", Qgis.Info)
-            # Fermer la dialogue
+            self.rapport_controller.buildRapport("docx")
             self.task_finished.emit(True)
         else:
             # La tâche a échoué (run a retourné False) ou a été annulée

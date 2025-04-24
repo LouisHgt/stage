@@ -53,4 +53,12 @@ Il a donc fallut que j'introduise des threads dans mon plugin. Desormais, quand 
 un thread se lance et il fera les action de traitement de données en arriere plan. Ainsi je peux afficher des choses pendant
 les actions lentes.
 
-23/04
+23/04 - Ce jour j'ai créée un deuxieme thread qui fait la deuxieme partie du plugin. J'ai du donc créer un signal de fin de thread pour quand le premier se termine
+on puisse lancer le second, car les programmes sont asychrones. Cette separation des threads pose des problemes de memoire. L'utilisation 
+de la librairie docx, plus precisement lors de la lecture d'un template pendant la creation de l'objet Document cause une erreur acces violation.
+J'ai passé la journée à essayer de trouver l'element en memoire qui posait probleme et pourquoi il ne se supprimait pas.
+
+24/04 J'ai assisté à deux reunions de pôle ajd. J'ai continué à chercher la source du bug toute la journée. j'ai remarqué à la fin de la journée 
+que lorsque je fais la partie creation de document dans le premier thread je n'ai pas d'erreur de memoire. J'ai donc décidé de revenir sur un seul thread,
+c'est la solution la plus simple car je n'ai pas accès au code bas niveau des librairies, surtour que si je le change je ne pourrais pas importer les changements
+sur les postes des utilisateurs.

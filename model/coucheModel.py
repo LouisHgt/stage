@@ -6,7 +6,8 @@ from qgis import processing # type: ignore
 from qgis.core import ( # type: ignore
     QgsFields, QgsVectorFileWriter, QgsField, QgsWkbTypes,
     QgsCoordinateReferenceSystem, QgsFeature, QgsVectorLayer,
-    QgsProject, QgsGeometry, QgsPointXY, QgsFeatureRequest
+    QgsProject, QgsGeometry, QgsPointXY, QgsFeatureRequest,
+    QgsLayerTreeGroup, QgsLayerTreeLayer
 )
 from qgis.PyQt.QtCore import QVariant # type: ignore
 
@@ -23,6 +24,7 @@ class coucheModel():
         if couche:
             return couche[0]
         else:
+            print('pas de couche avec ce nom : ' + nom_couche)
             return None
     
     def getCoucheLocationFromNom(self, nom_couche):
@@ -151,6 +153,16 @@ class coucheModel():
             except OSError as e:
                  print(f"Erreur lors de la création du dossier {tmp_path} : {e}")
 
+    def get_group_layers(self, group):
+        print('- group: ' + group.name())
+        for child in group.children():
+            if isinstance(child, QgsLayerTreeGroup):
+                # Recursive call to get nested groups
+                self.get_group_layers(child)
+            else:
+                print('  - layer: ' + child.name())
+                
+                
     def createStatusSensibilite(self, data):
         """Crée la couche shapefile de statut de sensibilité."""
         emplacement_couche = self.configModel.getFromConfig('emplacement_couche_status_sensibilite')[0]
@@ -194,6 +206,13 @@ class coucheModel():
                 writer.addFeature(feature)
                 
             del writer # Ferme et finalise le fichier
+            
+            
+            # root = self.project.layerTreeRoot()
+            # for child in root.children():
+            #     if isinstance(child, QgsLayerTreeGroup):
+            #         self.get_group_layers(child)
+                
 
         except Exception as e:
             print(f"ERREUR création couche {couche_path} : {e}")
@@ -263,6 +282,7 @@ class coucheModel():
             self.configModel.getFromConfig('emplacement_couche_status_sensibilite')[0],
             self.configModel.getFromConfig('nom_couche_status_sensibilite')[0] + '.shp'
         )
+        status_sentibilite_layer = QgsVectorLayer(status_sentibilite_path, "status_sentibilite_layer", "ogr")
         
         status_scenario_path = os.path.join(
             os.path.dirname(__file__),
@@ -270,7 +290,8 @@ class coucheModel():
             self.configModel.getFromConfig('emplacement_couche_status_scenario')[0],
             self.configModel.getFromConfig('nom_couche_status_scenario')[0] + '.shp'
         )
-        
+        status_scenario_layer = QgsVectorLayer(status_scenario_path, "status_scenario_path", "ogr")
+
         
         
         
@@ -287,6 +308,7 @@ class coucheModel():
 
 
         try:
+            # print(self.project.mapLayers().values())
             # Exécution de l'algorithme Processing
             result = processing.run(
                 "qgis:executesql",
@@ -294,8 +316,8 @@ class coucheModel():
                     'INPUT_DATASOURCES': [
                         self.getCoucheLocationFromNom('SITES_BASES_SDIS filtre RDI') + '|layerid=0|subset="VISU_RDI" = \'1\'',
                         self.getCoucheLocationFromNom('type_etendu'),
-                        status_sentibilite_path,
-                        status_scenario_path
+                        status_sentibilite_layer,
+                        status_scenario_layer
                     ],
                     'INPUT_QUERY': requete,
                     'INPUT_UID_FIELD': '',
@@ -305,8 +327,14 @@ class coucheModel():
                     'OUTPUT': site_retenu_path
                 }
             )
+            # print(self.project.mapLayers().values())
             
 
         except Exception as e:
             print(f"ERREUR execution SQL sur {status_sentibilite_path} vers {site_retenu_path}: {e}")
             raise
+        finally:
+            del status_sentibilite_layer
+            del status_scenario_layer
+            
+            

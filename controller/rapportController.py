@@ -2,6 +2,7 @@
 import os
 import time
 import docx
+from docx.package import Package
 from docx.shared import Pt, RGBColor, Cm # Pour les unités et couleurs
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT # Pour l'alignement (si besoin)
 from docx.enum.style import WD_STYLE_TYPE # Ajoutez cet import en haut du fichier si pas déjà fait
@@ -10,8 +11,7 @@ from .rapportTask import rapportTask
 from docx2pdf import convert
 from docx.styles.styles import Styles # Importer Styles peut aider pour le type hinting
 
-from qgis.core import QgsTask, QgsApplication, QgsMessageLog, Qgis # type: ignore
-
+from qgis.core import QgsTask, QgsApplication, QgsMessageLog, Qgis, QgsLayerTreeGroup, QgsLayerTreeLayer # type: ignore
 
 class rapportController():
     def __init__(self, config_model_inst, couche_model_inst):
@@ -39,11 +39,8 @@ class rapportController():
         
         rapport_path = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + fileType1
 
-        emplacement_template = os.path.join(os.path.dirname(__file__), '..', 'etc', 'template_rapport.docx')
-        self.rapport2 = docx.Document(emplacement_template)
         self.rapport = docx.Document()
-        
-        
+
         
         # Recuperation de la couche site_retenu
         emplacement_couche_site_retenu = self.configModel.getFromConfig('emplacement_couche_site_retenu')[0]
@@ -199,7 +196,7 @@ class rapportController():
         """
             Quand formTask est fini, pour appeler rapportTask
         """
-
+        
         if success and self.formView:
             description = "Tâche de generation de rapport en fcontion des données créées par le formulaire"
             self.current_task = rapportTask(
@@ -209,5 +206,7 @@ class rapportController():
                 self.dialog
             )
             QgsApplication.taskManager().addTask(self.current_task)
+            #del self.current_task
         else:
             print("echec de la tache formulaire, ou formView n'est pa dans rapportController")
+                    

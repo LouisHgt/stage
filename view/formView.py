@@ -156,7 +156,7 @@ class formView():
         self.progressBar.setMaximum(6)
         self.progressBar.setValue(0)
         
-        containerValidation.addWidget(self.progressBar)
+        #containerValidation.addWidget(self.progressBar)
     
     def setProgressBarValue(self, value):
         self.progressBar.setValue(value)
