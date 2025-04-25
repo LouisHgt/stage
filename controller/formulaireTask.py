@@ -42,7 +42,6 @@ class formulaireTask(QgsTask):
             self.setProgress(current_step / total_steps * 100)
             self.couche_model.clearTmpFolder() # Action de l'etape
             current_step += 1
-            self.formView.setProgressBarValue(current_step) # Actualisation de la progressBar
 
 
             # Étape 2: Créer Status Sensibilité
@@ -50,7 +49,6 @@ class formulaireTask(QgsTask):
             self.setProgress(current_step / total_steps * 100)
             self.couche_model.createStatusSensibilite(self.checkbox_values) # Action de l'etape
             current_step += 1
-            self.formView.setProgressBarValue(current_step) # Actualisation de la progressBar
 
 
             # Étape 3: Créer Status Scénario
@@ -58,7 +56,6 @@ class formulaireTask(QgsTask):
             self.setProgress(current_step / total_steps * 100)
             self.couche_model.createStatusScenario(self.combo_values) # Action de l'etape
             current_step += 1
-            self.formView.setProgressBarValue(current_step) # Actualisation de la progressBar
 
 
             # Étape 4: Créer Site Retenu
@@ -66,7 +63,6 @@ class formulaireTask(QgsTask):
             self.setProgress(current_step / total_steps * 100)
             self.couche_model.createSiteRetenu()
             current_step += 1
-            self.formView.setProgressBarValue(current_step) # Actualisation de la progressBar
             self.setProgress(current_step / total_steps * 100)
             
             return True

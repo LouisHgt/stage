@@ -198,7 +198,4 @@ class rapportController():
         """
         
         self.buildRapport("docx")
-
-        self.coucheModel.clearTmpFolder()
-        del self.formView
         self.dialog.accept()
