@@ -24,7 +24,7 @@ class rapportController():
     def setDialog(self, dialog):
         self.dialog = dialog
         
-    def buildRapport(self, fileType1):
+    def buildRapport(self):
         # On importe docx dans la methode pour eviter les conflits avec le garbage collector
         
         """Recupere les données d'entrée de la table 'site retenu' et crée un docx avec
@@ -37,7 +37,7 @@ class rapportController():
         emplacement_rapport = self.configModel.getFromConfig("emplacement_rapport")[0]
         nom_rapport = self.configModel.getFromConfig("nom_rapport")[0]
         
-        rapport_path = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + '.' + fileType1
+        rapport_path = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport) + nom_rapport + ".docx"
 
         self.rapport = docx.Document()
 
@@ -187,15 +187,31 @@ class rapportController():
 
 
     def convertToPdf(self):
-        fichier_docx_entree = "votre_document.docx"
-        fichier_pdf_sortie = "votre_document.pdf" 
-        #Todo : conversion du fichier docx créé en pdf
         
+        try:
+            emplacement_rapport = self.configModel.getFromConfig("emplacement_rapport")[0]
+            nom_rapport = self.configModel.getFromConfig("nom_rapport")[0]
+            
+            
+            fichier_docx_entree = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport) + nom_rapport + ".docx"
+            fichier_pdf_sortie = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport) + nom_rapport + '.pdf'
+        
+            print(fichier_docx_entree)
+            if os.path.exists(fichier_docx_entree):
+                convert(fichier_docx_entree, fichier_pdf_sortie)
+            else:
+                print("ce chemin n'existe pas : " + fichier_docx_entree)
+        
+        except Exception as e:
+            print("Erreur lors de la conversion du docx en pdf")
+            print(e)
+            raise
         
     def handleFormTaskFinished(self, success):
         """
             Quand formTask est fini
         """
         
-        self.buildRapport("docx")
+        self.buildRapport()
+        self.convertToPdf()
         self.dialog.accept()
