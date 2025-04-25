@@ -40,8 +40,7 @@ class formulaireTask(QgsTask):
             # Étape 1: Nettoyer Tmp
             if self.isCanceled(): return False
             self.setProgress(current_step / total_steps * 100)
-            QgsMessageLog.logMessage("Étape 1/5: Nettoyage du dossier temporaire...", "MonPlugin", Qgis.Info)
-            self.couche_model.clearTmpFolder()
+            self.couche_model.clearTmpFolder() # Action de l'etape
             current_step += 1
             self.formView.setProgressBarValue(current_step) # Actualisation de la progressBar
 
@@ -49,8 +48,7 @@ class formulaireTask(QgsTask):
             # Étape 2: Créer Status Sensibilité
             if self.isCanceled(): return False
             self.setProgress(current_step / total_steps * 100)
-            QgsMessageLog.logMessage("Étape 2/5: Création couche statut sensibilité...", "MonPlugin", Qgis.Info)
-            self.couche_model.createStatusSensibilite(self.checkbox_values)
+            self.couche_model.createStatusSensibilite(self.checkbox_values) # Action de l'etape
             current_step += 1
             self.formView.setProgressBarValue(current_step) # Actualisation de la progressBar
 
@@ -58,8 +56,7 @@ class formulaireTask(QgsTask):
             # Étape 3: Créer Status Scénario
             if self.isCanceled(): return False
             self.setProgress(current_step / total_steps * 100)
-            QgsMessageLog.logMessage("Étape 3/5: Création couche statut scénario...", "MonPlugin", Qgis.Info)
-            self.couche_model.createStatusScenario(self.combo_values)
+            self.couche_model.createStatusScenario(self.combo_values) # Action de l'etape
             current_step += 1
             self.formView.setProgressBarValue(current_step) # Actualisation de la progressBar
 
@@ -67,13 +64,13 @@ class formulaireTask(QgsTask):
             # Étape 4: Créer Site Retenu
             if self.isCanceled(): return False
             self.setProgress(current_step / total_steps * 100)
-            QgsMessageLog.logMessage("Étape 4/5: Création couche site retenu (SQL)...", "MonPlugin", Qgis.Info)
             self.couche_model.createSiteRetenu()
             current_step += 1
             self.formView.setProgressBarValue(current_step) # Actualisation de la progressBar
+            self.setProgress(current_step / total_steps * 100)
             
-            QgsMessageLog.logMessage("Tâche de recuperation de données terminée avec succes.", "MonPlugin", Qgis.Success)
-            return True # Succès
+            return True
+            
             
 
         except Exception as e:
@@ -88,9 +85,7 @@ class formulaireTask(QgsTask):
         boutonValider = self.dialog.findChild(QtWidgets.QPushButton, 'valider')
 
         if result:
-            QgsMessageLog.logMessage("Tâche terminée avec succès, fermeture de la fenêtre.", "MonPlugin", Qgis.Info)
-            self.rapport_controller.buildRapport("docx")
-            self.task_finished.emit(True)
+            self.task_finished.emit(True) # Signal fin de tâche
         else:
             # La tâche a échoué (run a retourné False) ou a été annulée
             if self.exception:

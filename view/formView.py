@@ -153,10 +153,10 @@ class formView():
         
         self.progressBar = QtWidgets.QProgressBar()
         self.progressBar.setMinimum(0)
-        self.progressBar.setMaximum(6)
+        self.progressBar.setMaximum(5)
         self.progressBar.setValue(0)
         
-        #containerValidation.addWidget(self.progressBar)
+        containerValidation.addWidget(self.progressBar)
     
     def setProgressBarValue(self, value):
         self.progressBar.setValue(value)

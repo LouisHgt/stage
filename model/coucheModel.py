@@ -336,5 +336,6 @@ class coucheModel():
         finally:
             del status_sentibilite_layer
             del status_scenario_layer
+            del result
             
             

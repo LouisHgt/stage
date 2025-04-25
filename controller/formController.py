@@ -63,8 +63,3 @@ class formController():
         # Ajouter la tâche au gestionnaire de tâches de QGIS
         QgsApplication.taskManager().addTask(self.current_task)
         self.current_task.task_finished.connect(self.rapportController.handleFormTaskFinished)
-
-    def handleFormTaskFinished(self, success):
-        del self.current_task
-        self.rapportController.handleFormTaskFinished(success)
-    

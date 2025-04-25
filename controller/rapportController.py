@@ -37,7 +37,7 @@ class rapportController():
         emplacement_rapport = self.configModel.getFromConfig("emplacement_rapport")[0]
         nom_rapport = self.configModel.getFromConfig("nom_rapport")[0]
         
-        rapport_path = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + fileType1
+        rapport_path = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + '.' + fileType1
 
         self.rapport = docx.Document()
 
@@ -194,19 +194,9 @@ class rapportController():
         
     def handleFormTaskFinished(self, success):
         """
-            Quand formTask est fini, pour appeler rapportTask
+            Quand formTask est fini
         """
         
-        if success and self.formView:
-            description = "Tâche de generation de rapport en fcontion des données créées par le formulaire"
-            self.current_task = rapportTask(
-                description,
-                self,
-                self.formView,
-                self.dialog
-            )
-            QgsApplication.taskManager().addTask(self.current_task)
-            #del self.current_task
-        else:
-            print("echec de la tache formulaire, ou formView n'est pa dans rapportController")
-                    
+        self.buildRapport("docx")
+        self.coucheModel.clearTmpFolder()
+        self.dialog.accept()
