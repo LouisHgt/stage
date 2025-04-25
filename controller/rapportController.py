@@ -2,13 +2,13 @@
 import os
 import time
 import docx
+import subprocess
 from docx.package import Package
 from docx.shared import Pt, RGBColor, Cm # Pour les unités et couleurs
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT # Pour l'alignement (si besoin)
 from docx.enum.style import WD_STYLE_TYPE # Ajoutez cet import en haut du fichier si pas déjà fait
 from ..model.configModel import configModel
 from .rapportTask import rapportTask
-from docx2pdf import convert
 from docx.styles.styles import Styles # Importer Styles peut aider pour le type hinting
 
 from qgis.core import QgsTask, QgsApplication, QgsMessageLog, Qgis, QgsLayerTreeGroup, QgsLayerTreeLayer # type: ignore
@@ -195,13 +195,30 @@ class rapportController():
             
             fichier_docx_entree = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport) + nom_rapport + ".docx"
             fichier_pdf_sortie = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport) + nom_rapport + '.pdf'
+            dossier_pdf_sortie = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport)
         
-            print(fichier_docx_entree)
-            if os.path.exists(fichier_docx_entree):
-                convert(fichier_docx_entree, fichier_pdf_sortie)
-            else:
-                print("ce chemin n'existe pas : " + fichier_docx_entree)
+            lo_path = os.path.dirname("C:\Program Files\LibreOffice\program\soffice.exe")
+
+            
+            # Création de la commande
+            command = [
+                lo_path,
+                '--headless', # Ne pas lancer l'interface graphique
+                '--convert-to', 'pdf',
+                '--outdir', dossier_pdf_sortie,
+                fichier_docx_entree
+            ]
         
+            result = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=20
+            )
+            
+            if result.returncode != 0:
+                print("erreur lors de la conversion du docx en pdf pendant la commande lo")
         except Exception as e:
             print("Erreur lors de la conversion du docx en pdf")
             print(e)
