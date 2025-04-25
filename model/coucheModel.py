@@ -42,7 +42,48 @@ class coucheModel():
             return None
 
     def getCoucheFromFile(self, path_couche, nom_couche):
-        return QgsVectorLayer(path_couche, nom_couche, "ogr")
+        
+        """
+        Charge une couche depuis un fichier, la copie en mémoire,
+        libère le fichier et retourne la couche mémoire.
+        """
+        
+        try :
+            
+            # Recup fichier
+            couche_fichier = QgsVectorLayer(path_couche, nom_couche, "ogr")
+            print(couche_fichier.fields().names())
+            
+            
+            # Copie dans la memoire
+            uri_memoire = f"{QgsWkbTypes.displayString(couche_fichier.wkbType())}?crs={couche_fichier.crs().authid()}"
+            couche_memoire = QgsVectorLayer(uri_memoire, nom_couche, "memory")
+            
+            provider_memoire = couche_memoire.dataProvider()
+            provider_memoire.addAttributes(couche_fichier.fields().toList())
+            couche_memoire.updateFields()
+            
+            features_a_copier = []
+            for feature in couche_fichier.getFeatures():
+                new_feature = QgsFeature(couche_memoire.fields())
+                new_feature.setGeometry(feature.geometry())
+                new_feature.setAttributes(feature.attributes())
+                features_a_copier.append(new_feature)
+                
+            provider_memoire.addFeatures(features_a_copier)
+            couche_memoire.updateExtents()
+            
+                   
+            del couche_fichier
+            
+            return couche_memoire
+            
+        except Exception as e:
+            print("Echec du chargement d'une couche : ")
+            print(e)
+            raise
+
+            
 
     def getNbrAttributsCouche(self, couche):
         i = 0
@@ -324,10 +365,11 @@ class coucheModel():
                     'INPUT_GEOMETRY_FIELD': '',
                     'INPUT_GEOMETRY_TYPE': 0,
                     'INPUT_GEOMETRY_CRS': None,
-                    'OUTPUT': site_retenu_path
+                    'OUTPUT': 'TEMPORARY_OUTPUT'
                 }
             )
-            # print(self.project.mapLayers().values())
+            
+            self.writeLayer(result['OUTPUT'], site_retenu_path)
             
 
         except Exception as e:
@@ -338,4 +380,22 @@ class coucheModel():
             del status_scenario_layer
             del result
             
+    def writeLayer(self, layer, emplacement_fichier):
+        
+        try:
+            context = self.project.transformContext()
+            options = QgsVectorFileWriter.SaveVectorOptions()
+            options.driverName = "ESRI Shapefile"
+            options.layerName = "site_retenu"
+            options.encoding = "UTF-8"
             
+            writer = QgsVectorFileWriter.writeAsVectorFormatV3(
+                layer,
+                emplacement_fichier,
+                context,
+                options
+            )
+            del writer
+        except Exception as e:
+            print(e)
+            raise

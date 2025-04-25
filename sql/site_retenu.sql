@@ -16,10 +16,10 @@ WHERE
     se.etat_type = 1      -- Filtrer sur le statut de sensibilité
     AND (
         (sc.indice_ret = 'Q10' AND (es.FREQ_INOND = 9 OR es.FREQ_INOND = 10)) OR
-        (sc.indice_ret = 'Q20' AND es.FREQ_INOND = 20) OR
-        (sc.indice_ret = 'Q30' AND es.FREQ_INOND = 30) OR
-        (sc.indice_ret = 'Q50' AND es.FREQ_INOND = 50) OR
-        (sc.indice_ret = 'Q100' AND es.FREQ_INOND = 100) OR
-        (sc.indice_ret = 'Qex' AND es.FREQ_INOND = 1000) OR
-        (sc.indice_ret = 'AZI' AND es.FREQ_INOND = 10000 OR es.FREQ_INOND = 999999)
+        (sc.indice_ret = 'Q20' AND es.FREQ_INOND >= 20) OR
+        (sc.indice_ret = 'Q30' AND es.FREQ_INOND >= 30) OR
+        (sc.indice_ret = 'Q50' AND es.FREQ_INOND >= 50) OR
+        (sc.indice_ret = 'Q100' AND es.FREQ_INOND >= 100) OR
+        (sc.indice_ret = 'Qex' AND es.FREQ_INOND >= 1000) OR
+        (sc.indice_ret = 'AZI' AND es.FREQ_INOND >= 10000 OR es.FREQ_INOND = 999999)
     )
