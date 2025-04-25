@@ -153,13 +153,14 @@ class formView():
         
         self.progressBar = QtWidgets.QProgressBar()
         self.progressBar.setMinimum(0)
-        self.progressBar.setMaximum(5)
+        self.progressBar.setMaximum(100)
         self.progressBar.setValue(0)
         
         containerValidation.addWidget(self.progressBar)
     
-    def setProgressBarValue(self, value):
-        self.progressBar.setValue(value)
+    def handleUpdateProgressBar(self, percentage_value):
+        
+        self.progressBar.setValue(int(percentage_value))
         
     def setupButtons(self, formController):
         """Setup des boutons de la fenetre QT."""

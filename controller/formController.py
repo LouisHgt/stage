@@ -60,6 +60,9 @@ class formController():
             self.dialog # Passe la référence de la dialog à la tâche
         )
 
+        # Liaison de la tâche aux handlers
+        self.current_task.progressChanged.connect(self.formView.handleUpdateProgressBar)
+        self.current_task.task_finished.connect(self.rapportController.handleFormTaskFinished)
         # Ajouter la tâche au gestionnaire de tâches de QGIS
         QgsApplication.taskManager().addTask(self.current_task)
-        self.current_task.task_finished.connect(self.rapportController.handleFormTaskFinished)
+        
