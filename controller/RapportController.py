@@ -30,7 +30,6 @@ class RapportController():
 
         # Instaciation du doc
         self.docxBuilder.initDoc()
-        # self.pdfBuilder.initDoc()
         
 
         
@@ -48,7 +47,6 @@ class RapportController():
         self.buildDocxRecursive(couche, self.coucheModel.getFilteredNiveau(couche))
         
         self.docxBuilder.writeDoc(rapport_path)
-        # self.pdfBuilder.writeDoc(pdf_path)
             
         print("rapport ecrit")
 
@@ -64,7 +62,6 @@ class RapportController():
         if current_nv >= self.niveau - 1:
             for elt in liste_elements:
                 self.docxBuilder.addParagraph(elt, current_nv)
-                # self.pdfBuilder.addParagraph(elt, current_nv)
             return
         
         for elt in liste_elements:
@@ -72,7 +69,6 @@ class RapportController():
             self.list.append(elt)
             
             self.docxBuilder.addParagraph(elt, current_nv)
-            # self.pdfBuilder.addParagraph(elt, current_nv)
             
             # On filtre
             nv_liste = self.coucheModel.getFilteredNiveau(couche, self.list)

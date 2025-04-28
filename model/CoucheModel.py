@@ -126,16 +126,15 @@ class CoucheModel():
                 i = 0
                 
                 
-                
                 for elt in liste_elt:
                     
-                    escaped_elt = elt.replace("'", "''") # Remplacer ' par ''
+                    if isinstance(elt, str):
+                        escaped_elt = elt.replace("'", "''") # Remplacer ' par ''
 
-                    expression += 'nv' + str(i) + ' = \'' + escaped_elt + '\' AND '
-                    i +=1
+                        expression += 'nv' + str(i) + ' = \'' + escaped_elt + '\' AND '
+                        i +=1
                 
                 expression = self.remove_and(expression) # On supprimme le dernier AND
-                
                 
                 request = QgsFeatureRequest().setFilterExpression(expression)
                 request.setSubsetOfAttributes(attributs, fields)
