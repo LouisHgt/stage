@@ -1,0 +1,64 @@
+Le but de mon stage est de developper un plugin sur un logciel de SIG (QGis) qui servira en cas de risque d'innondation,
+à repertorier selon un risque d'innondation indiqué et une taux de sensibilité (ex quels types de batiments sont concernés)
+l'ensemble des batiments à risque. Il faut donc que le plugin soit fiable et utilisable par un utilisateur non expert.
+La subtilité est qu'il doit aussi etre utilisable par un utilisateur intermediaire (celui qui met en place le programme sur les machines)
+qui lui devra pouvoir personnaliser le plugin en fonction de son utilisation (Ex ne plus classer les batiments selon les memes critères)
+ce qui rend le developpement plus complexe car je dois ecrire un code qui depend de nombreux parametre d'entrée, comme un fichier de configuration,
+ou des tables de données que j'utilise etc.
+
+
+Pendant les 3 premiers jour, j'ai rencontré l'équipe, discuté des enjeux du programme que j'allais developper,
+discuté des enjeux en general du travail de mes collègues. Aussi, avant de commencer la programmation j'ai fait un MCD
+des objets que j'allais manipuler dans mon plugin pour bien comprendre la facon dont j'allais traiter les données
+et que ca respecte les attentes  du produit demandé. Ce MCD m'a permit aussi d'avoir une connaissance approfondie
+dans le domaine pour lequel je faisais ce plugin : la géomatique en general et aussi plus precisement l'analyse des risques
+d'innondation ainsi que la mise en place de dispositifs en cas d'urgence. Ensuite, une fois le MCD complété partiellement
+(je ne pouvais pas le faire en entier car il me fallais commencer à développer pour etre sur de la facon dont j'allais traiter les données
+à partir d'un certain moment). Dans les jours suivants de la semaine, j'ai lu des codes de plugins qui existaient deja sur le logiciel
+afin de m'en inspirer et de comprendre comme QGis integre des plugins. J'ai donc commencé à coder un premier jet d'un plugin pour me familliariser
+avec l'api PyQGis. En parallele, j'ai commencé à chercher une bibliotheque d'ecriture de docx adaptée car le produit du formulaire
+est un document docx. J'ai donc d'un coté créé une premiere boite de dialogue dans QGis et une fonction pytho qui genere un dox comme je voulais.
+Lors de la semaine suivante, j'ai commencé le vrai plugin , en commencant par la création de la boite de dialogue.
+L'interface se construit avec un fichier xml, et j'ai utilisé une outil fournit par QGis qui s'appelle QTDesigner pour gérer l'architecture globale graphique
+de mes elements. Une fois le xml généré avec QTdesigner, j'ai comencé à integrer au plugin un code qui construit le formulaire en deux partie:
+Une dans laquelle on indique pour chaque bassin versant son indice de retour annuel, et l'autre dans lequel on indique pour chaque type 
+de batiment si on veut l'afficher ou pas. Il fallais donc faire appel à l'api PyQGis pour récupérer l'ensemble des bassins et
+les types de batiment, ainsi que pour stocker les données récupéréées à la fin du formulaire dans des tables QGis qui agiront comme
+la BD temporaire pendant le temps de vie de l'utilisation du plugin. Le défi de cette partie a été de construire le formulaire en 
+fonction de tables préexistentes et qui pourront changer dans le futur (Ex on change la table de clasification des batiments)
+C'est ici qu'on retrouve le besoin de créer un code utilisable par deux types d'utilisateurs, experts et non experts.
+J'ai ensuite défini une table qui répertorie le resultat du formulaire, et mon objectif etait de construire le formulaire en fonction
+de l'architecture de cette table. Ainsi, meme si je n'avais pas encore coder la partie ou je faisais la requete et
+le stockage des données que j'allais afficher dans le doc, j'avais defini la facon dont j'allais les stocker et surtout 
+un code qui contruit un doc à partir d'une table bien définie. De cette manière, je pouvais travailler sur les deux parties
+presque independamment, et je séparait la logique du formulaire de la logique de création de doc. Une fois la création
+de doc assez entammée, j'ai travaillé sur la création d'une vraie requete sql et de son utilisation avec l'api QGis.
+Il me fallais utiliser une requete SQL pour la performance dans le traitement de grandes données pour accelerer le plugin, 
+mais aussi pour qu'on puisse simplement modifier la requete sans avoir à coder du python. à la fin de la deuxieme semaine,
+j'avais un plugin fonctionnel, qui était capable de remplir les condition minimales d'utilisation avec quelques points faibles :
+le plugin est toujours lent car les requetes à l'api QGis sont lentes, meme si j'ai essayé de les optimiser(Tri des données à récuperer
+avec des filtres et code qui fonctionne avec le minimum d'information sur les données, par exemple si je dois récupérer les sites selon
+deux de leurs attributs, je ne recupere que les données concernants leursdeux attributs ce qui acceler la requete).
+Aussi, il faut que j'ammeliore la gestion de la memoire, car actuellement j'utilise un grabage collectore manuellement à la fin du plugin
+pour clean les données. Enfin le formulaire en lui meme ne remplit pas toutes les demandes de mon collegue qui l'utilisera.
+
+
+
+22/04 - AUjourd'hui j'ai prevu de revoir l'architecture de mon programme. C'est de la programmation objet et je gere une interface
+graphique, j'ai donc choisis que mon code ait une architecture MVC. J'ai donc réparti mes classes dans 3 dossiers, modele, vue, controller.
+
+Aussi, j'ai revu la facon dont mon plugin s'executait. Je voulais pouvoir afficher des choses pendant
+que mon programme fais des taches longues (afficher une barre de progression)
+Il a donc fallut que j'introduise des threads dans mon plugin. Desormais, quand on valide le formulaire,
+un thread se lance et il fera les action de traitement de données en arriere plan. Ainsi je peux afficher des choses pendant
+les actions lentes.
+
+23/04 - Ce jour j'ai créée un deuxieme thread qui fait la deuxieme partie du plugin. J'ai du donc créer un signal de fin de thread pour quand le premier se termine
+on puisse lancer le second, car les programmes sont asychrones. Cette separation des threads pose des problemes de memoire. L'utilisation 
+de la librairie docx, plus precisement lors de la lecture d'un template pendant la creation de l'objet Document cause une erreur acces violation.
+J'ai passé la journée à essayer de trouver l'element en memoire qui posait probleme et pourquoi il ne se supprimait pas.
+
+24/04 J'ai assisté à deux reunions de pôle ajd. J'ai continué à chercher la source du bug toute la journée. j'ai remarqué à la fin de la journée 
+que lorsque je fais la partie creation de document dans le premier thread je n'ai pas d'erreur de memoire. J'ai donc décidé de revenir sur un seul thread,
+c'est la solution la plus simple car je n'ai pas accès au code bas niveau des librairies, surtour que si je le change je ne pourrais pas importer les changements
+sur les postes des utilisateurs.

@@ -2,10 +2,10 @@ import configparser
 import os
 
 
-class configManager():
+class configModel():
     def __init__(self):
         #Emplacement du fichier de config
-        self.config_path = os.path.join(os.path.dirname(__file__), 'etc', 'Config.cfg')
+        self.config_path = os.path.join(os.path.dirname(__file__), '..', 'etc', 'Config.cfg')
 
         #Instance d'un parseur de config
         self.config = configparser.ConfigParser()
@@ -16,7 +16,6 @@ class configManager():
         Retourne :
             liste de strings
         """
-        
 
         #Liste des indices retour
         liste = []
@@ -31,4 +30,8 @@ class configManager():
         else:
             print("Le fichier de config n'existe pas.")
 
-        return liste
+        if len(liste) == 1:
+            return liste[0]
+        else:
+            return liste
+

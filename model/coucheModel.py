@@ -1,20 +1,22 @@
 import os
+import time
 
-from .configManager import configManager
+from .configModel import configModel
 from qgis import processing # type: ignore
 from qgis.core import ( # type: ignore
     QgsFields, QgsVectorFileWriter, QgsField, QgsWkbTypes,
     QgsCoordinateReferenceSystem, QgsFeature, QgsVectorLayer,
-    QgsProject, QgsGeometry, QgsPointXY, QgsFeatureRequest
+    QgsProject, QgsGeometry, QgsPointXY, QgsFeatureRequest,
+    QgsLayerTreeGroup, QgsLayerTreeLayer
 )
 from qgis.PyQt.QtCore import QVariant # type: ignore
 
-class coucheManager():
+class coucheModel():
 
-    def __init__(self, project: QgsProject):
+    def __init__(self):
         """Constructeur."""
-        self.project = project
-        self.configManager = configManager()
+        self.project = QgsProject.instance()
+        self.configModel = configModel()
 
     def getCoucheFromNom(self, nom_couche):
         """Récupère la couche QGIS depuis son nom."""
@@ -22,6 +24,7 @@ class coucheManager():
         if couche:
             return couche[0]
         else:
+            print('pas de couche avec ce nom : ' + nom_couche)
             return None
     
     def getCoucheLocationFromNom(self, nom_couche):
@@ -39,7 +42,47 @@ class coucheManager():
             return None
 
     def getCoucheFromFile(self, path_couche, nom_couche):
-        return QgsVectorLayer(path_couche, nom_couche, "ogr")
+        
+        """
+        Charge une couche depuis un fichier, la copie en mémoire,
+        libère le fichier et retourne la couche mémoire.
+        """
+        
+        try :
+            
+            # Recup fichier
+            couche_fichier = QgsVectorLayer(path_couche, nom_couche, "ogr")
+            
+            
+            # Copie dans la memoire
+            uri_memoire = f"{QgsWkbTypes.displayString(couche_fichier.wkbType())}?crs={couche_fichier.crs().authid()}"
+            couche_memoire = QgsVectorLayer(uri_memoire, nom_couche, "memory")
+            
+            provider_memoire = couche_memoire.dataProvider()
+            provider_memoire.addAttributes(couche_fichier.fields().toList())
+            couche_memoire.updateFields()
+            
+            features_a_copier = []
+            for feature in couche_fichier.getFeatures():
+                new_feature = QgsFeature(couche_memoire.fields())
+                new_feature.setGeometry(feature.geometry())
+                new_feature.setAttributes(feature.attributes())
+                features_a_copier.append(new_feature)
+                
+            provider_memoire.addFeatures(features_a_copier)
+            couche_memoire.updateExtents()
+            
+                   
+            del couche_fichier
+            
+            return couche_memoire
+            
+        except Exception as e:
+            print("Echec du chargement d'une couche : ")
+            print(e)
+            raise
+
+            
 
     def getNbrAttributsCouche(self, couche):
         i = 0
@@ -71,6 +114,12 @@ class coucheManager():
         filtered_nv = set()
         
         
+        fields = couche.fields()
+        attributs = []
+        for field in fields.names():
+            attributs.append(field)
+        
+        
         try:
             if nv != 0:
                 # Construction de l'expression pour le filtre
@@ -89,15 +138,19 @@ class coucheManager():
                 expression = self.remove_and(expression) # On supprimme le dernier AND
                 
                 
-                print(expression)
                 request = QgsFeatureRequest().setFilterExpression(expression)
-                    
+                request.setSubsetOfAttributes(attributs, fields)
+                
+                
                 for f in couche.getFeatures(request):
                     filtered_nv.add(f[current_attribut])
+                
                     
             else:
 
-                for f in couche.getFeatures():
+
+                request = QgsFeatureRequest().setSubsetOfAttributes(attributs, fields)
+                for f in couche.getFeatures(request):
                     filtered_nv.add(f[current_attribut])
         
         except Exception as e:
@@ -124,7 +177,7 @@ class coucheManager():
         
     def clearTmpFolder(self):
         """Supprime tous les fichiers du dossier tmp."""
-        tmp_path = os.path.join(os.path.dirname(__file__), 'tmp')
+        tmp_path = os.path.join(os.path.dirname(__file__), '..',  'tmp')
         if os.path.exists(tmp_path):
             for file_name in os.listdir(tmp_path):
                 file_path = os.path.join(tmp_path, file_name)
@@ -140,13 +193,23 @@ class coucheManager():
             except OSError as e:
                  print(f"Erreur lors de la création du dossier {tmp_path} : {e}")
 
+    def get_group_layers(self, group):
+        print('- group: ' + group.name())
+        for child in group.children():
+            if isinstance(child, QgsLayerTreeGroup):
+                # Recursive call to get nested groups
+                self.get_group_layers(child)
+            else:
+                print('  - layer: ' + child.name())
+                
+                
     def createStatusSensibilite(self, data):
         """Crée la couche shapefile de statut de sensibilité."""
-        emplacement_couche = self.configManager.getFromConfig('emplacement_couche_status_sensibilite')[0]
-        nom_couche_config = self.configManager.getFromConfig('nom_couche_status_sensibilite')[0]
+        emplacement_couche = self.configModel.getFromConfig('emplacement_couche_status_sensibilite')
+        nom_couche_config = self.configModel.getFromConfig('nom_couche_status_sensibilite')
         nom_couche_base, _ = os.path.splitext(nom_couche_config)
         nom_couche_shp = nom_couche_base + '.shp'
-        couche_path = os.path.join(os.path.dirname(__file__), emplacement_couche, nom_couche_shp)
+        couche_path = os.path.join(os.path.dirname(__file__), '..',  emplacement_couche, nom_couche_shp)
 
         fields = QgsFields()
         fields.append(QgsField("id_type", QVariant.Int, "Integer"))
@@ -183,6 +246,13 @@ class coucheManager():
                 writer.addFeature(feature)
                 
             del writer # Ferme et finalise le fichier
+            
+            
+            # root = self.project.layerTreeRoot()
+            # for child in root.children():
+            #     if isinstance(child, QgsLayerTreeGroup):
+            #         self.get_group_layers(child)
+                
 
         except Exception as e:
             print(f"ERREUR création couche {couche_path} : {e}")
@@ -191,11 +261,11 @@ class coucheManager():
 
     def createStatusScenario(self, data):
         """Crée la couche shapefile de statut de scénario."""
-        emplacement_couche = self.configManager.getFromConfig('emplacement_couche_status_scenario')[0]
-        nom_couche_config = self.configManager.getFromConfig('nom_couche_status_scenario')[0]
+        emplacement_couche = self.configModel.getFromConfig('emplacement_couche_status_scenario')
+        nom_couche_config = self.configModel.getFromConfig('nom_couche_status_scenario')
         nom_couche_base, _ = os.path.splitext(nom_couche_config)
         nom_couche_shp = nom_couche_base + '.shp'
-        couche_path = os.path.join(os.path.dirname(__file__), emplacement_couche, nom_couche_shp)
+        couche_path = os.path.join(os.path.dirname(__file__), '..',  emplacement_couche, nom_couche_shp)
 
         fields = QgsFields()
         fields.append(QgsField("nom_bassin", QVariant.String, "String"))
@@ -240,23 +310,28 @@ class coucheManager():
         # Chemin de sortie
         site_retenu_path = os.path.join(
             os.path.dirname(__file__),
-            self.configManager.getFromConfig('emplacement_couche_site_retenu')[0],
-            self.configManager.getFromConfig('nom_couche_site_retenu')[0] + '.shp'
+            '..', 
+            self.configModel.getFromConfig('emplacement_couche_site_retenu'),
+            self.configModel.getFromConfig('nom_couche_site_retenu') + '.shp'
         )
 
         # Chemins d'entrée
         status_sentibilite_path = os.path.join(
             os.path.dirname(__file__),
-            self.configManager.getFromConfig('emplacement_couche_status_sensibilite')[0],
-            self.configManager.getFromConfig('nom_couche_status_sensibilite')[0] + '.shp'
+            '..',
+            self.configModel.getFromConfig('emplacement_couche_status_sensibilite'),
+            self.configModel.getFromConfig('nom_couche_status_sensibilite') + '.shp'
         )
+        status_sentibilite_layer = QgsVectorLayer(status_sentibilite_path, "status_sentibilite_layer", "ogr")
         
         status_scenario_path = os.path.join(
             os.path.dirname(__file__),
-            self.configManager.getFromConfig('emplacement_couche_status_scenario')[0],
-            self.configManager.getFromConfig('nom_couche_status_scenario')[0] + '.shp'
+            '..',
+            self.configModel.getFromConfig('emplacement_couche_status_scenario'),
+            self.configModel.getFromConfig('nom_couche_status_scenario') + '.shp'
         )
-        
+        status_scenario_layer = QgsVectorLayer(status_scenario_path, "status_scenario_path", "ogr")
+
         
         
         
@@ -265,12 +340,10 @@ class coucheManager():
             raise FileNotFoundError(f"Fichier d'entrée pour SQL non trouvé: {status_sentibilite_path}")
 
 
-        requete_path = os.path.join(os.path.dirname(__file__), 'sql', self.configManager.getFromConfig('requete_formulaire'))
+        requete_path = os.path.join(os.path.dirname(__file__), '..', 'sql', self.configModel.getFromConfig('requete_formulaire'))
         
         requete = self.getSqlQuery(requete_path)
         
-        # print(requete)
-
 
         try:
             # Exécution de l'algorithme Processing
@@ -280,19 +353,45 @@ class coucheManager():
                     'INPUT_DATASOURCES': [
                         self.getCoucheLocationFromNom('SITES_BASES_SDIS filtre RDI') + '|layerid=0|subset="VISU_RDI" = \'1\'',
                         self.getCoucheLocationFromNom('type_etendu'),
-                        status_sentibilite_path,
-                        status_scenario_path
+                        status_sentibilite_layer,
+                        status_scenario_layer
                     ],
                     'INPUT_QUERY': requete,
                     'INPUT_UID_FIELD': '',
                     'INPUT_GEOMETRY_FIELD': '',
                     'INPUT_GEOMETRY_TYPE': 0,
                     'INPUT_GEOMETRY_CRS': None,
-                    'OUTPUT': site_retenu_path
+                    'OUTPUT': 'TEMPORARY_OUTPUT'
                 }
             )
+            
+            self.writeLayer(result['OUTPUT'], site_retenu_path)
             
 
         except Exception as e:
             print(f"ERREUR execution SQL sur {status_sentibilite_path} vers {site_retenu_path}: {e}")
+            raise
+        finally:
+            del status_sentibilite_layer
+            del status_scenario_layer
+            del result
+            
+    def writeLayer(self, layer, emplacement_fichier):
+        
+        try:
+            context = self.project.transformContext()
+            options = QgsVectorFileWriter.SaveVectorOptions()
+            options.driverName = "ESRI Shapefile"
+            options.layerName = "site_retenu"
+            options.encoding = "UTF-8"
+            
+            writer = QgsVectorFileWriter.writeAsVectorFormatV3(
+                layer,
+                emplacement_fichier,
+                context,
+                options
+            )
+            del writer
+        except Exception as e:
+            print(e)
             raise

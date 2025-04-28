@@ -1,8 +1,7 @@
 from time import sleep
 import os
-from .coucheManager import coucheManager
-from .configManager import configManager
-from .rapportBuilder import rapportBuilder
+from ..model.coucheModel import coucheModel
+from ..model.configModel import configModel
 
 
 # --- Imports QGIS ---
@@ -13,19 +12,16 @@ from qgis.PyQt import uic # type: ignore
 from qgis.PyQt import QtWidgets # type: ignore
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'DDTM_GenerationRapport_dialog_base.ui'))
+    os.path.dirname(__file__), '..\DDTM_GenerationRapport_dialog_base.ui'))
 
-class formBuilder(QtWidgets.QDialog, FORM_CLASS):
+class formView():
     
-    
-    def __init__(self, dialog):
-        """Constructor."""
-        project = QgsProject.instance()
-        self.dialog = dialog
-        self.coucheManager = coucheManager(project)
-        self.configManager = configManager()
-        self.rapportBuilder = rapportBuilder(self.coucheManager)
-        
+    def __init__(self, dialog, couche_model_inst, config_model_inst, rapport_controller_inst):
+        self.dialog = dialog # Référence à la fenêtre UI
+        # Stocker les instances si la vue en a DIRECTEMENT besoin (sinon, inutile)
+        self.coucheModel = couche_model_inst
+        self.configModel = config_model_inst
+
         
 
     def getComboBoxValues(self):
@@ -40,31 +36,6 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
         for type, checkBox in self.dialog.checkboxes.items():
             values[type] = checkBox.isChecked()
         return values
-
-    def pressed(self):
-        """
-            Affiche les données et les inscrit dans des couches
-            Crée le rapport docx
-            Ferme la boite de dialogue
-        """
-        
-        # print(self.getComboBoxValues())
-        # print(self.getCheckboxValues())
-        
-        self.coucheManager.clearTmpFolder()
-        self.coucheManager.createStatusSensibilite(self.getCheckboxValues())
-        self.coucheManager.createStatusScenario(self.getComboBoxValues())
-        self.coucheManager.createSiteRetenu()
-        
-        self.rapportBuilder.buildRapport(".docx")
-        output = os.path.join(os.path.dirname(__file__), 'tmp')
-        
-        # Suppression des objets non referencés
-        import gc
-        gc.collect()
-        
-        
-        self.dialog.accept()
         
 
     def setupFormulaireScenario(self):
@@ -78,15 +49,15 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
             # --------------------- Choix de l'indice de retour par bassin. -------------------
             
             # Recuperation des indices depuis le fichier de config
-            indices = self.configManager.getFromConfig('indices')
+            indices = self.configModel.getFromConfig('indices')
 
             
             # Recuperation des bassins depuis la couche QGis
-            nom_couche_bassins = self.configManager.getFromConfig('nom_couche_bassins')[0]
-            libelle_bassins = self.configManager.getFromConfig('libelle_couche_bassins')[0]
+            nom_couche_bassins = self.configModel.getFromConfig('nom_couche_bassins')
+            libelle_bassins = self.configModel.getFromConfig('libelle_couche_bassins')
             
             # Recupération de la couche Bassins_versants
-            bassins_versants = self.coucheManager.getCoucheFromNom(nom_couche_bassins)
+            bassins_versants = self.coucheModel.getCoucheFromNom(nom_couche_bassins)
             
             bassins = []
             # On parcourt la liste des couches pour récupérer leur noms
@@ -142,8 +113,8 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
             formulaire = container_sensibilite.findChild(QtWidgets.QFormLayout, 'formulaire_sensibilite')
             
             # Recuperation des types utilisés depuis la couche QGis
-            nom_couche_type = self.configManager.getFromConfig('nom_couche_type')
-            if nom_couche_type[0] == "":  # Si getFromConfig ne renvoie rien
+            nom_couche_type = self.configModel.getFromConfig('nom_couche_type')
+            if nom_couche_type == "":  # Si getFromConfig ne renvoie rien
                 nom_couche_type = "type_etendu"  # Valeur par défaut
             else:
                 nom_couche_type = nom_couche_type[0]  # Récupérer la première valeur
@@ -177,8 +148,21 @@ class formBuilder(QtWidgets.QDialog, FORM_CLASS):
             self.dialog.close()
             raise
         
+    def setupProgressBar(self):
+        containerValidation = self.dialog.findChild(QtWidgets.QVBoxLayout, 'container_validation')
         
-    def setupButtons(self):
+        self.progressBar = QtWidgets.QProgressBar()
+        self.progressBar.setMinimum(0)
+        self.progressBar.setMaximum(100)
+        self.progressBar.setValue(0)
+        
+        containerValidation.addWidget(self.progressBar)
+    
+    def handleUpdateProgressBar(self, percentage_value):
+        
+        self.progressBar.setValue(int(percentage_value))
+        
+    def setupButtons(self, formController):
         """Setup des boutons de la fenetre QT."""
         boutonValider = self.dialog.findChild(QtWidgets.QPushButton, 'valider')
-        boutonValider.clicked.connect(lambda: self.pressed())
+        boutonValider.clicked.connect(lambda: formController.pressed(boutonValider))

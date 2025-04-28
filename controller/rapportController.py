@@ -1,46 +1,59 @@
 
 import os
+import time
 import docx
+import subprocess
+from docx.package import Package
 from docx.shared import Pt, RGBColor, Cm # Pour les unités et couleurs
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT # Pour l'alignement (si besoin)
-from .configManager import configManager
+from docx.enum.style import WD_STYLE_TYPE # Ajoutez cet import en haut du fichier si pas déjà fait
+from ..model.configModel import configModel
+from docx.styles.styles import Styles # Importer Styles peut aider pour le type hinting
 
-class rapportBuilder():
-    def __init__(self, coucheManager):
-        self.configManager = configManager()
-        self.coucheManager = coucheManager
+from qgis.core import QgsTask, QgsApplication, QgsMessageLog, Qgis, QgsLayerTreeGroup, QgsLayerTreeLayer # type: ignore
 
-    def buildRapport(self, fileType1):
+class rapportController():
+    def __init__(self, config_model_inst, couche_model_inst):
+        self.configModel = config_model_inst
+        self.coucheModel = couche_model_inst
+        
+    def setFormView(self, formView):
+        self.formView = formView
+        
+    def setDialog(self, dialog):
+        self.dialog = dialog
+        
+    def buildRapport(self):
         # On importe docx dans la methode pour eviter les conflits avec le garbage collector
         
-        """Recupere les données d'entrée de la table 'site retenu' et crée un docx avec
-
-        Args:
-            Prend entre 1 et deux types de documents de sortie
+        """
+            Recupere les données d'entrée de la table 'site retenu' et crée un docx avec
         """
         
         # Recuparation de l'emplacement du rapport et de son nom
-        emplacement_rapport = self.configManager.getFromConfig("emplacement_rapport")[0]
-        nom_rapport = self.configManager.getFromConfig("nom_rapport")[0]
+        emplacement_rapport = self.configModel.getFromConfig("emplacement_rapport")
+        nom_rapport = self.configModel.getFromConfig("nom_rapport")
         
-        rapport_path = os.path.join(os.path.dirname(__file__), emplacement_rapport, nom_rapport) + fileType1
+        rapport_path = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + ".docx"
 
         self.rapport = docx.Document()
+
         
         # Recuperation de la couche site_retenu
-        emplacement_couche_site_retenu = self.configManager.getFromConfig('emplacement_couche_site_retenu')[0]
-        nom_couche_site_retenu = self.configManager.getFromConfig('nom_couche_site_retenu')[0]
-        path_site_retenu = os.path.join(os.path.dirname(__file__), emplacement_couche_site_retenu, nom_couche_site_retenu) + ".shp"
-        couche = self.coucheManager.getCoucheFromFile(path_site_retenu, "site_retenu")
+        emplacement_couche_site_retenu = self.configModel.getFromConfig('emplacement_couche_site_retenu')
+        nom_couche_site_retenu = self.configModel.getFromConfig('nom_couche_site_retenu')
+        path_site_retenu = os.path.join(os.path.dirname(__file__), '..', emplacement_couche_site_retenu, nom_couche_site_retenu) + ".shp"
+        couche = self.coucheModel.getCoucheFromFile(path_site_retenu, "site_retenu")
 
         
         
-        self.niveau = self.coucheManager.getNbrAttributsCouche(couche)
+        self.niveau = self.coucheModel.getNbrAttributsCouche(couche)
         self.list = [] # Liste dans laquelle on stocke les elements servants au filtre
-        self.buildDocxRecursive(couche, self.coucheManager.getFilteredNiveau(couche))
         
+        self.buildDocxRecursive(couche, self.coucheModel.getFilteredNiveau(couche))
         
         self.rapport.save(rapport_path)
+
         del self.rapport
         print("rapport ecrit")
 
@@ -55,7 +68,8 @@ class rapportBuilder():
         # Condition d'arret
         if current_nv >= self.niveau - 1:
             for elt in liste_elements:
-                p = self.rapport.add_heading(elt, 1)
+                pass
+                p = self.rapport.add_paragraph(elt)
                 self.apply_style_to_paragraph(p, current_nv)
             return
         
@@ -66,12 +80,13 @@ class rapportBuilder():
             
             
             p = self.rapport.add_paragraph(elt)
+            
+            
             self.apply_style_to_paragraph(p, current_nv)
             
             
-            
             # On filtre
-            nv_liste = self.coucheManager.getFilteredNiveau(couche, self.list)
+            nv_liste = self.coucheModel.getFilteredNiveau(couche, self.list)
             # On rappelle avec la nouvelle liste
             self.buildDocxRecursive(couche, nv_liste)
             self.list.pop()
@@ -91,7 +106,7 @@ class rapportBuilder():
         # --- Application des styles/formats par niveau ---
         if level == 0:  # Niveau Bassin Versant (Titre Principal)
             try:
-                paragraph.style = 'Heading 1' # Style Word intégré
+                paragraph.style = 'Heading1' # Style Word intégré
                 paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
                 font.color.rgb = RGBColor(255, 0, 0)
             except KeyError:
@@ -108,7 +123,7 @@ class rapportBuilder():
 
         elif level == 1: # Niveau Commune (Sous-titre 1)
             try:
-                paragraph.style = 'Heading 2'
+                paragraph.style = 'Heading2'
                 font.color.rgb = RGBColor(6, 0, 157)
             except KeyError:
                 print("Avertissement: Style 'Heading 2' non trouvé.")
@@ -123,7 +138,7 @@ class rapportBuilder():
 
         elif level == 2: # Niveau Type de site (Sous-titre 2)
             try:
-                paragraph.style = 'Heading 3'
+                paragraph.style = 'Heading3'
                 para_format.first_line_indent = Cm(1.27)
             except KeyError:
                 print("Avertissement: Style 'Heading 3' non trouvé.")
@@ -168,6 +183,47 @@ class rapportBuilder():
 
 
     def convertToPdf(self):
-        fichier_docx_entree = "votre_document.docx"
-        fichier_pdf_sortie = "votre_document.pdf" 
-        #Todo : conversion du fichier docx créé en pdf
+        
+        try:
+            emplacement_rapport = self.configModel.getFromConfig("emplacement_rapport")
+            nom_rapport = self.configModel.getFromConfig("nom_rapport")
+            
+            
+            fichier_docx_entree = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport) + nom_rapport + ".docx"
+            fichier_pdf_sortie = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport) + nom_rapport + '.pdf'
+            dossier_pdf_sortie = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport)
+        
+            lo_path = os.path.dirname("C:\Program Files\LibreOffice\program\soffice.exe")
+
+            
+            # Création de la commande
+            command = [
+                lo_path,
+                '--headless', # Ne pas lancer l'interface graphique
+                '--convert-to', 'pdf',
+                '--outdir', dossier_pdf_sortie,
+                fichier_docx_entree
+            ]
+        
+            result = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=20
+            )
+            
+            if result.returncode != 0:
+                print("erreur lors de la conversion du docx en pdf pendant la commande lo")
+        except Exception as e:
+            print("Erreur lors de la conversion du docx en pdf")
+            print(e)
+            raise
+        
+    def handleFormTaskFinished(self, success):
+        """
+            Quand formTask est fini
+        """
+        
+        self.buildRapport()
+        self.dialog.accept()
