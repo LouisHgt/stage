@@ -52,7 +52,6 @@ class coucheModel():
             
             # Recup fichier
             couche_fichier = QgsVectorLayer(path_couche, nom_couche, "ogr")
-            print(couche_fichier.fields().names())
             
             
             # Copie dans la memoire

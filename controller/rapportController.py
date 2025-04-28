@@ -230,5 +230,5 @@ class rapportController():
         """
         
         self.buildRapport()
-        self.convertToPdf()
+        # self.convertToPdf()
         self.dialog.accept()
