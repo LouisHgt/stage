@@ -30,9 +30,9 @@ from .resources import *
 # Import the code for the dialog
 from .DDTM_GenerationRapport_dialog import DDTM_GenerationRapportDialog
 import os.path
-from .model.coucheModel import coucheModel
-from .model.configModel import configModel
-from .controller.rapportController import rapportController
+from .model.CoucheModel import CoucheModel
+from .model.ConfigModel import ConfigModel
+from .controller.RapportController import RapportController
 
 
 class DDTM_GenerationRapport:
@@ -71,9 +71,9 @@ class DDTM_GenerationRapport:
         self.first_start = None
         
         # Instanciation des objets MVC
-        self.configModel = configModel()
-        self.coucheModel = coucheModel()
-        self.rapportController = rapportController(self.configModel, self.coucheModel)
+        self.configModel = ConfigModel()
+        self.coucheModel = CoucheModel()
+        self.rapportController = RapportController(self.configModel, self.coucheModel)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):

@@ -5,9 +5,9 @@ from docx.enum.text import WD_PARAGRAPH_ALIGNMENT # Pour l'alignement (si besoin
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
-from .builder import builder
+from .Builder import Builder
 
-class docxBuilder(builder):
+class DocxBuilder(Builder):
     
     def __init__(self):
         pass

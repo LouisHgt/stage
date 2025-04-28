@@ -1,6 +1,6 @@
 import os
 
-from .configModel import configModel
+from .ConfigModel import ConfigModel
 from qgis import processing # type: ignore
 from qgis.core import ( # type: ignore
     QgsFields, QgsVectorFileWriter, QgsField, QgsWkbTypes,
@@ -10,12 +10,12 @@ from qgis.core import ( # type: ignore
 )
 from qgis.PyQt.QtCore import QVariant # type: ignore
 
-class coucheModel():
+class CoucheModel():
 
     def __init__(self):
         """Constructeur."""
         self.project = QgsProject.instance()
-        self.configModel = configModel()
+        self.configModel = ConfigModel()
 
     def getCoucheFromNom(self, nom_couche):
         """Récupère la couche QGIS depuis son nom."""

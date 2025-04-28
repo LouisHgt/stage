@@ -2,13 +2,13 @@ import os
 import docx
 import subprocess
 
-from .docxBuilder import docxBuilder
+from .DocxBuilder import DocxBuilder
 
-class rapportController():
+class RapportController():
     def __init__(self, config_model_inst, couche_model_inst):
         self.configModel = config_model_inst
         self.coucheModel = couche_model_inst
-        self.docxBuilder = docxBuilder()
+        self.docxBuilder = DocxBuilder()
         
     def setFormView(self, formView):
         self.formView = formView

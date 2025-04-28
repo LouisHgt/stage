@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class builder(ABC):
+class Builder(ABC):
     @abstractmethod
     def initDoc(self):
         pass

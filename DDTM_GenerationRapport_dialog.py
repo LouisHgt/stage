@@ -23,7 +23,7 @@
 """
 
 import os
-from .controller.formController import formController
+from .controller.FormController import FormController
 
 # --- Imports Qt ---
 from qgis.PyQt import uic # type: ignore 
@@ -42,7 +42,7 @@ class DDTM_GenerationRapportDialog(QtWidgets.QDialog, FORM_CLASS):
 
         
         # Instancier le contrôleur en passant les instances
-        self.formController = formController(self, couche_model_inst, config_model_inst, rapport_controller_inst)
+        self.formController = FormController(self, couche_model_inst, config_model_inst, rapport_controller_inst)
 
         try:
             self.formController.setupFormulaires()

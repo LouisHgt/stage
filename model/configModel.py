@@ -2,7 +2,7 @@ import configparser
 import os
 
 
-class configModel():
+class ConfigModel():
     def __init__(self):
         #Emplacement du fichier de config
         self.config_path = os.path.join(os.path.dirname(__file__), '..', 'etc', 'Config.cfg')

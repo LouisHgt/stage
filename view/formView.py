@@ -1,8 +1,5 @@
 from time import sleep
 import os
-from ..model.coucheModel import coucheModel
-from ..model.configModel import configModel
-
 
 # --- Imports QGIS ---
 from qgis.core import QgsProject, QgsVectorLayer, QgsMessageLog, Qgis # type: ignore
@@ -14,7 +11,7 @@ from qgis.PyQt import QtWidgets # type: ignore
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), '..\DDTM_GenerationRapport_dialog_base.ui'))
 
-class formView():
+class FormView():
     
     def __init__(self, dialog, couche_model_inst, config_model_inst, rapport_controller_inst):
         self.dialog = dialog # Référence à la fenêtre UI

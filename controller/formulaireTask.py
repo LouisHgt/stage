@@ -2,7 +2,7 @@ from qgis.core import QgsTask, QgsMessageLog, Qgis # type: ignore
 from qgis.PyQt import QtWidgets # type: ignore
 from qgis.PyQt.QtCore import pyqtSignal # type: ignore
 
-class formulaireTask(QgsTask):
+class FormulaireTask(QgsTask):
     """Tâche QGIS pour générer le rapport en arrière-plan."""
 
     # Signal de fin de tache

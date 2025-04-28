@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
-from .builder import builder
+from .Builder import Builder
 
-class pdfBuilder(builder):
+class PdfBuilder(Builder):
     
     def __init__(self):
         pass
