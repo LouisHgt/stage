@@ -1,15 +1,33 @@
 import docx
+
 from docx.shared import Pt, RGBColor, Inches # Pour les unités et couleurs
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT # Pour l'alignement (si besoin)
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
-class docxBuilder():
+from .builder import builder
+
+class docxBuilder(builder):
     
     def __init__(self):
         pass
     
-    def addParagraph(self, document:docx.Document, elt, niveau):
+    def initDoc(self):
+        self.document = docx.Document()
+    
+    def writeDoc(self, rapport_path):
+        
+        try:
+            self.document.save(rapport_path)
+        except Exception as e:
+            print("Erreur lors de l'ecriture du doc dans writeDoc")
+            print(e)
+            raise
+        finally:
+            del self.document
+        
+    
+    def addParagraph(self, elt, niveau):
         """
             Prend en argument un document, l'élément à ajouter
             et le niveau du paragraph à ajouter
@@ -17,11 +35,13 @@ class docxBuilder():
             Renvoie le document modifié
         """
         
-        p = document.add_paragraph(elt)
-        
-        self.apply_style_to_paragraph(p, niveau)
-        
-        return document
+        try:
+            p = self.document.add_paragraph(elt)
+            
+            self.apply_style_to_paragraph(p, niveau)
+        except Exception as e:
+            print("Erreur lors de la creation du paragraphe dans addParagraph")
+            raise
     
     def apply_style_to_paragraph(self, paragraph, level):
         para_format = paragraph.paragraph_format

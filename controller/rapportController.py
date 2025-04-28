@@ -30,7 +30,8 @@ class rapportController():
         rapport_path = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + ".docx"
 
         # Instaciation du doc
-        self.rapport = docx.Document()
+        self.docxBuilder.initDoc()
+        self.docxBuilder.initDoc()
         
 
         
@@ -47,9 +48,8 @@ class rapportController():
         
         self.buildDocxRecursive(couche, self.coucheModel.getFilteredNiveau(couche))
         
-        self.rapport.save(rapport_path)
+        self.docxBuilder.writeDoc(rapport_path)
 
-        del self.rapport
         print("rapport ecrit")
 
         
@@ -63,15 +63,14 @@ class rapportController():
         # Condition d'arret
         if current_nv >= self.niveau - 1:
             for elt in liste_elements:
-                pass
-                self.rapport = self.docxBuilder.addParagraph(self.rapport, elt, current_nv)
+                self.rapport = self.docxBuilder.addParagraph(elt, current_nv)
             return
         
         for elt in liste_elements:
 
             self.list.append(elt)
             
-            self.rapport = self.docxBuilder.addParagraph(self.rapport, elt, current_nv)
+            self.rapport = self.docxBuilder.addParagraph(elt, current_nv)
             
             # On filtre
             nv_liste = self.coucheModel.getFilteredNiveau(couche, self.list)
