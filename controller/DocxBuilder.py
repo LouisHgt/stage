@@ -5,9 +5,8 @@ from docx.enum.text import WD_PARAGRAPH_ALIGNMENT # Pour l'alignement (si besoin
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
-from .Builder import Builder
 
-class DocxBuilder(Builder):
+class DocxBuilder():
     
     def __init__(self):
         pass
@@ -164,3 +163,4 @@ class DocxBuilder(Builder):
                 r.rPr.rFonts.set(qn('w:eastAsia'), 'Calibri')
             para_format.space_before = Pt(0)
             para_format.space_after = Pt(6)
+            

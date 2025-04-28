@@ -1,6 +1,4 @@
 import os
-import docx
-import subprocess
 
 from .DocxBuilder import DocxBuilder
 
@@ -28,10 +26,11 @@ class RapportController():
         nom_rapport = self.configModel.getFromConfig("nom_rapport")
         
         rapport_path = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + ".docx"
+        pdf_path = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + ".pdf"
 
         # Instaciation du doc
         self.docxBuilder.initDoc()
-        self.docxBuilder.initDoc()
+        # self.pdfBuilder.initDoc()
         
 
         
@@ -49,7 +48,8 @@ class RapportController():
         self.buildDocxRecursive(couche, self.coucheModel.getFilteredNiveau(couche))
         
         self.docxBuilder.writeDoc(rapport_path)
-
+        # self.pdfBuilder.writeDoc(pdf_path)
+            
         print("rapport ecrit")
 
         
@@ -63,14 +63,16 @@ class RapportController():
         # Condition d'arret
         if current_nv >= self.niveau - 1:
             for elt in liste_elements:
-                self.rapport = self.docxBuilder.addParagraph(elt, current_nv)
+                self.docxBuilder.addParagraph(elt, current_nv)
+                # self.pdfBuilder.addParagraph(elt, current_nv)
             return
         
         for elt in liste_elements:
 
             self.list.append(elt)
             
-            self.rapport = self.docxBuilder.addParagraph(elt, current_nv)
+            self.docxBuilder.addParagraph(elt, current_nv)
+            # self.pdfBuilder.addParagraph(elt, current_nv)
             
             # On filtre
             nv_liste = self.coucheModel.getFilteredNiveau(couche, self.list)
@@ -87,32 +89,15 @@ class RapportController():
             nom_rapport = self.configModel.getFromConfig("nom_rapport")
             
             
-            fichier_docx_entree = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport) + nom_rapport + ".docx"
-            fichier_pdf_sortie = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport) + nom_rapport + '.pdf'
-            dossier_pdf_sortie = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport)
+            fichier_docx_entree = "\"" + os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + ".docx\""
+            dossier_pdf_sortie = "\"" + os.path.join(os.path.dirname(__file__), '..', emplacement_rapport) + "\""
         
-            lo_path = os.path.dirname("C:\Program Files\LibreOffice\program\soffice.exe")
+            lo_path = "\"C:\\Program Files\\LibreOffice\\program\\soffice.exe\""
+            bat_path = os.path.join(os.path.dirname(__file__), '..', 'etc', 'convertToPdf.bat')
 
+            command = bat_path + " " + fichier_docx_entree + " " + dossier_pdf_sortie + " " + lo_path
+            os.system(command)
             
-            # Création de la commande
-            command = [
-                lo_path,
-                '--headless', # Ne pas lancer l'interface graphique
-                '--convert-to', 'pdf',
-                '--outdir', dossier_pdf_sortie,
-                fichier_docx_entree
-            ]
-        
-            result = subprocess.run(
-                command,
-                capture_output=True,
-                text=True,
-                check=False,
-                timeout=20
-            )
-            
-            if result.returncode != 0:
-                print("erreur lors de la conversion du docx en pdf pendant la commande lo")
         except Exception as e:
             print("Erreur lors de la conversion du docx en pdf")
             print(e)
@@ -122,6 +107,14 @@ class RapportController():
         """
             Quand formTask est fini
         """
-        
-        self.buildRapport()
-        self.dialog.accept()
+        try:
+            self.buildRapport()
+            
+            # Conversion en pdf si précisé dans le config
+            if self.configModel.getFromConfig("convertir_en_pdf") == "1":
+                self.convertToPdf()
+        except Exception as e:
+            print("erreur lors de l'ecriture du doc ou du pdf dans le handlerFormTaskFinished")
+            print(e)
+        finally:
+            self.dialog.accept()
