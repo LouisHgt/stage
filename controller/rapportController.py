@@ -8,7 +8,6 @@ from docx.shared import Pt, RGBColor, Cm # Pour les unités et couleurs
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT # Pour l'alignement (si besoin)
 from docx.enum.style import WD_STYLE_TYPE # Ajoutez cet import en haut du fichier si pas déjà fait
 from ..model.configModel import configModel
-from .rapportTask import rapportTask
 from docx.styles.styles import Styles # Importer Styles peut aider pour le type hinting
 
 from qgis.core import QgsTask, QgsApplication, QgsMessageLog, Qgis, QgsLayerTreeGroup, QgsLayerTreeLayer # type: ignore
@@ -27,24 +26,22 @@ class rapportController():
     def buildRapport(self):
         # On importe docx dans la methode pour eviter les conflits avec le garbage collector
         
-        """Recupere les données d'entrée de la table 'site retenu' et crée un docx avec
-
-        Args:
-            Prend entre 1 et deux types de documents de sortie
+        """
+            Recupere les données d'entrée de la table 'site retenu' et crée un docx avec
         """
         
         # Recuparation de l'emplacement du rapport et de son nom
-        emplacement_rapport = self.configModel.getFromConfig("emplacement_rapport")[0]
-        nom_rapport = self.configModel.getFromConfig("nom_rapport")[0]
+        emplacement_rapport = self.configModel.getFromConfig("emplacement_rapport")
+        nom_rapport = self.configModel.getFromConfig("nom_rapport")
         
-        rapport_path = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport) + nom_rapport + ".docx"
+        rapport_path = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + ".docx"
 
         self.rapport = docx.Document()
 
         
         # Recuperation de la couche site_retenu
-        emplacement_couche_site_retenu = self.configModel.getFromConfig('emplacement_couche_site_retenu')[0]
-        nom_couche_site_retenu = self.configModel.getFromConfig('nom_couche_site_retenu')[0]
+        emplacement_couche_site_retenu = self.configModel.getFromConfig('emplacement_couche_site_retenu')
+        nom_couche_site_retenu = self.configModel.getFromConfig('nom_couche_site_retenu')
         path_site_retenu = os.path.join(os.path.dirname(__file__), '..', emplacement_couche_site_retenu, nom_couche_site_retenu) + ".shp"
         couche = self.coucheModel.getCoucheFromFile(path_site_retenu, "site_retenu")
 
@@ -86,7 +83,6 @@ class rapportController():
             
             
             self.apply_style_to_paragraph(p, current_nv)
-            
             
             
             # On filtre
@@ -189,8 +185,8 @@ class rapportController():
     def convertToPdf(self):
         
         try:
-            emplacement_rapport = self.configModel.getFromConfig("emplacement_rapport")[0]
-            nom_rapport = self.configModel.getFromConfig("nom_rapport")[0]
+            emplacement_rapport = self.configModel.getFromConfig("emplacement_rapport")
+            nom_rapport = self.configModel.getFromConfig("nom_rapport")
             
             
             fichier_docx_entree = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport) + nom_rapport + ".docx"
@@ -230,5 +226,4 @@ class rapportController():
         """
         
         self.buildRapport()
-        # self.convertToPdf()
         self.dialog.accept()

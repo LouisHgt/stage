@@ -53,8 +53,8 @@ class formView():
 
             
             # Recuperation des bassins depuis la couche QGis
-            nom_couche_bassins = self.configModel.getFromConfig('nom_couche_bassins')[0]
-            libelle_bassins = self.configModel.getFromConfig('libelle_couche_bassins')[0]
+            nom_couche_bassins = self.configModel.getFromConfig('nom_couche_bassins')
+            libelle_bassins = self.configModel.getFromConfig('libelle_couche_bassins')
             
             # Recupération de la couche Bassins_versants
             bassins_versants = self.coucheModel.getCoucheFromNom(nom_couche_bassins)
@@ -114,7 +114,7 @@ class formView():
             
             # Recuperation des types utilisés depuis la couche QGis
             nom_couche_type = self.configModel.getFromConfig('nom_couche_type')
-            if nom_couche_type[0] == "":  # Si getFromConfig ne renvoie rien
+            if nom_couche_type == "":  # Si getFromConfig ne renvoie rien
                 nom_couche_type = "type_etendu"  # Valeur par défaut
             else:
                 nom_couche_type = nom_couche_type[0]  # Récupérer la première valeur

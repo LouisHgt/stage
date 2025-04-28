@@ -2,7 +2,6 @@ from ..view.formView import formView
 from ..model.coucheModel import coucheModel
 from ..model import configModel
 from .formulaireTask import formulaireTask
-from .rapportTask import rapportTask
 
 # --- Imports Qt ---
 from qgis.PyQt import QtWidgets # type: ignore
@@ -16,7 +15,7 @@ class formController():
         # Stocker les instances reçues
         self.coucheModel = couche_model_inst
         self.configModel = config_model_inst
-        self.rapportController = rapport_controller_inst # Utilise l'instance reçue
+        self.rapportController = rapport_controller_inst
         
 
         # Instancier la vue en passant les instances
@@ -38,8 +37,6 @@ class formController():
             Ferme la boite de dialogue
         """
         
-        # print(self.getComboBoxValues())
-        # print(self.getCheckboxValues())
            
         boutonValider.setEnabled(False)
         boutonValider.setText('Traitement...')
@@ -53,11 +50,9 @@ class formController():
         self.current_task = formulaireTask(
             task_description,
             self.coucheModel,
-            self.rapportController,
-            self.formView,
             combo_values,
             checkbox_values,
-            self.dialog # Passe la référence de la dialog à la tâche
+            self.dialog
         )
 
         # Liaison de la tâche aux handlers

@@ -205,8 +205,8 @@ class coucheModel():
                 
     def createStatusSensibilite(self, data):
         """Crée la couche shapefile de statut de sensibilité."""
-        emplacement_couche = self.configModel.getFromConfig('emplacement_couche_status_sensibilite')[0]
-        nom_couche_config = self.configModel.getFromConfig('nom_couche_status_sensibilite')[0]
+        emplacement_couche = self.configModel.getFromConfig('emplacement_couche_status_sensibilite')
+        nom_couche_config = self.configModel.getFromConfig('nom_couche_status_sensibilite')
         nom_couche_base, _ = os.path.splitext(nom_couche_config)
         nom_couche_shp = nom_couche_base + '.shp'
         couche_path = os.path.join(os.path.dirname(__file__), '..',  emplacement_couche, nom_couche_shp)
@@ -261,8 +261,8 @@ class coucheModel():
 
     def createStatusScenario(self, data):
         """Crée la couche shapefile de statut de scénario."""
-        emplacement_couche = self.configModel.getFromConfig('emplacement_couche_status_scenario')[0]
-        nom_couche_config = self.configModel.getFromConfig('nom_couche_status_scenario')[0]
+        emplacement_couche = self.configModel.getFromConfig('emplacement_couche_status_scenario')
+        nom_couche_config = self.configModel.getFromConfig('nom_couche_status_scenario')
         nom_couche_base, _ = os.path.splitext(nom_couche_config)
         nom_couche_shp = nom_couche_base + '.shp'
         couche_path = os.path.join(os.path.dirname(__file__), '..',  emplacement_couche, nom_couche_shp)
@@ -311,24 +311,24 @@ class coucheModel():
         site_retenu_path = os.path.join(
             os.path.dirname(__file__),
             '..', 
-            self.configModel.getFromConfig('emplacement_couche_site_retenu')[0],
-            self.configModel.getFromConfig('nom_couche_site_retenu')[0] + '.shp'
+            self.configModel.getFromConfig('emplacement_couche_site_retenu'),
+            self.configModel.getFromConfig('nom_couche_site_retenu') + '.shp'
         )
 
         # Chemins d'entrée
         status_sentibilite_path = os.path.join(
             os.path.dirname(__file__),
             '..',
-            self.configModel.getFromConfig('emplacement_couche_status_sensibilite')[0],
-            self.configModel.getFromConfig('nom_couche_status_sensibilite')[0] + '.shp'
+            self.configModel.getFromConfig('emplacement_couche_status_sensibilite'),
+            self.configModel.getFromConfig('nom_couche_status_sensibilite') + '.shp'
         )
         status_sentibilite_layer = QgsVectorLayer(status_sentibilite_path, "status_sentibilite_layer", "ogr")
         
         status_scenario_path = os.path.join(
             os.path.dirname(__file__),
             '..',
-            self.configModel.getFromConfig('emplacement_couche_status_scenario')[0],
-            self.configModel.getFromConfig('nom_couche_status_scenario')[0] + '.shp'
+            self.configModel.getFromConfig('emplacement_couche_status_scenario'),
+            self.configModel.getFromConfig('nom_couche_status_scenario') + '.shp'
         )
         status_scenario_layer = QgsVectorLayer(status_scenario_path, "status_scenario_path", "ogr")
 
@@ -344,11 +344,8 @@ class coucheModel():
         
         requete = self.getSqlQuery(requete_path)
         
-        # print(requete)
-
 
         try:
-            # print(self.project.mapLayers().values())
             # Exécution de l'algorithme Processing
             result = processing.run(
                 "qgis:executesql",

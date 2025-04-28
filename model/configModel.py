@@ -16,7 +16,6 @@ class configModel():
         Retourne :
             liste de strings
         """
-        
 
         #Liste des indices retour
         liste = []
@@ -31,4 +30,8 @@ class configModel():
         else:
             print("Le fichier de config n'existe pas.")
 
-        return liste
+        if len(liste) == 1:
+            return liste[0]
+        else:
+            return liste
+

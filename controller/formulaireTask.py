@@ -8,7 +8,7 @@ class formulaireTask(QgsTask):
     # Signal de fin de tache
     task_finished = pyqtSignal(bool)   
      
-    def __init__(self, description, couche_model, rapport_controller, formView, combo_values, checkbox_values, dialog_reference):
+    def __init__(self, description, couche_model, combo_values, checkbox_values, dialog_reference):
         """
         Constructeur de la tâche.
 
@@ -21,8 +21,6 @@ class formulaireTask(QgsTask):
         """
         super().__init__(description, QgsTask.CanCancel) # Permet l'annulation
         self.couche_model = couche_model
-        self.rapport_controller = rapport_controller
-        self.formView = formView
         self.combo_values = combo_values
         self.checkbox_values = checkbox_values
         self.dialog = dialog_reference # Garde une référence à la dialog
@@ -78,7 +76,6 @@ class formulaireTask(QgsTask):
     def finished(self, result):
         """Exécuté dans le thread principal après la fin de run()."""
         # Récupérer le bouton Valider de la dialogue
-        boutonValider = self.dialog.findChild(QtWidgets.QPushButton, 'valider')
 
         if result:
             self.task_finished.emit(True) # Signal fin de tâche
@@ -89,14 +86,9 @@ class formulaireTask(QgsTask):
                 QgsMessageLog.logMessage(f"La tâche a échoué : {self.exception}", "MonPlugin", Qgis.Critical)
                 QtWidgets.QMessageBox.critical(self.dialog, "Erreur de Tâche", f"Une erreur est survenue durant la génération :\n\n{self.exception}")
             elif self.isCanceled():
-                 QgsMessageLog.logMessage("La tâche a été annulée par l'utilisateur.", "MonPlugin", Qgis.Warning)
-                 QtWidgets.QMessageBox.warning(self.dialog, "Tâche Annulée", "La génération du rapport a été annulée.")
+                QgsMessageLog.logMessage("La tâche a été annulée par l'utilisateur.", "MonPlugin", Qgis.Warning)
+                QtWidgets.QMessageBox.warning(self.dialog, "Tâche Annulée", "La génération du rapport a été annulée.")
             else:
-                 # Échec inconnu
-                 QgsMessageLog.logMessage("La tâche a échoué pour une raison inconnue.", "MonPlugin", Qgis.Critical)
-                 QtWidgets.QMessageBox.critical(self.dialog, "Erreur Inconnue", "La tâche a échoué sans retourner d'erreur spécifique.")
-
-            # Très important : Réactiver le bouton en cas d'échec ou d'annulation
-            if boutonValider:
-                boutonValider.setEnabled(True)
-                boutonValider.setText('Valider') # Remettre le texte initial
+                # Échec inconnu
+                QgsMessageLog.logMessage("La tâche a échoué pour une raison inconnue.", "MonPlugin", Qgis.Critical)
+                QtWidgets.QMessageBox.critical(self.dialog, "Erreur Inconnue", "La tâche a échoué sans retourner d'erreur spécifique.")
