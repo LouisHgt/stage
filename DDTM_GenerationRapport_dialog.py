@@ -23,7 +23,6 @@
 """
 
 import os
-from time import sleep
 from .controller.formController import formController
 
 # --- Imports Qt ---

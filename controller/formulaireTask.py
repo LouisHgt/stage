@@ -1,4 +1,4 @@
-from qgis.core import QgsTask, QgsApplication, QgsMessageLog, Qgis # type: ignore
+from qgis.core import QgsTask, QgsMessageLog, Qgis # type: ignore
 from qgis.PyQt import QtWidgets # type: ignore
 from qgis.PyQt.QtCore import pyqtSignal # type: ignore
 

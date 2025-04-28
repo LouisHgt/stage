@@ -1,5 +1,4 @@
 import os
-import time
 
 from .configModel import configModel
 from qgis import processing # type: ignore

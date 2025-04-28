@@ -1,6 +1,4 @@
 from ..view.formView import formView
-from ..model.coucheModel import coucheModel
-from ..model import configModel
 from .formulaireTask import formulaireTask
 
 # --- Imports Qt ---
