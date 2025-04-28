@@ -4,7 +4,6 @@ import docx
 from docx.shared import Pt, RGBColor, Cm # Pour les unités et couleurs
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT # Pour l'alignement (si besoin)
 from .configManager import configManager
-from docx2pdf import convert
 
 class rapportBuilder():
     def __init__(self, coucheManager):
