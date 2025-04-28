@@ -62,3 +62,10 @@ J'ai passé la journée à essayer de trouver l'element en memoire qui posait pr
 que lorsque je fais la partie creation de document dans le premier thread je n'ai pas d'erreur de memoire. J'ai donc décidé de revenir sur un seul thread,
 c'est la solution la plus simple car je n'ai pas accès au code bas niveau des librairies, surtour que si je le change je ne pourrais pas importer les changements
 sur les postes des utilisateurs.
+
+25/04 J'ai essayé de trouver un moyen de convertir mon docx en pdf à la fin du traitement du plugin. Le probleme est que QGis ne semble pas avoir accès
+aux commandes subprocess. C'est un probleme de droits.
+
+28/04 J'ai créé un readme, nettoyé mon code, supprimé les fichiers inutiles. Je suis en train de choisir si je cherche un moyen de convertir mon docx en pdf
+ou si je créer directement le pdf. Le probleme est que la création de pdf ne se fait pas comme celle du docx. Cela voudrait dire qu'il serait compliqué
+de faire correspondre les deux documents. -> FPDF2
