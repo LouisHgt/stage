@@ -83,12 +83,6 @@
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
        </spacer>
       </item>
       <item>
@@ -115,15 +109,52 @@
     </widget>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="container_validation">
-     <item>
-      <widget class="QPushButton" name="valider">
-       <property name="text">
-        <string>Valider</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QWidget" name="verticalWidget_2" native="true">
+     <layout class="QVBoxLayout" name="container_footer">
+      <item>
+       <widget class="QWidget" name="" native="true">
+        <layout class="QHBoxLayout" name="container_validation">
+         <item>
+          <widget class="QWidget" name="verticalWidget" native="true">
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <item>
+             <widget class="QPushButton" name="valider">
+              <property name="text">
+               <string>Valider</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="pdfCheckBox">
+           <property name="text">
+            <string>Générer en pdf</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>

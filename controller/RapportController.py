@@ -2,6 +2,8 @@ import os
 
 from .DocxBuilder import DocxBuilder
 
+from qgis.PyQt import QtWidgets # type: ignore
+
 class RapportController():
     def __init__(self, config_model_inst, couche_model_inst):
         self.configModel = config_model_inst
@@ -106,8 +108,11 @@ class RapportController():
         try:
             self.buildRapport()
             
+            pdfCheckBox = self.formView.dialog.findChild(QtWidgets.QCheckBox, 'pdfCheckBox')
+            isPdfBoxChecked = pdfCheckBox.isChecked()
+                    
             # Conversion en pdf si précisé dans le config
-            if self.configModel.getFromConfig("convertir_en_pdf") == "1":
+            if isPdfBoxChecked:
                 self.convertToPdf()
         except Exception as e:
             print("erreur lors de l'ecriture du doc ou du pdf dans le handlerFormTaskFinished")

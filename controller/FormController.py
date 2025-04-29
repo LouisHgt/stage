@@ -32,7 +32,7 @@ class FormController():
             Ferme la boite de dialogue
         """
         
-           
+        
         boutonValider.setEnabled(False)
         boutonValider.setText('Traitement...')
         self.formView.setupProgressBar()
