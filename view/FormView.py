@@ -166,3 +166,10 @@ class FormView():
         """Setup des boutons de la fenetre QT."""
         boutonValider = self.dialog.findChild(QtWidgets.QPushButton, 'valider')
         boutonValider.clicked.connect(lambda: formController.pressed(boutonValider))
+        
+        pdfCheckBox = self.dialog.findChild(QtWidgets.QCheckBox, 'pdfCheckBox')
+        
+        if self.configModel.getFromConfig('convertir_en_pdf') == '1':
+            pdfCheckBox.setChecked(True)
+        else:
+            pdfCheckBox.setChecked(False)

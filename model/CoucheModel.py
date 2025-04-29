@@ -6,7 +6,7 @@ from qgis.core import ( # type: ignore
     QgsFields, QgsVectorFileWriter, QgsField, QgsWkbTypes,
     QgsCoordinateReferenceSystem, QgsFeature, QgsVectorLayer,
     QgsProject, QgsGeometry, QgsPointXY, QgsFeatureRequest,
-    QgsLayerTreeGroup, QgsLayerTreeLayer
+    QgsLayerTreeGroup
 )
 from qgis.PyQt.QtCore import QVariant # type: ignore
 

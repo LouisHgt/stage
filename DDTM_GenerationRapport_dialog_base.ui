@@ -147,11 +147,14 @@
         </item>
         <item>
          <widget class="QCheckBox" name="pdfCheckBox">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <property name="text">
            <string>Générer en pdf</string>
           </property>
           <property name="checked">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
          </widget>
         </item>
