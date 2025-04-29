@@ -33,7 +33,7 @@ class DocxBuilder():
             
             Renvoie le document modifié
         """
-        
+        print(niveau)
         try:
             p = self.document.add_paragraph(elt)
             
@@ -41,6 +41,9 @@ class DocxBuilder():
         except Exception as e:
             print("Erreur lors de la creation du paragraphe dans addParagraph")
             raise
+    
+    def addHyperlink(paragraph, elt):
+        pass
     
     def apply_style_to_paragraph(self, paragraph, level):
         para_format = paragraph.paragraph_format
