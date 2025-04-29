@@ -68,4 +68,8 @@ aux commandes subprocess. C'est un probleme de droits.
 
 28/04 J'ai créé un readme, nettoyé mon code, supprimé les fichiers inutiles. Je suis en train de choisir si je cherche un moyen de convertir mon docx en pdf
 ou si je créer directement le pdf. Le probleme est que la création de pdf ne se fait pas comme celle du docx. Cela voudrait dire qu'il serait compliqué
-de faire correspondre les deux documents. -> FPDF2
+de faire correspondre les deux documents. -> FPDF2. Finalement, j'ai trouvé qu'il est possible de lancer la commande libre office pour generer le pdf
+avec al commande os.system(). J'ai donc implementé la conversion de document avec cette commande.
+
+29/04 J'ai ajouté une checkbox pour que l'utilisateur puisse selectionner si il veut une conversion pdf ou pas.
+Je vais mtn essayer que les noms des sites puissent etre cliquable pour qu'on puisse rechercher facilement le site sur internet.
