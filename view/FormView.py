@@ -19,20 +19,6 @@ class FormView():
         self.coucheModel = couche_model_inst
         self.configModel = config_model_inst
 
-    def findWidget(self, parent, type, nom):
-
-        result = None 
-        for widget in parent.children():
-            print(type(widget))
-            if widget == parent.findChild(type, nom):
-                return widget
-            else:
-                result = self.findWidget(widget, type, nom)
-        
-        if result:
-            return result
-        else:
-            return None
 
     def getComboBoxValues(self):
         """Récupère les valeurs sélectionnées dans les QComboBox."""
@@ -54,9 +40,7 @@ class FormView():
         try:
             
             # Recuperation du conteneur principal QT
-            container_scenario2 = self.dialog.findChild(QtWidgets.QWidget, 'container_formulaires').findChild(QtWidgets.QWidget, 'container_scenario')
-            container_scenario = self.findWidget(self.dialog, QtWidgets.QWidget, 'container_scenario')
-            print(type(container_scenario))
+            container_scenario = self.dialog.findChild(QtWidgets.QWidget, 'container_scenario')
             
             # --------------------- Choix de l'indice de retour par bassin. -------------------
             
@@ -161,8 +145,12 @@ class FormView():
             raise
         
     def setupProgressBar(self):
-        containerFooter = self.dialog.findChild(QtWidgets.QHBoxLayout, 'container_footer')
         
+        pdfCheckBox = self.dialog.findChild(QtWidgets.QCheckBox, 'pdfCheckBox')
+        pdfCheckBox.hide()
+        
+        containerFooter = self.dialog.findChild(QtWidgets.QVBoxLayout, 'container_footer')
+                
         self.progressBar = QtWidgets.QProgressBar()
         self.progressBar.setMinimum(0)
         self.progressBar.setMaximum(100)

@@ -87,13 +87,19 @@ class RapportController():
             nom_rapport = self.configModel.getFromConfig("nom_rapport")
             
             
-            fichier_docx_entree = "\"" + os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + ".docx\""
-            dossier_pdf_sortie = "\"" + os.path.join(os.path.dirname(__file__), '..', emplacement_rapport) + "\""
+            fichier_docx_entree = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + ".docx"
+            fichier_docx_entree = "\"" + fichier_docx_entree + "\""
+            
+            dossier_pdf_sortie = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport)
+            dossier_pdf_sortie = "\"" + dossier_pdf_sortie + "\""
         
             lo_path = "\"C:\\Program Files\\LibreOffice\\program\\soffice.exe\""
+            
             bat_path = os.path.join(os.path.dirname(__file__), '..', 'etc', 'convertToPdf.bat')
 
-            command = bat_path + " " + fichier_docx_entree + " " + dossier_pdf_sortie + " " + lo_path
+            space = " "
+            command = bat_path + space + fichier_docx_entree + space + dossier_pdf_sortie + space + lo_path
+            
             os.system(command)
             
         except Exception as e:

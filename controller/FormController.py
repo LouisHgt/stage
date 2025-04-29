@@ -31,8 +31,7 @@ class FormController():
             Crée le rapport docx
             Ferme la boite de dialogue
         """
-        
-        
+                
         boutonValider.setEnabled(False)
         boutonValider.setText('Traitement...')
         self.formView.setupProgressBar()
