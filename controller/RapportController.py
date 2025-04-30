@@ -99,6 +99,7 @@ class RapportController():
 
             space = " "
             command = bat_path + space + fichier_docx_entree + space + dossier_pdf_sortie + space + lo_path
+            print(command)
             
             os.system(command)
             
