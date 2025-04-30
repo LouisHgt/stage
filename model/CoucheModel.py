@@ -116,7 +116,8 @@ class CoucheModel():
         fields = couche.fields()
         attributs = []
         for field in fields.names():
-            attributs.append(field)
+            if len(attributs) < nv:
+                attributs.append(field)
         
         
         try:
@@ -135,7 +136,7 @@ class CoucheModel():
                         i +=1
                 
                 expression = self.remove_and(expression) # On supprimme le dernier AND
-                
+
                 request = QgsFeatureRequest().setFilterExpression(expression)
                 request.setSubsetOfAttributes(attributs, fields)
                 
@@ -158,6 +159,14 @@ class CoucheModel():
         finally:
             return list(filtered_nv) # Conversion en liste
         
+    def upperCaseWithSpaces(self, string):
+        """
+            Prend un string en argument et renvoie en majuscule sans les -
+        """
+
+        return string.replace("-", " ").upper()
+        
+    
     def getSqlQuery(self, requete_path):
         try:
 

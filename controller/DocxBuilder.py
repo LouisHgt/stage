@@ -33,7 +33,6 @@ class DocxBuilder():
             
             Renvoie le document modifié
         """
-        print(niveau)
         try:
             p = self.document.add_paragraph(elt)
             
