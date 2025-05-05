@@ -24,8 +24,7 @@ class FormController():
         """Configure les formulaires."""
         self.formView.setupFormulaireScenario()
         self.formView.setupFormulaireSensibilite()
-        
-                
+        self.formView.setupCanvas()
         self.formView.setupButtons(self)
         
     def pressed(self, boutonValider):

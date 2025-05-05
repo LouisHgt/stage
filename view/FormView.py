@@ -3,27 +3,21 @@ import os
 
 # --- Imports QGIS ---
 from qgis.core import QgsProject # type: ignore
+from qgis.core import QgsProject # type: ignore
+from qgis.gui import QgsMapCanvas # type: ignore
 
 # --- Imports Qt ---
 from qgis.PyQt import uic # type: ignore
 from qgis.PyQt import QtWidgets # type: ignore
+from qgis.gui import QgsMapCanvas # type: ignore
 
-from qgis.gui import (
+from ..controller.WheelEventFilter import WheelEventFilter
 
-    QgsMapCanvas,
 
-    QgsVertexMarker,
-
-    QgsMapCanvasItem,
-
-    QgsMapMouseEvent,
-
-    QgsRubberBand,
-
-)
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), '..\DDTM_GenerationRapport_dialog_base.ui'))
+
 
 class FormView():
     
@@ -47,24 +41,28 @@ class FormView():
             values[type] = checkBox.isChecked()
         return values
         
-
-    def setupFormulaireScenario(self):
-        
-        
-        """Creation canvas"""
+    def setupCanvas(self):
+        """Setup du canvas"""
+        couche_fond = self.coucheModel.getCoucheFromNom('N_ORTHO_2023_COUL_006')
         couche_bassin = self.coucheModel.getCoucheFromNom('Bassins versants')
-        if not couche_bassin.isValid():
+        if not couche_fond.isValid() and not couche_bassin.isValid():
             print('pas valide')
         
-        canvas = QgsMapCanvas()
-        canvas.setExtent(couche_bassin.extent())
-        canvas.setLayers([couche_bassin])
-        canvas.show()
-
-        conainer = self.dialog.findChild(QtWidgets.QVBoxLayout, 'temp')
-        conainer.addWidget(canvas)
-
         
+        canvas = QgsMapCanvas()
+        canvas.setProject(QgsProject().instance())
+        canvas.setExtent(couche_bassin.extent())
+        canvas.setLayers([couche_bassin, couche_fond])
+        canvas.show()
+        
+        self.wheel_filter = WheelEventFilter(canvas)
+        canvas.viewport().installEventFilter(self.wheel_filter)
+        
+        conainer = self.dialog.findChild(QtWidgets.QVBoxLayout, 'container_canvas')
+        conainer.insertWidget(0, canvas)
+
+
+    def setupFormulaireScenario(self):
         """Setup du formulaire de scenario."""
 
         try:
