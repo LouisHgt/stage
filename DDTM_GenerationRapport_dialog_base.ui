@@ -163,6 +163,9 @@
      </item>
     </layout>
    </item>
+   <item>
+    <layout class="QVBoxLayout" name="temp"/>
+   </item>
   </layout>
  </widget>
  <resources/>

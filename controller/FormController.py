@@ -4,6 +4,7 @@ from .FormulaireTask import FormulaireTask
 # --- Imports QGIS Core ---
 from qgis.core import QgsApplication # type: ignore
 
+
 class FormController():
     def __init__(self, dialog, couche_model_inst, config_model_inst, rapport_controller_inst):
         self.dialog = dialog
@@ -23,6 +24,8 @@ class FormController():
         """Configure les formulaires."""
         self.formView.setupFormulaireScenario()
         self.formView.setupFormulaireSensibilite()
+        
+                
         self.formView.setupButtons(self)
         
     def pressed(self, boutonValider):

@@ -8,6 +8,20 @@ from qgis.core import QgsProject # type: ignore
 from qgis.PyQt import uic # type: ignore
 from qgis.PyQt import QtWidgets # type: ignore
 
+from qgis.gui import (
+
+    QgsMapCanvas,
+
+    QgsVertexMarker,
+
+    QgsMapCanvasItem,
+
+    QgsMapMouseEvent,
+
+    QgsRubberBand,
+
+)
+
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), '..\DDTM_GenerationRapport_dialog_base.ui'))
 
@@ -35,6 +49,22 @@ class FormView():
         
 
     def setupFormulaireScenario(self):
+        
+        
+        """Creation canvas"""
+        couche_bassin = self.coucheModel.getCoucheFromNom('Bassins versants')
+        if not couche_bassin.isValid():
+            print('pas valide')
+        
+        canvas = QgsMapCanvas()
+        canvas.setExtent(couche_bassin.extent())
+        canvas.setLayers([couche_bassin])
+        canvas.show()
+
+        conainer = self.dialog.findChild(QtWidgets.QVBoxLayout, 'temp')
+        conainer.addWidget(canvas)
+
+        
         """Setup du formulaire de scenario."""
 
         try:
@@ -108,6 +138,8 @@ class FormView():
             container_sensibilite = self.dialog.findChild(QtWidgets.QWidget, 'container_formulaires').findChild(QtWidgets.QWidget, 'container_sensibilite')
             formulaire = container_sensibilite.findChild(QtWidgets.QFormLayout, 'formulaire_sensibilite')
             
+            
+            
             # Recuperation des types utilisés depuis la couche QGis
             nom_couche_type = self.configModel.getFromConfig('nom_couche_type')
             if nom_couche_type == "":  # Si getFromConfig ne renvoie rien
@@ -155,6 +187,7 @@ class FormView():
         self.progressBar.setMinimum(0)
         self.progressBar.setMaximum(100)
         self.progressBar.setValue(0)
+        
         
         containerFooter.addWidget(self.progressBar)
     
