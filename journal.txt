@@ -73,3 +73,7 @@ avec al commande os.system(). J'ai donc implementé la conversion de document av
 
 29/04 J'ai ajouté une checkbox pour que l'utilisateur puisse selectionner si il veut une conversion pdf ou pas.
 Je vais mtn essayer que les noms des sites puissent etre cliquable pour qu'on puisse rechercher facilement le site sur internet.
+
+05/05 J'ai plusieurs choix : soit je choisis de développer l'option de pouvoir cliquer sur les noms des sites pour lancer la rechercher
+, soit je choisis d'implementer le choix de n'afficher que certains niveaux. Je dois aussi voir la facon dont Bernard veut que 
+les sites soient classés.
