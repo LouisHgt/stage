@@ -81,4 +81,5 @@ les sites soient classés.
 06/05 Aujourd'hui j'ai rajouté un canvas sur mon plugin à gauche. J'ai aussi du empecher l'utilisateur de scroll et 
 et selectionner une zone sur la carte quand l'utilisateur mets sa souris sur une ligne du formulaire.
 Pour ca, j'ai créer des eventFilters personnalisés pour intercepter les evenements et les gérer 
-(ne rien faire dans le cas du scroll, ou selectionner une zone dans le cas du hover)
+(ne rien faire dans le cas du scroll, ou selectionner une zone dans le cas du hover).
+Je dois encore charger les geometries au debut lancement du plugin pour rendre la selection de la zone plus fluide.
