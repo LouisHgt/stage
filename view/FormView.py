@@ -2,8 +2,7 @@ from time import sleep
 import os
 
 # --- Imports QGIS ---
-from qgis.core import QgsProject # type: ignore
-from qgis.core import QgsProject # type: ignore
+from qgis.core import QgsProject, QgsVectorLayer # type: ignore
 from qgis.gui import QgsMapCanvas # type: ignore
 
 # --- Imports Qt ---
@@ -12,6 +11,7 @@ from qgis.PyQt import QtWidgets # type: ignore
 from qgis.gui import QgsMapCanvas # type: ignore
 
 from ..controller.WheelEventFilter import WheelEventFilter
+from ..controller.HoverEventFilter import HoverEventFilter
 
 
 
@@ -26,6 +26,9 @@ class FormView():
         # Stocker les instances
         self.coucheModel = couche_model_inst
         self.configModel = config_model_inst
+        
+        # Stocker les eventFilters
+        self.hover_filters = []
 
 
     def getComboBoxValues(self):
@@ -41,25 +44,56 @@ class FormView():
             values[type] = checkBox.isChecked()
         return values
         
+    def highlightBassin(self, lib_bassin = None):
+        """
+            Highlight une zone si le libelé est précisé,
+            sinon ne higlight rien
+        """  
+        
+        # Récupération de la couche  
+        couche_bassin = self.coucheModel.getCoucheFromNom('Bassins versants')
+        
+        couche_bassin.removeSelection()
+        
+        # Désélection
+        if lib_bassin == None:
+            return
+        
+        
+        # Si un libellé est précisé
+                
+        # Construction de l'expression
+        expression = "\"LIB\" = \'" + lib_bassin + "\'"
+        
+        couche_bassin.selectByExpression(expression, QgsVectorLayer.SetSelection)
+    
     def setupCanvas(self):
         """Setup du canvas"""
-        couche_fond = self.coucheModel.getCoucheFromNom('N_ORTHO_2023_COUL_006')
-        couche_bassin = self.coucheModel.getCoucheFromNom('Bassins versants')
-        if not couche_fond.isValid() and not couche_bassin.isValid():
-            print('pas valide')
         
-        
-        canvas = QgsMapCanvas()
-        canvas.setProject(QgsProject().instance())
-        canvas.setExtent(couche_bassin.extent())
-        canvas.setLayers([couche_bassin, couche_fond])
-        canvas.show()
-        
-        self.wheel_filter = WheelEventFilter(canvas)
-        canvas.viewport().installEventFilter(self.wheel_filter)
-        
-        conainer = self.dialog.findChild(QtWidgets.QVBoxLayout, 'container_canvas')
-        conainer.insertWidget(0, canvas)
+        try:
+            # Gestion des couches
+            couche_fond = self.coucheModel.getCoucheFromNom('N_ORTHO_2023_COUL_006')
+            couche_bassin = self.coucheModel.getCoucheFromNom('Bassins versants')
+            if not couche_fond.isValid() and not couche_bassin.isValid():
+                print('pas valide')
+            
+            # Creation du canvas
+            canvas = QgsMapCanvas()
+            canvas.setProject(QgsProject().instance())
+            canvas.setExtent(couche_bassin.extent())
+            canvas.setLayers([couche_bassin, couche_fond])
+                    
+            # Gestion du zoom
+            self.wheel_filter = WheelEventFilter(canvas)
+            canvas.viewport().installEventFilter(self.wheel_filter)
+            
+            # Ajout au formulaire
+            conainer = self.dialog.findChild(QtWidgets.QVBoxLayout, 'container_canvas')
+            conainer.insertWidget(0, canvas)
+        except Exception as e:
+            print("Erreur lors de la création du canvas")
+            print(e)
+            raise
 
 
     def setupFormulaireScenario(self):
@@ -97,6 +131,16 @@ class FormView():
             
             hauteur_minimum_ligne_formulaire = 25
             for bassin in bassins:
+                
+                # 1. Créer un QWidget conteneur pour la ligne entière
+                row_widget = QtWidgets.QWidget()
+
+                # 2. Créer un layout pour ce QWidget conteneur (par exemple QHBoxLayout)
+                row_layout = QtWidgets.QHBoxLayout(row_widget) # Applique directement le layout au widget
+                row_layout.setContentsMargins(0, 0, 0, 0) # Optionnel: pour que le hover soit précis
+                row_layout.setSpacing(2)                  # Optionnel: espacement entre label et combobox
+                
+    
                 # Ajout d'un label pour chaque bassin
                 label = QtWidgets.QLabel(bassin)
                 label.setMinimumHeight(hauteur_minimum_ligne_formulaire)
@@ -105,10 +149,22 @@ class FormView():
                 comboBox.setMinimumHeight(hauteur_minimum_ligne_formulaire)
                 comboBox.addItems(indices)
                 
+                # Ajouter la comboBox et le layout à la ligne
+                row_layout.addWidget(label)
+                row_layout.addWidget(comboBox)
+                
+                
+                # Création du filtre pour hover
+                event_filter = HoverEventFilter(bassin, self)
+                row_widget.installEventFilter(event_filter)
+
                 # Stocker la combobox dans le dictionnaire
                 self.dialog.combo_boxes[bassin] = comboBox
+                # Stocker l'event filter pour nepas perdre la reference
+                self.hover_filters.append(event_filter)
                 
-                formulaire.addRow(label, comboBox)
+                # Installation du filtre sur
+                formulaire.addRow(row_widget)
 
             
 

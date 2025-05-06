@@ -1,8 +1,8 @@
-from PyQt5.QtCore import QObject, QEvent
+from PyQt5.QtCore import QObject, QEvent # type: ignore
 
 class WheelEventFilter(QObject):
     def __init__(self, canvas):
-        super().__init__(canvas) # Important pour la gestion parent/enfant Qt
+        super().__init__(canvas)
         self._canvas = canvas
 
     def eventFilter(self, watched, event):
