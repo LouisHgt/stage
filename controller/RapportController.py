@@ -116,11 +116,14 @@ class RapportController():
             self.buildRapport()
             
             pdfCheckBox = self.formView.dialog.findChild(QtWidgets.QCheckBox, 'pdfCheckBox')
-            isPdfBoxChecked = pdfCheckBox.isChecked()
                     
             # Conversion en pdf si précisé dans le config
-            if isPdfBoxChecked:
+            if pdfCheckBox.isChecked():
                 self.convertToPdf()
+            
+            path = r"C:\Users\louis.huguet\Travail\Plugins\DDTM06_GenerationRapport\output"
+            os.startfile(path)
+            
         except Exception as e:
             print("erreur lors de l'ecriture du doc ou du pdf dans le handlerFormTaskFinished")
             print(e)
