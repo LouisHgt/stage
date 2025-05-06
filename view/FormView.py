@@ -2,12 +2,11 @@ from time import sleep
 import os
 
 # --- Imports QGIS ---
-from qgis.core import QgsProject, QgsVectorLayer # type: ignore
-from qgis.gui import QgsMapCanvas # type: ignore
+from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes # type: ignore
+from qgis.gui import QgsMapCanvas, QgsRubberBand # type: ignore
 
 # --- Imports Qt ---
-from qgis.PyQt import uic # type: ignore
-from qgis.PyQt import QtWidgets # type: ignore
+from qgis.PyQt import uic, QtWidgets, QtGui # type: ignore
 from qgis.gui import QgsMapCanvas # type: ignore
 
 from ..controller.WheelEventFilter import WheelEventFilter
@@ -49,23 +48,18 @@ class FormView():
             Highlight une zone si le libelé est précisé,
             sinon ne higlight rien
         """  
-        
-        # Récupération de la couche  
-        couche_bassin = self.coucheModel.getCoucheFromNom('Bassins versants')
-        
-        couche_bassin.removeSelection()
+        # Suppression du dessin
+        self.hover_ruber.reset(QgsWkbTypes.PolygonGeometry)
         
         # Désélection
         if lib_bassin == None:
             return
+
         
-        
-        # Si un libellé est précisé
-                
-        # Construction de l'expression
-        expression = "\"LIB\" = \'" + lib_bassin + "\'"
-        
-        couche_bassin.selectByExpression(expression, QgsVectorLayer.SetSelection)
+        # Récupération de la geom
+        geom = self.bassins_geom.get(lib_bassin)        
+        self.hover_ruber.setToGeometry(geom, None)
+
     
     def setupCanvas(self):
         """Setup du canvas"""
@@ -86,6 +80,11 @@ class FormView():
             # Gestion du zoom
             self.wheel_filter = WheelEventFilter(canvas)
             canvas.viewport().installEventFilter(self.wheel_filter)
+            
+            # Creation du rubber band
+            self.hover_ruber = QgsRubberBand(canvas, QgsWkbTypes.PolygonGeometry)
+            self.hover_ruber.setColor(QtGui.QColor(255, 170, 0, 180))
+            self.hover_ruber.setWidth(2)
             
             # Ajout au formulaire
             conainer = self.dialog.findChild(QtWidgets.QVBoxLayout, 'container_canvas')
@@ -118,10 +117,19 @@ class FormView():
             bassins_versants = self.coucheModel.getCoucheFromNom(nom_couche_bassins)
             
             bassins = []
+            self.bassins_geom = {}
             # On parcourt la liste des couches pour récupérer leur noms
             for feature in bassins_versants.getFeatures():
+                
+                # Récupération du nom
                 bassin = feature[libelle_bassins]
                 bassins.append(bassin)
+                
+                # Récupération de la geometrie
+                geom = feature.geometry()
+                self.bassins_geom[bassin] = geom
+                
+                
             
             # Ajout d'un formulaire de scenario
             formulaire = container_scenario.findChild(QtWidgets.QFormLayout, 'formulaire_scenario')

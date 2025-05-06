@@ -17,7 +17,7 @@ class HoverEventFilter(QtCore.QObject):
             return True
         elif event.type() == QtCore.QEvent.Leave:
             # On Cache le highlight
-            self.formView.highlightBassin()
+            # self.formView.highlightBassin()
             return True
         else:
             # Sinon on laisse gérer les evenemtns pas la classe parente
