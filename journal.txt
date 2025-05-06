@@ -77,3 +77,8 @@ Je vais mtn essayer que les noms des sites puissent etre cliquable pour qu'on pu
 05/05 J'ai plusieurs choix : soit je choisis de développer l'option de pouvoir cliquer sur les noms des sites pour lancer la rechercher
 , soit je choisis d'implementer le choix de n'afficher que certains niveaux. Je dois aussi voir la facon dont Bernard veut que 
 les sites soient classés.
+
+06/05 Aujourd'hui j'ai rajouté un canvas sur mon plugin à gauche. J'ai aussi du empecher l'utilisateur de scroll et 
+et selectionner une zone sur la carte quand l'utilisateur mets sa souris sur une ligne du formulaire.
+Pour ca, j'ai créer des eventFilters personnalisés pour intercepter les evenements et les gérer 
+(ne rien faire dans le cas du scroll, ou selectionner une zone dans le cas du hover)
