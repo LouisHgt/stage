@@ -121,6 +121,7 @@ class RapportController():
             if pdfCheckBox.isChecked():
                 self.convertToPdf()
             
+            self.coucheModel.clearTmpFolder()
             path = r"C:\Users\louis.huguet\Travail\Plugins\DDTM06_GenerationRapport\output"
             os.startfile(path)
             

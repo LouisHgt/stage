@@ -1,9 +1,9 @@
-import docx
+import docx # type: ignore
 
-from docx.shared import Pt, RGBColor, Inches # Pour les unités et couleurs
-from docx.enum.text import WD_PARAGRAPH_ALIGNMENT # Pour l'alignement (si besoin)
-from docx.oxml.ns import qn
-from docx.oxml import OxmlElement
+from docx.shared import Pt, RGBColor, Inches # type: ignore
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT # type: ignore
+from docx.oxml.ns import qn # type: ignore
+from docx.oxml import OxmlElement # type: ignore
 
 
 class DocxBuilder():
