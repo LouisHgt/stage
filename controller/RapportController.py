@@ -31,8 +31,7 @@ class RapportController():
 
         # Instaciation du doc
         self.docxBuilder.initDoc()
-        
-
+    
         
         # Recuperation de la couche site_retenu
         emplacement_couche_site_retenu = self.configModel.getFromConfig('emplacement_couche_site_retenu')

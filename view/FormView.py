@@ -224,7 +224,11 @@ class FormView():
                 # Ajout d'un checkbox pour chaque type de site
                 checkBox = QtWidgets.QCheckBox()
                 checkBox.setMinimumHeight(25)
-                checkBox.setChecked(True)
+                
+                if self.configModel.getFromConfig("sites_coches") == "1":
+                    checkBox.setChecked(True)
+                else:
+                    checkBox.setChecked(False)
                 
                 # Stockage de la checkbox dans le dictionnaire
                 self.dialog.checkboxes[id] = checkBox

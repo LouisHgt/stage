@@ -13,6 +13,15 @@ class DocxBuilder():
     
     def initDoc(self):
         self.document = docx.Document()
+        
+        titre = self.document.add_heading("Sites sensibles", level=0)
+        titre.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+        
+        p = self.document.add_paragraph("Voici un récapitulatif des sites concernés par le scenario indiqué.")
+        font = p.runs[0]
+        font.size = Pt(20)
+        
+        self.document.add_page_break()
     
     def writeDoc(self, rapport_path):
         
