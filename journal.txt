@@ -83,3 +83,11 @@ et selectionner une zone sur la carte quand l'utilisateur mets sa souris sur une
 Pour ca, j'ai créer des eventFilters personnalisés pour intercepter les evenements et les gérer 
 (ne rien faire dans le cas du scroll, ou selectionner une zone dans le cas du hover).
 Je dois encore charger les geometries au debut lancement du plugin pour rendre la selection de la zone plus fluide.
+
+07/05 Hier j'ai fini d'implementer le chargement des geometries au lancement du plugin. Ainsi, au lieu de selectionner
+des elements de la couche directement, je surligne la geometrie associée à l'element de la couche et ca rend l'application 
+beaucoup plus fluide. Ce matin, j'ai corrigé les doublons de noms de communes (ex CAGNES-SUR-MER, CAGNES SUR MER, cagnes sur mer)
+en normalisant directement la sortie de la requete SQL (UPPER(), REPLACE()). J'avais essayé de stocker aussi le code INSEE de la
+commune pour trier les sites en finction de ce code, mais ca rendait le code extremement compliqué car la construction du docx
+se basait sur le nombre d'attributs de la table de sortie du formulaire, donc autant regler le probleme dans un niveau plus profond
+du code.
