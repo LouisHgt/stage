@@ -42,7 +42,7 @@ class RapportController():
 
         
         
-        self.niveau = self.coucheModel.getNbrNiveauxCouche(couche)
+        self.niveau = self.coucheModel.getNbrAttributsCouche(couche)
         self.list = [] # Liste dans laquelle on stocke les elements servants au filtre
         
         self.buildDocxRecursive(couche, self.coucheModel.getFilteredNiveau(couche))
