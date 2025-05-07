@@ -49,7 +49,7 @@ class FormView():
             sinon ne higlight rien
         """  
         # Suppression du dessin
-        self.hover_ruber.reset(QgsWkbTypes.PolygonGeometry)
+        self.hover_ruber.reset()
         
         # Désélection
         if lib_bassin == None:
