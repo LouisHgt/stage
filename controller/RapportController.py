@@ -28,7 +28,6 @@ class RapportController():
         nom_rapport = self.configModel.getFromConfig("nom_rapport")
         
         rapport_path = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + ".docx"
-        pdf_path = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + ".pdf"
 
         # Instaciation du doc
         self.docxBuilder.initDoc()
@@ -43,7 +42,7 @@ class RapportController():
 
         
         
-        self.niveau = self.coucheModel.getNbrAttributsCouche(couche)
+        self.niveau = self.coucheModel.getNbrNiveauxCouche(couche)
         self.list = [] # Liste dans laquelle on stocke les elements servants au filtre
         
         self.buildDocxRecursive(couche, self.coucheModel.getFilteredNiveau(couche))
@@ -121,7 +120,6 @@ class RapportController():
             if pdfCheckBox.isChecked():
                 self.convertToPdf()
             
-            self.coucheModel.clearTmpFolder()
             path = r"C:\Users\louis.huguet\Travail\Plugins\DDTM06_GenerationRapport\output"
             os.startfile(path)
             
