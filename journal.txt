@@ -91,3 +91,6 @@ en normalisant directement la sortie de la requete SQL (UPPER(), REPLACE()). J'a
 commune pour trier les sites en finction de ce code, mais ca rendait le code extremement compliqué car la construction du docx
 se basait sur le nombre d'attributs de la table de sortie du formulaire, donc autant regler le probleme dans un niveau plus profond
 du code.
+
+12/05 Aujourd'hui je vais travailler sur un systeme de persistance dans lequel l'utilisateur pourra sauvegarder une configuration
+de formulaire (ex: un scenario meteo precis) et le reutiliser plus tard.
