@@ -160,6 +160,7 @@ class FormView():
                 comboBox = QtWidgets.QComboBox()
                 comboBox.setMinimumHeight(hauteur_minimum_ligne_formulaire)
                 comboBox.addItems(indices)
+                comboBox.setCurrentIndex(comboBox.count() - 1)
                 
                 # Ajouter la comboBox et le layout à la ligne
                 row_layout.addWidget(label)

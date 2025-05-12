@@ -39,12 +39,11 @@ class FormController():
         
         # On parcours les lignes du formulaire
         for i in range(nbr_rows):
-            print(i)
             
             # On récupère l'élément qui possede la comboBox
             row_formulaire = formulaire.itemAt(i).widget().layout()
             
-            
+            # On récupère la comboBox et on la met sur son dernier indice -> 'Vide'
             if isinstance(row_formulaire, QtWidgets.QHBoxLayout):
                 for j in range(row_formulaire.count()):
                     if isinstance(row_formulaire.itemAt(j).widget(), QtWidgets.QComboBox):
