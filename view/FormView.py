@@ -43,6 +43,10 @@ class FormView():
             values[type] = checkBox.isChecked()
         return values
         
+    def getFormulaire(self):
+        return self.dialog.findChild(QtWidgets.QFormLayout, 'formulaire_scenario')
+        
+        
     def highlightBassin(self, lib_bassin = None):
         """
             Highlight une zone si le libelé est précisé,
@@ -265,6 +269,9 @@ class FormView():
         """Setup des boutons de la fenetre QT."""
         boutonValider = self.dialog.findChild(QtWidgets.QPushButton, 'valider')
         boutonValider.clicked.connect(lambda: formController.pressed(boutonValider))
+        
+        bouton_reinitialiser = self.dialog.findChild(QtWidgets.QPushButton, 'bouton_reinitialiser')
+        bouton_reinitialiser.clicked.connect(lambda: formController.reinitialiserPressed())
         
         pdfCheckBox = self.dialog.findChild(QtWidgets.QCheckBox, 'pdfCheckBox')
         

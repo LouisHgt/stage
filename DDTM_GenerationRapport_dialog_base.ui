@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1543</width>
-    <height>940</height>
+    <height>939</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -95,6 +95,13 @@
              </item>
              <item>
               <layout class="QFormLayout" name="formulaire_scenario"/>
+             </item>
+             <item>
+              <widget class="QPushButton" name="bouton_reinitialiser">
+               <property name="text">
+                <string>Réinitialiser</string>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>

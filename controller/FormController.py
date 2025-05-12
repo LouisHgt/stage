@@ -4,6 +4,9 @@ from .FormulaireTask import FormulaireTask
 # --- Imports QGIS Core ---
 from qgis.core import QgsApplication # type: ignore
 
+# --- Imports Qt ---
+from qgis.PyQt import QtWidgets # type: ignore
+
 
 class FormController():
     def __init__(self, dialog, couche_model_inst, config_model_inst, rapport_controller_inst):
@@ -27,6 +30,28 @@ class FormController():
         self.formView.setupCanvas()
         self.formView.setupButtons(self)
         
+    def reinitialiserPressed(self):
+        
+        # Récupération du formulaire scenario
+        formulaire = self.formView.getFormulaire()
+        # Nbr de ligne du formulaire
+        nbr_rows = formulaire.rowCount()
+        
+        # On parcours les lignes du formulaire
+        for i in range(nbr_rows):
+            print(i)
+            
+            # On récupère l'élément qui possede la comboBox
+            row_formulaire = formulaire.itemAt(i).widget().layout()
+            
+            
+            if isinstance(row_formulaire, QtWidgets.QHBoxLayout):
+                for j in range(row_formulaire.count()):
+                    if isinstance(row_formulaire.itemAt(j).widget(), QtWidgets.QComboBox):
+                        comboBox = row_formulaire.itemAt(j).widget()
+                        comboBox.setCurrentIndex(comboBox.count() - 1)
+        
+    
     def pressed(self, boutonValider):
         """
             Affiche les données et les inscrit dans des couches
@@ -57,3 +82,4 @@ class FormController():
         # Ajouter la tâche au gestionnaire de tâches de QGIS
         QgsApplication.taskManager().addTask(self.current_task)
         
+    
