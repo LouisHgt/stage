@@ -94,3 +94,7 @@ du code.
 
 12/05 Aujourd'hui je vais travailler sur un systeme de persistance dans lequel l'utilisateur pourra sauvegarder une configuration
 de formulaire (ex: un scenario meteo precis) et le reutiliser plus tard.
+
+13/05 Trier les types de sites par ordre alphabetique
+Preparer l'exclusion de bassins. Sauvegarder les bassins et leur occur dans bassin versant avec un bouton.
+Sauvegarder les sites et leur etat (coché ou pas) dans une autre table. Créer une interface de gestion des sauvegardes.

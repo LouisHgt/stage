@@ -72,6 +72,7 @@ class FormView():
             # Gestion des couches
             couche_fond = self.coucheModel.getCoucheFromNom('N_ORTHO_2023_COUL_006')
             couche_bassin = self.coucheModel.getCoucheFromNom('Bassins versants')
+            couche_cours_eau = self.coucheModel.getCoucheFromNom('Cours d\'eau principaux')
             if not couche_fond.isValid() and not couche_bassin.isValid():
                 print('pas valide')
             
@@ -79,7 +80,7 @@ class FormView():
             canvas = QgsMapCanvas()
             canvas.setProject(QgsProject().instance())
             canvas.setExtent(couche_bassin.extent())
-            canvas.setLayers([couche_bassin, couche_fond])
+            canvas.setLayers([couche_cours_eau, couche_bassin, couche_fond])
                     
             # Gestion du zoom
             self.wheel_filter = WheelEventFilter(canvas)
