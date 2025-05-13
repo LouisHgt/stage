@@ -276,7 +276,7 @@ class FormView():
         bouton_reinitialiser.clicked.connect(lambda: formController.reinitialiserPressed())
         
         bouton_save_bassins = self.dialog.findChild(QtWidgets.QPushButton, 'bouton_save_bassins')
-        bouton_save_bassins.clicked.connect(lambda: formController.sauvegarderBassinPressed())
+        bouton_save_bassins.clicked.connect(lambda: formController.sauvegarderBassinPressed(bouton_save_bassins))
         
         pdfCheckBox = self.dialog.findChild(QtWidgets.QCheckBox, 'pdfCheckBox')
         

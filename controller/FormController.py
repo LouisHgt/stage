@@ -83,14 +83,26 @@ class FormController():
             
         return data
            
-    def sauvegarderBassinPressed(self):
-        # Recuperation des données necessaire à la sauvegarde de la couche
-        couche_sauvegarde = self.coucheModel.getCoucheFromNom('Bassins versants')
-        comboBoxValues = self.formView.getComboBoxValues()
-        comboBoxValues = self.normalizeData(comboBoxValues)
+    def sauvegarderBassinPressed(self, bouton):
         
-        self.coucheModel.save_bassins(couche_sauvegarde, comboBoxValues)
-                
+        try:
+            # On desactive le bouon le temps du traitement
+            bouton.setEnabled(False)
+            bouton.setText("Traitement...")
+            bouton.repaint()
+            
+            # Recuperation des données necessaire à la sauvegarde de la couche
+            couche_sauvegarde = self.coucheModel.getCoucheFromNom('Bassins versants')
+            comboBoxValues = self.formView.getComboBoxValues()
+            comboBoxValues = self.normalizeData(comboBoxValues)
+            
+            self.coucheModel.save_bassins(couche_sauvegarde, comboBoxValues)
+            bouton.setEnabled(True)
+            bouton.setText("Sauvegarder")
+        except Exception as e:
+            print("Probleme rencontré lors de la sauvegarde des occurences de bassins")
+            print(e)
+            
     
     def pressed(self, boutonValider):
         """

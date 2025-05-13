@@ -384,14 +384,14 @@ class CoucheModel():
             del result
             
     def save_bassins(self, couche_sauvegarde, data):
+        # Ouvre la couche, modifie tous les champs
+        # avec les valeurs des combobox et la sauvegarde
         couche_sauvegarde.startEditing()
                 
         for feature in couche_sauvegarde.getFeatures():
             
             value = data.get(feature['LIB'])
-            
-            print(value)
-            
+                        
             if data.get(feature['LIB']):
                 feature['OCCUR'] = value
             else:
