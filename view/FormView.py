@@ -72,7 +72,7 @@ class FormView():
             # Gestion des couches
             couche_fond = self.coucheModel.getCoucheFromNom('N_ORTHO_2023_COUL_006')
             couche_bassin = self.coucheModel.getCoucheFromNom('Bassins versants')
-            couche_cours_eau = self.coucheModel.getCoucheFromNom('Cours d\'eau principaux')
+            couche_cours_eau = self.coucheModel.getCoucheFromNom('Cours_d_eau_principaux')
             if not couche_fond.isValid() and not couche_bassin.isValid():
                 print('pas valide')
             
@@ -274,6 +274,9 @@ class FormView():
         
         bouton_reinitialiser = self.dialog.findChild(QtWidgets.QPushButton, 'bouton_reinitialiser')
         bouton_reinitialiser.clicked.connect(lambda: formController.reinitialiserPressed())
+        
+        bouton_save_bassins = self.dialog.findChild(QtWidgets.QPushButton, 'bouton_save_bassins')
+        bouton_save_bassins.clicked.connect(lambda: formController.sauvegarderBassinPressed())
         
         pdfCheckBox = self.dialog.findChild(QtWidgets.QCheckBox, 'pdfCheckBox')
         

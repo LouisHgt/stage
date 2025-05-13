@@ -97,11 +97,22 @@
               <layout class="QFormLayout" name="formulaire_scenario"/>
              </item>
              <item>
-              <widget class="QPushButton" name="bouton_reinitialiser">
-               <property name="text">
-                <string>Réinitialiser</string>
-               </property>
-              </widget>
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <item>
+                <widget class="QPushButton" name="bouton_reinitialiser">
+                 <property name="text">
+                  <string>Réinitialiser</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="bouton_save_bassins">
+                 <property name="text">
+                  <string>Sauvegarder</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
             </layout>
            </widget>

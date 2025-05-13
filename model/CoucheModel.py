@@ -383,6 +383,31 @@ class CoucheModel():
             del status_scenario_layer
             del result
             
+    def save_bassins(self, couche_sauvegarde, data):
+        couche_sauvegarde.startEditing()
+                
+        for feature in couche_sauvegarde.getFeatures():
+            
+            value = data.get(feature['LIB'])
+            
+            print(value)
+            
+            if data.get(feature['LIB']):
+                feature['OCCUR'] = value
+            else:
+                feature['OCCUR'] = 0
+                
+            couche_sauvegarde.updateFeature(feature)
+        
+        # On annule les changements si il y a une erreur
+        if not couche_sauvegarde.commitChanges():
+            print("Erreur de sauvegarde")
+            couche_sauvegarde.rollBack()
+        # Sinon on refresh la couche
+        else:
+            print("Sauvegarde reussie")
+        
+    
     def writeLayer(self, layer, emplacement_fichier):
         
         try:

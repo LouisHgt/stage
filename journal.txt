@@ -98,3 +98,4 @@ de formulaire (ex: un scenario meteo precis) et le reutiliser plus tard.
 13/05 Trier les types de sites par ordre alphabetique
 Preparer l'exclusion de bassins. Sauvegarder les bassins et leur occur dans bassin versant avec un bouton.
 Sauvegarder les sites et leur etat (coché ou pas) dans une autre table. Créer une interface de gestion des sauvegardes.
+Sauvegarde des occurences de bassins finie.

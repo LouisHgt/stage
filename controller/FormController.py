@@ -31,6 +31,10 @@ class FormController():
         self.formView.setupButtons(self)
         
     def reinitialiserPressed(self):
+        '''
+            Remets toutes les comboBox du formulaire scenario
+            à 'Vide'
+        '''
         
         # Récupération du formulaire scenario
         formulaire = self.formView.getFormulaire()
@@ -49,7 +53,44 @@ class FormController():
                     if isinstance(row_formulaire.itemAt(j).widget(), QtWidgets.QComboBox):
                         comboBox = row_formulaire.itemAt(j).widget()
                         comboBox.setCurrentIndex(comboBox.count() - 1)
+     
+    def indiceStringToInt(self, indice_string):
+        if indice_string == "Q10":
+            return 10
+        elif indice_string == "Q20":
+            return 20
+        elif indice_string == "Q50":
+            return 50
+        elif indice_string == "Q100":
+            return 100
+        elif indice_string == "Qex":
+            return 1000
+        elif indice_string == "AZI":
+            return 10000
+        elif indice_string == "Vide":
+            return 0
+        else:
+            return 0
+    
+    def normalizeData(self, data):
+        """
+            Prend en argument les valeurs du formulaire et renvoie
+            un dictionnaire avec les occurences en int
+        """
         
+        for key, val in data.items():
+            data[key] = self.indiceStringToInt(val)
+            
+        return data
+           
+    def sauvegarderBassinPressed(self):
+        # Recuperation des données necessaire à la sauvegarde de la couche
+        couche_sauvegarde = self.coucheModel.getCoucheFromNom('Bassins versants')
+        comboBoxValues = self.formView.getComboBoxValues()
+        comboBoxValues = self.normalizeData(comboBoxValues)
+        
+        self.coucheModel.save_bassins(couche_sauvegarde, comboBoxValues)
+                
     
     def pressed(self, boutonValider):
         """
