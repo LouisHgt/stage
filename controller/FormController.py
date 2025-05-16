@@ -5,7 +5,7 @@ from .FormulaireTask import FormulaireTask
 from qgis.core import QgsApplication # type: ignore
 
 # --- Imports Qt ---
-from qgis.PyQt import QtWidgets # type: ignore
+from qgis.PyQt import QtWidgets, QtGui # type: ignore
 
 
 class FormController():
@@ -25,7 +25,7 @@ class FormController():
     
     def setupFormulaires(self):
         """Configure les formulaires."""
-        self.formView.setupFormulaireScenario()
+        self.formView.setupFormulaireScenario(self)
         self.formView.setupFormulaireSensibilite()
         self.formView.setupCanvas()
         self.formView.setupButtons(self)
@@ -103,7 +103,38 @@ class FormController():
             print("Probleme rencontré lors de la sauvegarde des occurences de bassins")
             print(e)
             
-    
+    def handleOccurBassinChanged(self, occur, lib_bassin):
+        """
+            Appelle la methode de la vue qui surligne le bassin en fonction d'un nom de bassin
+            et d'une couleur
+        """
+        
+        opacite = int(self.configModel.getFromConfig("opacite"))
+        
+        if occur == "Q10":
+            couleur = QtGui.QColor(254, 4, 8, opacite)
+        elif occur == "Q20":
+            couleur = QtGui.QColor(246, 107, 0, opacite)
+        elif occur == "Q30":
+            couleur = QtGui.QColor(246, 149, 230, opacite)
+        elif occur == "Q50":
+            couleur = QtGui.QColor(152, 0, 240, opacite)
+        elif occur == "Q100":
+            couleur = QtGui.QColor(0, 129, 250, opacite)
+        elif occur == "Qex":
+            couleur = QtGui.QColor(113, 222, 255, opacite)
+        elif occur == "AZI":
+            couleur = QtGui.QColor(12, 238, 254, opacite)
+        elif occur == "Vide":
+            self.formView.highlightBassin(lib_bassin)
+            return
+        else:
+            self.formView.highlightBassin(lib_bassin)
+            return
+        
+        self.formView.highlightBassin(lib_bassin, couleur)
+
+        
     def pressed(self, boutonValider):
         """
             Affiche les données et les inscrit dans des couches

@@ -10,7 +10,7 @@ from qgis.PyQt import uic, QtWidgets, QtGui # type: ignore
 from qgis.gui import QgsMapCanvas # type: ignore
 
 from ..controller.WheelEventFilter import WheelEventFilter
-from ..controller.HoverEventFilter import HoverEventFilter
+from ..controller.ChangeEventFilter import ChangeEventFilter
 
 
 
@@ -28,8 +28,15 @@ class FormView():
         
         # Stocker les eventFilters
         self.hover_filters = []
+        
+        # Stocker les rubberBands
+        self.rubber_bands = {}
+        
+        # Stocker le canvas créé
+        self.canvas = None
 
-
+    def createRubberBand(self):
+        return
     def getComboBoxValues(self):
         """Récupère les valeurs sélectionnées dans les QComboBox."""
         values = {}
@@ -47,23 +54,37 @@ class FormView():
         return self.dialog.findChild(QtWidgets.QFormLayout, 'formulaire_scenario')
         
         
-    def highlightBassin(self, lib_bassin = None):
+    def highlightBassin(self, lib_bassin, couleur = None):
         """
             Highlight une zone si le libelé est précisé,
             sinon ne higlight rien
         """  
-        # Suppression du dessin
-        self.hover_ruber.reset()
+        # Récupération du rubber band ou creation
+        if lib_bassin in self.rubber_bands:
+            current_rubber = self.rubber_bands.get(lib_bassin)
+        else :
+            # Création d'un nouveau rubberBand
+            current_rubber = QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
+           
+            # Récupération de la geom
+            geom = self.bassins_geom.get(lib_bassin)        
+            current_rubber.setToGeometry(geom, None)
+            
+            # Ajout au dictionnaire
+            self.rubber_bands[lib_bassin] = current_rubber
         
-        # Désélection
-        if lib_bassin == None:
+        # Gestion de la couleur
+        current_rubber.hide()
+        # cacher le rubber band si occur == "Vide"
+        if couleur != None:
+            current_rubber.hide()
+            current_rubber.setColor(couleur)
+            current_rubber.show()
+        else:
             return
-
-        
-        # Récupération de la geom
-        geom = self.bassins_geom.get(lib_bassin)        
-        self.hover_ruber.setToGeometry(geom, None)
-
+            
+            
+            
     
     def setupCanvas(self):
         """Setup du canvas"""
@@ -77,30 +98,29 @@ class FormView():
                 print('pas valide')
             
             # Creation du canvas
-            canvas = QgsMapCanvas()
-            canvas.setProject(QgsProject().instance())
-            canvas.setExtent(couche_bassin.extent())
-            canvas.setLayers([couche_cours_eau, couche_bassin, couche_fond])
+            self.canvas = QgsMapCanvas()
+            self.canvas.setProject(QgsProject().instance())
+            self.canvas.setExtent(couche_bassin.extent())
+            self.canvas.setLayers([couche_cours_eau, couche_bassin, couche_fond])
                     
             # Gestion du zoom
-            self.wheel_filter = WheelEventFilter(canvas)
-            canvas.viewport().installEventFilter(self.wheel_filter)
+            self.wheel_filter = WheelEventFilter(self.canvas)
+            self.canvas.viewport().installEventFilter(self.wheel_filter)
             
             # Creation du rubber band
-            self.hover_ruber = QgsRubberBand(canvas, QgsWkbTypes.PolygonGeometry)
-            self.hover_ruber.setColor(QtGui.QColor(255, 170, 0, 180))
-            self.hover_ruber.setWidth(2)
+            self.hover_rubber = QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
+            self.hover_rubber.setWidth(2)
             
             # Ajout au formulaire
             conainer = self.dialog.findChild(QtWidgets.QVBoxLayout, 'container_canvas')
-            conainer.insertWidget(0, canvas)
+            conainer.insertWidget(0, self.canvas)
         except Exception as e:
             print("Erreur lors de la création du canvas")
             print(e)
             raise
 
 
-    def setupFormulaireScenario(self):
+    def setupFormulaireScenario(self, formController):
         """Setup du formulaire de scenario."""
 
         try:
@@ -169,13 +189,22 @@ class FormView():
                 
                 
                 # Création du filtre pour hover
-                event_filter = HoverEventFilter(bassin, self)
-                row_widget.installEventFilter(event_filter)
+                #event_filter = ChangeEventFilter(bassin, self)
+                #row_widget.installEventFilter(event_filter)
+                
+                # Lisaison de la combobox au handler pour surligner le bassin
+                comboBox.currentTextChanged.connect(
+                    lambda new_text, lib_bassin=label.text(): 
+                        formController.handleOccurBassinChanged(
+                            new_text,
+                            lib_bassin
+                        )
+                )
 
                 # Stocker la combobox dans le dictionnaire
                 self.dialog.combo_boxes[bassin] = comboBox
                 # Stocker l'event filter pour nepas perdre la reference
-                self.hover_filters.append(event_filter)
+                #self.hover_filters.append(event_filter)
                 
                 # Installation du filtre sur
                 formulaire.addRow(row_widget)

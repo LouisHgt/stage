@@ -1,6 +1,6 @@
 from PyQt5 import QtCore # type: ignore
 
-class HoverEventFilter(QtCore.QObject):
+class ChangeEventFilter(QtCore.QObject):
     def __init__(self, lib_bassin, formView):
         super().__init__()
         self.lib_bassin = lib_bassin
