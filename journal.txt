@@ -99,3 +99,5 @@ de formulaire (ex: un scenario meteo precis) et le reutiliser plus tard.
 Preparer l'exclusion de bassins. Sauvegarder les bassins et leur occur dans bassin versant avec un bouton.
 Sauvegarder les sites et leur etat (coché ou pas) dans une autre table. Créer une interface de gestion des sauvegardes.
 Sauvegarde des occurences de bassins finie.
+
+16/05 Aujourd'hui, je vais afficher les bassins selectionnés avec la couleur de leur occurence.
