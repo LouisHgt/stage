@@ -100,4 +100,6 @@ Preparer l'exclusion de bassins. Sauvegarder les bassins et leur occur dans bass
 Sauvegarder les sites et leur etat (coché ou pas) dans une autre table. Créer une interface de gestion des sauvegardes.
 Sauvegarde des occurences de bassins finie.
 
-16/05 Aujourd'hui, je vais afficher les bassins selectionnés avec la couleur de leur occurence.
+16/05 Aujourd'hui, je vais afficher les bassins selectionnés avec la couleur de leur occurence. J'ai du changer lamethode de surlignage.
+Je créer maintenant un QgsRubberBand par bassin, que je stocke dans un dictionnaire, et je l'utilise
+pour afficher la couleur.
