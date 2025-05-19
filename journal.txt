@@ -103,3 +103,5 @@ Sauvegarde des occurences de bassins finie.
 16/05 Aujourd'hui, je vais afficher les bassins selectionnés avec la couleur de leur occurence. J'ai du changer lamethode de surlignage.
 Je créer maintenant un QgsRubberBand par bassin, que je stocke dans un dictionnaire, et je l'utilise
 pour afficher la couleur.
+
+19/05 Expliquer le MCD (comment les données sont gérées, utilisées et leur formes)

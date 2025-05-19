@@ -83,6 +83,15 @@ class FormController():
             
         return data
            
+    def upperList(self, list):
+        new_list = []
+        
+        for elt in list:
+            if type(elt) == str:
+                new_list.append(elt.upper())
+
+        return new_list
+
     def sauvegarderBassinPressed(self, bouton):
         
         try:

@@ -142,17 +142,19 @@ class FormView():
             bassins_versants = self.coucheModel.getCoucheFromNom(nom_couche_bassins)
             
             bassins = []
+            bassins_retires = formController.upperList(self.configModel.getFromConfig("bassins_retires"))
             self.bassins_geom = {}
             # On parcourt la liste des couches pour récupérer leur noms
             for feature in bassins_versants.getFeatures():
                 
                 # Récupération du nom
                 bassin = feature[libelle_bassins]
-                bassins.append(bassin)
+                if bassin not in bassins_retires:
+                    bassins.append(bassin)
                 
-                # Récupération de la geometrie
-                geom = feature.geometry()
-                self.bassins_geom[bassin] = geom
+                    # Récupération de la geometrie
+                    geom = feature.geometry()
+                    self.bassins_geom[bassin] = geom
                 
                 
             
@@ -220,13 +222,15 @@ class FormView():
     def mapTypes(self, couche_type):
         colonne_id = "id"
         colonne_nom = "nom"
+        colonne_code = "code"
         
-        
+        codes = {}
         types = {}
         for feature in couche_type.getFeatures():
             types[feature[colonne_id]] = feature[colonne_nom]
+            codes[feature[colonne_id]] = feature[colonne_code]
 
-        return types
+        return (types, codes)
         
     def setupFormulaireSensibilite(self):
         try:
@@ -242,34 +246,39 @@ class FormView():
             if nom_couche_type == "":  # Si getFromConfig ne renvoie rien
                 nom_couche_type = "type_etendu"  # Valeur par défaut
             else:
-                nom_couche_type = nom_couche_type[0]  # Récupérer la première valeur
+                nom_couche_type = nom_couche_type  # Récupérer la première valeur
             
             couche_types = project.mapLayersByName(nom_couche_type)[0]
             
-            types = self.mapTypes(couche_types)
-            
+            (types, codes) = self.mapTypes(couche_types)
+            print(types)
             # Dictionnaire pour stocker l'etat des checkboxes en fonction du type
             self.dialog.checkboxes = {}
             
+            # Types de sites à exclure
+            types_retires = self.configModel.getFromConfig("types_retires")
+            
             # On parcours les types de la couche "type" pour créer le formulaire
             for id, nom in types.items():
-                # Ajout d'un label pour chaque type de site
-                label = QtWidgets.QLabel(nom)
-                label.setMinimumHeight(25)
-                # Ajout d'un checkbox pour chaque type de site
-                checkBox = QtWidgets.QCheckBox()
-                checkBox.setMinimumHeight(25)
-                
-                if self.configModel.getFromConfig("sites_coches") == "1":
-                    checkBox.setChecked(True)
-                else:
-                    checkBox.setChecked(False)
-                
-                # Stockage de la checkbox dans le dictionnaire
-                self.dialog.checkboxes[id] = checkBox
-                
-                # Ajout du label et du combobox au formulaire
-                formulaire.addRow(checkBox, label)
+                # On vérifie que les type ne fait pas partie des exclus
+                if codes.get(id) not in types_retires:
+                    # Ajout d'un label pour chaque type de site
+                    label = QtWidgets.QLabel(nom)
+                    label.setMinimumHeight(25)
+                    # Ajout d'un checkbox pour chaque type de site
+                    checkBox = QtWidgets.QCheckBox()
+                    checkBox.setMinimumHeight(25)
+                    
+                    if self.configModel.getFromConfig("sites_coches") == "1":
+                        checkBox.setChecked(True)
+                    else:
+                        checkBox.setChecked(False)
+                    
+                    # Stockage de la checkbox dans le dictionnaire
+                    self.dialog.checkboxes[id] = checkBox
+                    
+                    # Ajout du label et du combobox au formulaire
+                    formulaire.addRow(checkBox, label)
             
             
         except Exception as e:
