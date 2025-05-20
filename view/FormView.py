@@ -251,7 +251,6 @@ class FormView():
             couche_types = project.mapLayersByName(nom_couche_type)[0]
             
             (types, codes) = self.mapTypes(couche_types)
-            print(types)
             # Dictionnaire pour stocker l'etat des checkboxes en fonction du type
             self.dialog.checkboxes = {}
             

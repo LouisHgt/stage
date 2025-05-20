@@ -48,7 +48,7 @@ class RapportController():
         
         self.docxBuilder.writeDoc(rapport_path)
             
-        print("rapport ecrit")
+        print("Rapport écrit")
 
         
         
@@ -64,6 +64,7 @@ class RapportController():
                 self.docxBuilder.addParagraph(elt, current_nv)
             return
         
+        # On parcour chaque element d'entrée
         for elt in liste_elements:
 
             self.list.append(elt)
