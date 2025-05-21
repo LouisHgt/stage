@@ -82,7 +82,7 @@ class FormController():
             data[key] = self.indiceStringToInt(val)
             
         return data
-           
+               
     def upperList(self, list):
         new_list = []
         

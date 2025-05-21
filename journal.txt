@@ -108,3 +108,4 @@ pour afficher la couleur.
 
 21/05 Inversion du code couleur et simplification de la methode d'appel
 de highlight. Tri des bassins et des types de sites par ordre alphabetique.
+Ajout d'une couche intrermediaire pour trier les sites et les groupement de sites

@@ -314,7 +314,7 @@ class CoucheModel():
     def createSiteRetenu(self):
         """Crée la couche site_retenu via requête SQL sur status_sensibilite."""
 
-        # Chemin de sortie
+        # Couche de sortie
         site_retenu_path = os.path.join(
             os.path.dirname(__file__),
             '..', 
@@ -322,7 +322,7 @@ class CoucheModel():
             self.configModel.getFromConfig('nom_couche_site_retenu') + '.shp'
         )
 
-        # Chemins d'entrée
+        # Couches d'entrée
         status_sentibilite_path = os.path.join(
             os.path.dirname(__file__),
             '..',
@@ -339,8 +339,9 @@ class CoucheModel():
         )
         status_scenario_layer = QgsVectorLayer(status_scenario_path, "status_scenario_path", "ogr")
 
+        sites_layer = self.getCoucheLocationFromNom('sites_tries')
         
-        
+        types_layer = self.getCoucheLocationFromNom('type_etendu')
         
         # Vérification existence fichier source
         if not os.path.exists(status_sentibilite_path):
@@ -358,8 +359,8 @@ class CoucheModel():
                 "qgis:executesql",
                 {
                     'INPUT_DATASOURCES': [
-                        self.getCoucheLocationFromNom('SITES_BASES_SDIS filtre RDI') + '|layerid=0|subset="VISU_RDI" = \'1\'',
-                        self.getCoucheLocationFromNom('type_etendu'),
+                        sites_layer,
+                        types_layer,
                         status_sentibilite_layer,
                         status_scenario_layer
                     ],
@@ -383,6 +384,53 @@ class CoucheModel():
             del status_scenario_layer
             del result
             
+    def createSites(self):
+        # Couche de sortie
+        sites_tries = os.path.join(
+            os.path.dirname(__file__),
+            '..', 
+            self.configModel.getFromConfig('emplacement_couche_site_tries'),
+            self.configModel.getFromConfig('nom_couche_sites_tries') + '.shp'
+        )
+        print(sites_tries)
+        
+        # Couches d'entrée
+        sites_base_RDI = self.getCoucheLocationFromNom('SITES_BASES_SDIS filtre RDI') + '|layerid=0|subset="VISU_RDI" = \'1\''
+        
+        
+        # Récupération de la requete
+        requete_path = os.path.join(os.path.dirname(__file__), '..', 'sql', self.configModel.getFromConfig('requete_sites'))
+        requete = self.getSqlQuery(requete_path)
+        
+        # Execution de la requete
+        try:
+            # Exécution de l'algorithme Processing
+            result = processing.run(
+                "qgis:executesql",
+                {
+                    'INPUT_DATASOURCES': [
+                        sites_base_RDI
+                    ],
+                    'INPUT_QUERY': requete,
+                    'INPUT_UID_FIELD': '',
+                    'INPUT_GEOMETRY_FIELD': '',
+                    'INPUT_GEOMETRY_TYPE': 0,
+                    'INPUT_GEOMETRY_CRS': None,
+                    'OUTPUT': 'TEMPORARY_OUTPUT'
+                }
+            )
+                        
+            self.writeLayer(result['OUTPUT'], sites_tries)
+            
+
+        except Exception as e:
+            print(f"ERREUR execution SQL sur {sites_base_RDI} vers {sites_tries}: {e}")
+            raise
+        finally:
+            del sites_base_RDI
+            del sites_tries
+            del result
+    
     def save_bassins(self, couche_sauvegarde, data):
         # Ouvre la couche, modifie tous les champs
         # avec les valeurs des combobox et la sauvegarde

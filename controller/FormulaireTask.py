@@ -32,7 +32,7 @@ class FormulaireTask(QgsTask):
         """Le code exécuté en arrière-plan. DOIT retourner True en cas de succès, False sinon."""
         QgsMessageLog.logMessage("Début de la tâche de recuperation des données selon le formulaire.", "MonPlugin", Qgis.Info)
         try:
-            total_steps = 4 # Nombre total d'étapes pour la progression
+            total_steps = 5 # Nombre total d'étapes pour la progression
             current_step = 0
 
             # Étape 1: Nettoyer Tmp
@@ -41,22 +41,27 @@ class FormulaireTask(QgsTask):
             self.couche_model.clearTmpFolder() # Action de l'etape
             current_step += 1
 
-
-            # Étape 2: Créer Status Sensibilité
+            # Étape 2: Tri des sites
+            if self.isCanceled():return False
+            self.setProgress(current_step / total_steps * 100)
+            self.couche_model.createSites()
+            current_step += 1
+            
+            # Étape 3: Créer Status Sensibilité
             if self.isCanceled(): return False
             self.setProgress(current_step / total_steps * 100)
             self.couche_model.createStatusSensibilite(self.checkbox_values) # Action de l'etape
             current_step += 1
 
 
-            # Étape 3: Créer Status Scénario
+            # Étape 4: Créer Status Scénario
             if self.isCanceled(): return False
             self.setProgress(current_step / total_steps * 100)
             self.couche_model.createStatusScenario(self.combo_values) # Action de l'etape
             current_step += 1
 
 
-            # Étape 4: Créer Site Retenu
+            # Étape 5: Créer Site Retenu
             if self.isCanceled(): return False
             self.setProgress(current_step / total_steps * 100)
             self.couche_model.createSiteRetenu()
