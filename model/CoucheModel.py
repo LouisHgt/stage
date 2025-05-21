@@ -339,7 +339,7 @@ class CoucheModel():
         )
         status_scenario_layer = QgsVectorLayer(status_scenario_path, "status_scenario_path", "ogr")
 
-        sites_layer = self.getCoucheLocationFromNom('sites_tries')
+        sites_layer = self.getCoucheLocationFromNom('self.sites_tries')
         
         types_layer = self.getCoucheLocationFromNom('type_etendu')
         
@@ -351,7 +351,7 @@ class CoucheModel():
         requete_path = os.path.join(os.path.dirname(__file__), '..', 'sql', self.configModel.getFromConfig('requete_formulaire'))
         
         requete = self.getSqlQuery(requete_path)
-        
+        result = None
 
         try:
             # Exécution de l'algorithme Processing
@@ -359,7 +359,7 @@ class CoucheModel():
                 "qgis:executesql",
                 {
                     'INPUT_DATASOURCES': [
-                        sites_layer,
+                        self.sites_tries,
                         types_layer,
                         status_sentibilite_layer,
                         status_scenario_layer
@@ -386,13 +386,13 @@ class CoucheModel():
             
     def createSites(self):
         # Couche de sortie
-        sites_tries = os.path.join(
+        self.sites_tries = os.path.join(
             os.path.dirname(__file__),
             '..', 
             self.configModel.getFromConfig('emplacement_couche_site_tries'),
             self.configModel.getFromConfig('nom_couche_sites_tries') + '.shp'
         )
-        print(sites_tries)
+        print(self.sites_tries)
         
         # Couches d'entrée
         sites_base_RDI = self.getCoucheLocationFromNom('SITES_BASES_SDIS filtre RDI') + '|layerid=0|subset="VISU_RDI" = \'1\''
@@ -401,6 +401,8 @@ class CoucheModel():
         # Récupération de la requete
         requete_path = os.path.join(os.path.dirname(__file__), '..', 'sql', self.configModel.getFromConfig('requete_sites'))
         requete = self.getSqlQuery(requete_path)
+        
+        result = None
         
         # Execution de la requete
         try:
@@ -420,15 +422,15 @@ class CoucheModel():
                 }
             )
                         
-            self.writeLayer(result['OUTPUT'], sites_tries)
+            self.writeLayer(result['OUTPUT'], self.sites_tries)
             
 
         except Exception as e:
-            print(f"ERREUR execution SQL sur {sites_base_RDI} vers {sites_tries}: {e}")
+            print(f"ERREUR execution SQL sur {sites_base_RDI} vers {self.sites_tries}: {e}")
             raise
         finally:
             del sites_base_RDI
-            del sites_tries
+            # del self.sites_tries
             del result
     
     def save_bassins(self, couche_sauvegarde, data):
