@@ -107,4 +107,4 @@ pour afficher la couleur.
 19/05 Expliquer le MCD (comment les données sont gérées, utilisées et leur formes)
 
 21/05 Inversion du code couleur et simplification de la methode d'appel
-de highlight.
+de highlight. Tri des bassins et des types de sites par ordre alphabetique.

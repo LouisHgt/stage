@@ -156,6 +156,8 @@ class FormView():
                     geom = feature.geometry()
                     self.bassins_geom[bassin] = geom
                 
+            # Tri des bassins par ordrealphabetique
+            bassins.sort()
                 
             
             # Ajout d'un formulaire de scenario
@@ -251,6 +253,11 @@ class FormView():
             couche_types = project.mapLayersByName(nom_couche_type)[0]
             
             (types, codes) = self.mapTypes(couche_types)
+            
+            # Tri des types par ordre alphabetique
+            types = dict(sorted(types.items(), key=lambda item: item[1]))
+            print(types)
+            
             # Dictionnaire pour stocker l'etat des checkboxes en fonction du type
             self.dialog.checkboxes = {}
             
