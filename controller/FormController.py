@@ -120,29 +120,24 @@ class FormController():
         
         opacite = int(self.configModel.getFromConfig("opacite"))
         
-        if occur == "Q10":
-            couleur = QtGui.QColor(254, 4, 8, opacite)
-        elif occur == "Q20":
-            couleur = QtGui.QColor(246, 107, 0, opacite)
-        elif occur == "Q30":
-            couleur = QtGui.QColor(246, 149, 230, opacite)
-        elif occur == "Q50":
-            couleur = QtGui.QColor(152, 0, 240, opacite)
-        elif occur == "Q100":
-            couleur = QtGui.QColor(0, 129, 250, opacite)
-        elif occur == "Qex":
-            couleur = QtGui.QColor(113, 222, 255, opacite)
-        elif occur == "AZI":
-            couleur = QtGui.QColor(12, 238, 254, opacite)
-        elif occur == "Vide":
-            self.formView.highlightBassin(lib_bassin)
-            return
-        else:
-            self.formView.highlightBassin(lib_bassin)
-            return
+        couleurs_dic = {
+            "Q10": QtGui.QColor(12, 238, 254, opacite),
+            "Q20": QtGui.QColor(113, 222, 255, opacite),
+            "Q30": QtGui.QColor(0, 129, 250, opacite),
+            "Q50": QtGui.QColor(152, 0, 240, opacite),
+            "Q100": QtGui.QColor(246, 149, 230, opacite),
+            "Qex": QtGui.QColor(246, 107, 0, opacite),
+            "AZI": QtGui.QColor(254, 4, 8, opacite),
+            "Vide": None
+        }
         
-        self.formView.highlightBassin(lib_bassin, couleur)
-
+        couleur = couleurs_dic.get(occur)
+        
+        if couleur is None:
+            self.formView.highlightBassin(lib_bassin)
+        else:
+            self.formView.highlightBassin(lib_bassin, couleur)
+            
         
     def pressed(self, boutonValider):
         """
