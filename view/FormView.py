@@ -306,14 +306,18 @@ class FormView():
         
     def setupButtons(self, formController):
         """Setup des boutons de la fenetre QT."""
+        # Bouton de validation des formulaires
         boutonValider = self.dialog.findChild(QtWidgets.QPushButton, 'valider')
         boutonValider.clicked.connect(lambda: formController.pressed(boutonValider))
         
+        # Bouton de reinitialisation des occurences
         bouton_reinitialiser = self.dialog.findChild(QtWidgets.QPushButton, 'bouton_reinitialiser')
         bouton_reinitialiser.clicked.connect(lambda: formController.reinitialiserPressed())
         
+        # Bouton de sauvegarde des occurences de bassins
         bouton_save_bassins = self.dialog.findChild(QtWidgets.QPushButton, 'bouton_save_bassins')
         bouton_save_bassins.clicked.connect(lambda: formController.sauvegarderBassinPressed(bouton_save_bassins))
+        boutonValider.clicked.connect(lambda: formController.sauvegarderBassinPressed(bouton_save_bassins))
         
         pdfCheckBox = self.dialog.findChild(QtWidgets.QCheckBox, 'pdfCheckBox')
         
