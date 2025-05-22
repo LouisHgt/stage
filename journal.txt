@@ -109,3 +109,7 @@ pour afficher la couleur.
 21/05 Inversion du code couleur et simplification de la methode d'appel
 de highlight. Tri des bassins et des types de sites par ordre alphabetique.
 Ajout d'une couche intrermediaire pour trier les sites et les groupement de sites
+
+22/05 Aujourd'hui, face aux problemes d'ouvertures et de fermeture de fichiers lors des requetes
+sql de QGis, j'ai décidé de changer la facon dont je stocke les données. Je créer mtn une base de donnée,
+cet qui va grandement simplifier les manipulations des données. J'utilise la librairie sqlite.
