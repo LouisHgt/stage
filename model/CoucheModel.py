@@ -339,7 +339,7 @@ class CoucheModel():
         )
         status_scenario_layer = QgsVectorLayer(status_scenario_path, "status_scenario_path", "ogr")
 
-        sites_layer = self.getCoucheLocationFromNom('self.sites_tries')
+        sites_layer = self.getCoucheLocationFromNom('sites_tries')
         
         types_layer = self.getCoucheLocationFromNom('type_etendu')
         
@@ -359,7 +359,7 @@ class CoucheModel():
                 "qgis:executesql",
                 {
                     'INPUT_DATASOURCES': [
-                        self.sites_tries,
+                        sites_layer,
                         types_layer,
                         status_sentibilite_layer,
                         status_scenario_layer
@@ -373,6 +373,10 @@ class CoucheModel():
                 }
             )
             
+            print(self.getCoucheFromNom("sites_tries").id())
+            self.project.removeMapLayer(self.getCoucheFromNom("sites_tries").id())
+
+            # On écrit la couche en fichier
             self.writeLayer(result['OUTPUT'], site_retenu_path)
             
 
@@ -386,13 +390,12 @@ class CoucheModel():
             
     def createSites(self):
         # Couche de sortie
-        self.sites_tries = os.path.join(
+        sites_tries = os.path.join(
             os.path.dirname(__file__),
             '..', 
             self.configModel.getFromConfig('emplacement_couche_site_tries'),
             self.configModel.getFromConfig('nom_couche_sites_tries') + '.shp'
         )
-        print(self.sites_tries)
         
         # Couches d'entrée
         sites_base_RDI = self.getCoucheLocationFromNom('SITES_BASES_SDIS filtre RDI') + '|layerid=0|subset="VISU_RDI" = \'1\''
@@ -422,15 +425,26 @@ class CoucheModel():
                 }
             )
                         
-            self.writeLayer(result['OUTPUT'], self.sites_tries)
+            # On érit la couche en fichier et on l'ajoute au projet
+            self.writeLayer(result['OUTPUT'], sites_tries)
             
+            print(sites_tries)
+            print(self.configModel.getFromConfig('nom_couche_sites_tries'))
+            
+            layer_from_file = QgsVectorLayer(
+                sites_tries,
+                self.configModel.getFromConfig('nom_couche_sites_tries'),
+                "ogr"
+            )
+            self.project.addMapLayer(layer_from_file, False)
+
 
         except Exception as e:
-            print(f"ERREUR execution SQL sur {sites_base_RDI} vers {self.sites_tries}: {e}")
+            print(f"ERREUR execution SQL sur {sites_base_RDI} vers {sites_tries}: {e}")
             raise
         finally:
             del sites_base_RDI
-            # del self.sites_tries
+            del sites_tries
             del result
     
     def save_bassins(self, couche_sauvegarde, data):
@@ -467,13 +481,12 @@ class CoucheModel():
             options.layerName = "site_retenu"
             options.encoding = "UTF-8"
             
-            writer = QgsVectorFileWriter.writeAsVectorFormatV3(
+            QgsVectorFileWriter.writeAsVectorFormatV3(
                 layer,
                 emplacement_fichier,
                 context,
                 options
             )
-            del writer
         except Exception as e:
             print(e)
             raise

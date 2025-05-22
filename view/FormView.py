@@ -256,7 +256,6 @@ class FormView():
             
             # Tri des types par ordre alphabetique
             types = dict(sorted(types.items(), key=lambda item: item[1]))
-            print(types)
             
             # Dictionnaire pour stocker l'etat des checkboxes en fonction du type
             self.dialog.checkboxes = {}

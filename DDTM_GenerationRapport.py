@@ -205,6 +205,7 @@ class DDTM_GenerationRapport:
             
             # See if OK was pressed
             if result:
+                #self.coucheModel.clearTmpFolder()
                 pass
                 
         except Exception as e:
