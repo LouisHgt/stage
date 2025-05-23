@@ -1,4 +1,5 @@
 import os
+import sqlite3
 
 from .ConfigModel import ConfigModel
 from qgis import processing # type: ignore
@@ -17,6 +18,11 @@ class CoucheModel():
         self.project = QgsProject.instance()
         self.configModel = ConfigModel()
 
+
+
+
+
+
     def getCoucheFromNom(self, nom_couche):
         """Récupère la couche QGIS depuis son nom."""
         couche = self.project.mapLayersByName(nom_couche)
@@ -25,6 +31,12 @@ class CoucheModel():
         else:
             print('pas de couche avec ce nom : ' + nom_couche)
             return None
+    
+    
+    
+    
+    
+    
     
     def getCoucheLocationFromNom(self, nom_couche):
         """Récupère l'emplacement physique (chemin) de la couche QGIS depuis son nom."""
@@ -39,6 +51,10 @@ class CoucheModel():
         else:
             print(f"La couche '{nom_couche}' est introuvable.")
             return None
+
+
+
+
 
     def getCoucheFromFile(self, path_couche, nom_couche):
         
@@ -82,6 +98,7 @@ class CoucheModel():
             raise
 
             
+            
 
     def getNbrAttributsCouche(self, couche):
         i = 0
@@ -89,6 +106,10 @@ class CoucheModel():
             i += 1
         
         return i
+    
+    
+    
+    
     
     def remove_and(self, text):
         """
@@ -102,6 +123,10 @@ class CoucheModel():
         else:
             # Retourne la chaîne originale si elle ne se termine pas par le suffixe
             return text
+    
+    
+    
+    
     
     def getFilteredNiveau(self, couche, liste_elt = []):
         
@@ -159,6 +184,10 @@ class CoucheModel():
         finally:
             return list(filtered_nv) # Conversion en liste
         
+        
+        
+        
+        
     def upperCaseWithSpaces(self, string):
         """
             Prend un string en argument et renvoie en majuscule sans les -
@@ -166,6 +195,9 @@ class CoucheModel():
 
         return string.replace("-", " ").upper()
         
+    
+    
+    
     
     def getSqlQuery(self, requete_path):
         try:
@@ -181,6 +213,10 @@ class CoucheModel():
             raise
             
         return sql_query
+        
+        
+        
+        
         
     def clearTmpFolder(self):
         """Supprime tous les fichiers du dossier tmp."""
@@ -200,6 +236,9 @@ class CoucheModel():
             except OSError as e:
                  print(f"Erreur lors de la création du dossier {tmp_path} : {e}")
 
+
+
+
     def get_group_layers(self, group):
         print('- group: ' + group.name())
         for child in group.children():
@@ -208,6 +247,9 @@ class CoucheModel():
                 self.get_group_layers(child)
             else:
                 print('  - layer: ' + child.name())
+                
+                
+                
                 
                 
     def createStatusSensibilite(self, data):
@@ -266,6 +308,11 @@ class CoucheModel():
             raise
         
 
+
+
+
+
+
     def createStatusScenario(self, data):
         """Crée la couche shapefile de statut de scénario."""
         emplacement_couche = self.configModel.getFromConfig('emplacement_couche_status_scenario')
@@ -309,6 +356,10 @@ class CoucheModel():
         except Exception as e:
             print(f"ERREUR création couche {couche_path} : {e}")
             raise
+
+
+
+
 
 
     def createSiteRetenu(self):
@@ -388,6 +439,11 @@ class CoucheModel():
             del status_scenario_layer
             del result
             
+            
+            
+            
+            
+            
     def createSites(self):
         # Couche de sortie
         sites_tries = os.path.join(
@@ -447,6 +503,10 @@ class CoucheModel():
             del sites_tries
             del result
     
+    
+    
+    
+    
     def save_bassins(self, couche_sauvegarde, data):
         # Ouvre la couche, modifie tous les champs
         # avec les valeurs des combobox et la sauvegarde
@@ -472,6 +532,9 @@ class CoucheModel():
             print("Sauvegarde reussie")
         
     
+    
+    
+    
     def writeLayer(self, layer, emplacement_fichier):
         
         try:
@@ -490,3 +553,46 @@ class CoucheModel():
         except Exception as e:
             print(e)
             raise
+
+
+    
+    
+    def get_sites_from_couche(self, nom_couche):
+        """
+        Récupère la couche
+        Récupère les index des attributs qu'on va récupérer (plus rapide)
+        Parcours la couche pour stocker les données dans une liste de tuples 
+        (lisible par la requete qui stockera les données en table bd)
+        """
+        
+        
+        # Récupération de la couche
+        couche = self.getCoucheFromNom(nom_couche)
+        
+        # Récupération des index
+        fields = couche.fields()
+        
+        idx_nom_site = fields.indexFromName("NOM")
+        idx_type_site = fields.indexFromName("TYPE")
+        idx_commune_site = fields.indexFromName("COMMUNE")
+        idx_sect_inond_site = fields.indexFromName("SECT_INOND")
+        idx_freq_inond_site = fields.indexFromName("FREQ_INOND")
+        
+        data = []
+        
+        if couche and couche.isValid() and isinstance(couche, QgsVectorLayer):
+            for feature in couche.getFeatures():
+                
+                # Récupération des données
+                nom_site = feature.attribute(idx_nom_site)
+                type_site = feature.attribute(idx_type_site)
+                nom_commune_site = feature.attribute(idx_commune_site)
+                sect_inond_site = feature.attribute(idx_sect_inond_site)
+                freq_inond_site = feature.attribute(idx_freq_inond_site)
+                
+                
+                # Stockage dans la liste de tuples
+                data.append((nom_site, type_site, nom_commune_site, sect_inond_site, freq_inond_site, feature.geometry().asWkt()))
+        
+        
+        return data

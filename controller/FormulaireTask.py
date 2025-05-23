@@ -64,9 +64,9 @@ class FormulaireTask(QgsTask):
 
             # Étape 5: Création de la table sites
             if self.isCanceled(): return False
-            
+            data = dataBaseModel.convertDataTypes(self.couche_model.get_sites_from_couche('SITES_BASES_SDIS filtre RDI'))
 
-
+            dataBaseModel.create_table_sites("sites_bases_sdis_filtre", data)
 
 
 
