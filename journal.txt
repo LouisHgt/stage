@@ -117,3 +117,5 @@ cet qui va grandement simplifier les manipulations des données. J'utilise la li
 23/05 Aujourd'hui j'ai fais une methode qui prend le nom d'une couche en argument et qui stocke ses données
 dans une table à son nom. Il faut seulement que la couche possède les attributs requis, et que je
 fasse un methode qui recupère les données d'une couche seulement avec son nom.
+
+26/05 Suppression des tables au lancement si elles existaient encore.

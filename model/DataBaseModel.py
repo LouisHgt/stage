@@ -48,13 +48,22 @@ class DataBaseModel():
                 
                 cursor.executescript(requete)
             
-
         except Exception as e:
             print(f"Erreur lors de l'initialisation de la bd {e}")
+            raise
     
     
     
-    
+    def init_spacialite_cursor(self, connection):
+        connection.enable_load_extension(True)
+        connection.load_extension('mod_spatialite')
+        
+        cursor = connection.cursor()
+        
+        return cursor
+
+
+
     
     
     
@@ -91,13 +100,14 @@ class DataBaseModel():
 
         try:
             with sqlite3.connect(self.emplacement_bd) as conn:
-                cursor = conn.cursor()
+                cursor = self.init_spacialite_cursor(conn)
                 cursor.executemany(sql_insert, data_to_insert)
             
             return True
         except Exception as e:
             print("Erreur lors de la sauvegarde de status scenario en table")
             print(e)
+            raise
             
             
             
@@ -118,17 +128,18 @@ class DataBaseModel():
         
         
         # Construction de la requete SQL
-        sql_insert = f"INSERT INTO \"status_sensibilite\" (\"id_type\", \"etat_type\") VALUES (?, ?)"
+        sql_insert = f"INSERT INTO \"status_sensibilite\" (\"id_type\", \"etat_type\") VALUES (?, ?);"
 
         try:
             with sqlite3.connect(self.emplacement_bd) as conn:
-                cursor = conn.cursor()
+                cursor = self.init_spacialite_cursor(conn)
                 cursor.executemany(sql_insert, data_to_insert)
             
             return True
         except Exception as e:
             print("Erreur lors de la sauvegarde de status scenario en table")
             print(e)
+            raise
             
             
             
@@ -139,6 +150,9 @@ class DataBaseModel():
             
     def create_table_sites(self, nom_table, data):
         """
+        Créer une table qui peut servir d'entrée de donées
+        Ex: sites_bases_sdis_filtre_rdi
+        
         Prend en argument une liste de tuples
         Tuple : NOM, TYPE, COMMUNE, BASSIN, FREQ, GEOM
         """
@@ -151,12 +165,35 @@ class DataBaseModel():
         # Création de l'attribut geom, chargement de l'extention spacialite et insertion des données
         try:
             with sqlite3.connect(self.emplacement_bd) as conn:
-                # Chargement de l'extention
-                conn.enable_load_extension(True)
-                conn.load_extension('mod_spatialite')
-                
-                cursor = conn.cursor()
+                # Chargement de l'extention   
+                cursor = self.init_spacialite_cursor(conn)
 
+                # Création de la table avec geometrie
+                sql_drop = f"""
+                DROP TABLE IF EXISTS {nom_table};
+                """
+                
+                cursor.execute(sql_drop)
+                
+                sql_create = f"""
+                CREATE TABLE {nom_table} (
+                    NOM TEXT NOT NULL,
+                    TYPE TEXT NOT NULL,
+                    COMMUNE TEXT NOT NULL,
+                    SECT_INOND TEXT NOT NULL,
+                    FREQ_INOND FLOAT NOT NULL
+                );
+                """
+                
+                cursor.execute(sql_create)
+                
+                
+                # Ajout de la colonne geom_s
+                sql_select = f"""
+                SELECT AddGeometryColumn('{nom_table}', 'geom_s', 2154, 'MULTIPOLYGON', 'XY', 0);
+                """
+                
+                cursor.execute(sql_select)
                 
                 # Ajout des données
                 # Construction de la requete SQL
@@ -167,9 +204,14 @@ class DataBaseModel():
                 
 
         except Exception as e:
-            print(f"Erreur lors de l'insertion des données dans {nom_table}, {e}")                
+            print(f"Erreur lors de l'insertion des données dans {nom_table}, {e}")       
+            raise         
             
             
+    
+    
+    
+    
     
     
     
@@ -189,6 +231,77 @@ class DataBaseModel():
             data_to_insert.append(new_tuple)
         
         return data_to_insert
+    
+    
+    
+    
+    
+    
+    
+    
+    def get_sites(self, liste_tables_entrée):
+        """
+        Prend une liste de table en entrée et les compiles en une seule
+        
+        """
+        
+        if len(liste_tables_entrée) == 0:
+            print("Aucun table en entrée !")
+            return False
+        
+        # Requete du tri des sites
+        try:
+            with sqlite3.connect(self.emplacement_bd) as conn:
+                cursor = self.init_spacialite_cursor(conn)
+
+                # Création de la requete
+                sql_select = f"""
+                SELECT * 
+                FROM {liste_tables_entrée.pop(0)}
+                """
+                
+                
+                for table in liste_tables_entrée:
+                    sql_select += f"""
+                    UNION
+                    SELECT *
+                    FROM {table}
+                    """
+                
+                sql_select += f"""
+                ORDER BY nom
+                ;"""
+                cursor.execute(sql_select)
+                
+                data = cursor.fetchall()
+                
+                return data
+                
+        except Exception as e:
+            print(f"Erreur dans create_table_sites_retenus : {e}")
+            raise
+        
+        
+    
+    
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     

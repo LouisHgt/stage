@@ -34,7 +34,7 @@ class FormulaireTask(QgsTask):
         """Le code exécuté en arrière-plan. DOIT retourner True en cas de succès, False sinon."""
         QgsMessageLog.logMessage("Début de la tâche de recuperation des données selon le formulaire.", "MonPlugin", Qgis.Info)
         try:
-            total_steps = 4 # Nombre total d'étapes pour la progression
+            total_steps = 6 # Nombre total d'étapes pour la progression
             current_step = 0
             self.setProgress(current_step / total_steps * 100)
 
@@ -62,18 +62,30 @@ class FormulaireTask(QgsTask):
             current_step += 1
             self.setProgress(current_step / total_steps * 100)
 
-            # Étape 5: Création de la table sites
+            # Étape 5: Création de la table sites base sdis filtre RDI
             if self.isCanceled(): return False
+            
+            # Récupération des données et conversion en types pythons
             data = dataBaseModel.convertDataTypes(self.couche_model.get_sites_from_couche('SITES_BASES_SDIS filtre RDI'))
-
             dataBaseModel.create_table_sites("sites_bases_sdis_filtre", data)
+            del data # On supprime data pour libérer de la mémoire
+            current_step += 1
+            self.setProgress(current_step / total_steps * 100)
+
+            # Étape 6: Création de la table sites
+            if self.isCanceled(): return False
+            # Récupération de l'ensemble des sites
+            data = dataBaseModel.get_sites(["sites_bases_sdis_filtre"])
+            dataBaseModel.create_table_sites("sites", data)
+            del data # On supprime data pour libérer de la mémoire
+            current_step += 1
+            self.setProgress(current_step / total_steps * 100)
 
 
 
-
-
-
-
+            # Étape 7: Requete finale des sites retenus
+            if self.isCanceled(): return False
+            
 
 
 

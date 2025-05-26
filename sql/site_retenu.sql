@@ -1,9 +1,9 @@
 SELECT
     sc.nom_bassin as nv0, -- Bassin
-    UPPER(REPLACE(es.commune, '-', ' ')) as nv1, -- Commune
+    UPPER(REPLACE(es.COMMUNE, '-', ' ')) as nv1, -- Commune
     te.nom as nv2,        -- Type
     es.NOM as nv3,        -- Nom de site
-    es.geometry           -- Inclure la geometry pour que le fichier se forme bien avec qgis:run
+    es.geom_s          -- Inclure la geometry pour que le fichier se forme bien avec qgis:run
 FROM
     input1 AS es
 INNER JOIN
