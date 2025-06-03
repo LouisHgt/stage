@@ -20,7 +20,7 @@ class RapportController():
         # On importe docx dans la methode pour eviter les conflits avec le garbage collector
         
         """
-            Recupere les données d'entrée de la table 'site retenu' et crée un docx avec
+            Recupere les données d'entrée de la table 'site_retenu' et crée un docx avec
         """
         
         # Recuparation de l'emplacement du rapport et de son nom

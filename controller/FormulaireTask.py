@@ -138,7 +138,7 @@ class FormulaireTask(QgsTask):
 
             # Étape  : Creation du fichier site_retenu
             if self.isCanceled(): return False
-            
+            self.couche_model.createSiteRetenu(sites_retenus)
 
 
 

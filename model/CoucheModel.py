@@ -372,6 +372,54 @@ class CoucheModel():
             self.configModel.getFromConfig('emplacement_couche_site_retenu'),
             self.configModel.getFromConfig('nom_couche_site_retenu') + '.shp'
         )
+        
+        
+        # Création de la couche
+        # Définir les champs
+        fields = QgsFields()
+        fields.append(QgsField("nv0", QVariant.String, len=50))
+        fields.append(QgsField("nv1", QVariant.String, len=100))
+        fields.append(QgsField("nv2", QVariant.String, len=50))
+        fields.append(QgsField("nv3", QVariant.String, len=100))
+        
+        
+        # Création d'une uri de base opur stocker la couche en memoire
+        base_uri = "NoGeometry?crs=epsg:2154"
+        nom_layer = self.configModel.getFromConfig('nom_couche_site_retenu')
+        
+        
+        # Création de la couche en memoire
+        try:
+            couche_site_retenu = QgsVectorLayer(base_uri, nom_layer, "memory")
+            
+            
+            
+            provider = couche_site_retenu.dataProvider()
+            # 2. Ajouter les champs à partir de votre objet QgsFields existant
+            # Note: addAttributes attend une liste de QgsField, pas un QgsFields.
+            # On peut convertir QgsFields en liste de QgsField.
+            provider.addAttributes([fields.field(i) for i in range(fields.count())])
+            
+            couche_site_retenu.updateFields()
+            
+            
+            # Ajout des données dans feature_to_add
+            feature_to_add = []
+            for site_tuple in sites_retenus:
+                feature = QgsFeature(couche_site_retenu.fields())
+                feature.setAttributes(list(site_tuple))
+                
+                feature_to_add.append(feature)
+            
+            # Insertion des données
+            provider.addFeatures(feature_to_add)
+            couche_site_retenu.updateExtents()
+            
+            self.writeLayer(couche_site_retenu, site_retenu_path)
+                
+        except Exception as e:
+            print(f"Erreur lors de la creation de la couche site_retenu :{e}")
+            raise
 
             
             
