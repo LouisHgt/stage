@@ -90,6 +90,8 @@ class CoucheModel():
                    
             del couche_fichier
             
+            print(type(couche_memoire))
+            print(couche_memoire.featureCount())
             return couche_memoire
             
         except Exception as e:
@@ -365,6 +367,9 @@ class CoucheModel():
     def createSiteRetenu(self, sites_retenus):
         """Crée la couche site_retenu via requête SQL sur status_sensibilite."""
 
+        print(sites_retenus)
+        print(len(sites_retenus))
+
         # Couche de sortie
         site_retenu_path = os.path.join(
             os.path.dirname(__file__),
@@ -378,13 +383,13 @@ class CoucheModel():
         # Définir les champs
         fields = QgsFields()
         fields.append(QgsField("nv0", QVariant.String, len=50))
-        fields.append(QgsField("nv1", QVariant.String, len=100))
-        fields.append(QgsField("nv2", QVariant.String, len=50))
-        fields.append(QgsField("nv3", QVariant.String, len=100))
+        fields.append(QgsField("nv1", QVariant.String, len=200))
+        fields.append(QgsField("nv2", QVariant.String, len=200))
+        fields.append(QgsField("nv3", QVariant.String, len=200))
         
         
-        # Création d'une uri de base opur stocker la couche en memoire
-        base_uri = "NoGeometry?crs=epsg:2154"
+        # Création d'une uri de base pour stocker la couche en memoire
+        base_uri = "Point?crs=epsg:2154"
         nom_layer = self.configModel.getFromConfig('nom_couche_site_retenu')
         
         
@@ -408,6 +413,9 @@ class CoucheModel():
             for site_tuple in sites_retenus:
                 feature = QgsFeature(couche_site_retenu.fields())
                 feature.setAttributes(list(site_tuple))
+                
+                # Ajout d'une geometrie nulle
+                feature.setGeometry(QgsGeometry())
                 
                 feature_to_add.append(feature)
             
