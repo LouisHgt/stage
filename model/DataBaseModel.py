@@ -99,7 +99,7 @@ class DataBaseModel():
         types = []
         
         for feature in couche_type_etendu.getFeatures():
-            types.append((feature['code'], feature['nom']))
+            types.append((feature['id'], feature['code'], feature['nom']))
 
         
         # Requetes
@@ -107,14 +107,14 @@ class DataBaseModel():
         DROP TABLE IF EXISTS type_etendu;
         
         CREATE TABLE type_etendu (
+            id INTEGER NOT NULL,
             code TEXT NOT NULL,
             nom TEXT NOT NULL
         );
         """
         
-        sql_insert = f"INSERT INTO \"type_etendu\" (\"code\", \"nom\") VALUES (?, ?)"
-        print(sql_insert)
-        print(types)
+        sql_insert = f"INSERT INTO \"type_etendu\" (\"id\", \"code\", \"nom\") VALUES (?, ?, ?)"
+
         
         # Création de la table type_etendu
         try:
@@ -354,10 +354,21 @@ class DataBaseModel():
             'sql',
             'site_retenu.sql'
             )
-        self.coucheModel.getSqlQuery(emplacement_requete)
+        sql_select = self.coucheModel.getSqlQuery(emplacement_requete)
         
         
-        # Création de la table
+        # Execution de la requete
+        try:
+            with sqlite3.connect(self.emplacement_bd) as conn:
+                cursor = self.init_spacialite_cursor(conn)
+                
+                cursor.execute(sql_select)
+                
+                data = cursor.fetchall()
+                print(type(data))
+                return data
+        except Exception as e:
+            print(f"Erreur lors du select des sites_retenus :{e}")
         
         
     

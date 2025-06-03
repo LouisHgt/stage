@@ -44,6 +44,11 @@ class FormulaireTask(QgsTask):
             current_step += 1
             self.setProgress(current_step / total_steps * 100)
 
+
+
+
+
+
             # Étape 2: Initialisation de la bd
             if self.isCanceled(): return False
             dataBaseModel = DataBaseModel(self.couche_model)
@@ -51,9 +56,17 @@ class FormulaireTask(QgsTask):
             self.setProgress(current_step / total_steps * 100)
             
             
-            # Étape  : Création de la table sites etendus
+            
+            
+            
+            
+            # Étape  : Création de la table type etendus
             if self.isCanceled(): return False
             dataBaseModel.create_table_type_etendu()
+            
+            
+            
+            
             
             
             
@@ -63,12 +76,23 @@ class FormulaireTask(QgsTask):
             current_step += 1
             self.setProgress(current_step / total_steps * 100)
             
+            
+            
+            
+            
+            
+            
             # Étape 4: Création de la table status_sensibilite
             if self.isCanceled(): return False
             dataBaseModel.create_table_status_sensibilite(self.checkbox_values)
             current_step += 1
             self.setProgress(current_step / total_steps * 100)
 
+            
+            
+            
+            
+            
             
             # Étape 5: Récupération des sites dans la couche sites base sdis et conversion en types pythons
             data = dataBaseModel.convertDataTypes(self.couche_model.get_sites_from_couche('SITES_BASES_SDIS filtre RDI'))
@@ -78,6 +102,10 @@ class FormulaireTask(QgsTask):
             current_step += 1
             self.setProgress(current_step / total_steps * 100)
 
+
+
+
+
             # Étape 6: Création de la table sites
             if self.isCanceled(): return False
             # Récupération de l'ensemble des sites
@@ -86,9 +114,12 @@ class FormulaireTask(QgsTask):
             del data # On supprime data pour libérer de la mémoire
             
             
+            
+            
+            
             # Étape 7: Création de la table sites retenus
             if self.isCanceled(): return False
-            dataBaseModel.show_database_tables()
+            #dataBaseModel.show_database_tables()
             
             
             
@@ -102,8 +133,12 @@ class FormulaireTask(QgsTask):
 
             # Étape 7: Requete finale des sites retenus
             if self.isCanceled(): return False
-            
+            sites_retenus = dataBaseModel.get_sites_retenus()
 
+
+            # Étape  : Creation du fichier site_retenu
+            if self.isCanceled(): return False
+            
 
 
 
