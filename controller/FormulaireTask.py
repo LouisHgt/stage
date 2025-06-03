@@ -50,6 +50,13 @@ class FormulaireTask(QgsTask):
             current_step += 1
             self.setProgress(current_step / total_steps * 100)
             
+            
+            # Étape  : Création de la table sites etendus
+            if self.isCanceled(): return False
+            dataBaseModel.create_table_type_etendu()
+            
+            
+            
             # Étape 3: Création de la table status_scenario
             if self.isCanceled(): return False
             dataBaseModel.create_table_status_scenario(self.combo_values)
@@ -62,11 +69,10 @@ class FormulaireTask(QgsTask):
             current_step += 1
             self.setProgress(current_step / total_steps * 100)
 
-            # Étape 5: Création de la table sites base sdis filtre RDI
-            if self.isCanceled(): return False
             
-            # Récupération des données et conversion en types pythons
+            # Étape 5: Récupération des sites dans la couche sites base sdis et conversion en types pythons
             data = dataBaseModel.convertDataTypes(self.couche_model.get_sites_from_couche('SITES_BASES_SDIS filtre RDI'))
+            # Création de la table sites_base_sdis_filtre_rdi
             dataBaseModel.create_table_sites("sites_bases_sdis_filtre", data)
             del data # On supprime data pour libérer de la mémoire
             current_step += 1
@@ -78,6 +84,17 @@ class FormulaireTask(QgsTask):
             data = dataBaseModel.get_sites(["sites_bases_sdis_filtre"])
             dataBaseModel.create_table_sites("sites", data)
             del data # On supprime data pour libérer de la mémoire
+            
+            
+            # Étape 7: Création de la table sites retenus
+            if self.isCanceled(): return False
+            dataBaseModel.show_database_tables()
+            
+            
+            
+            
+            
+            
             current_step += 1
             self.setProgress(current_step / total_steps * 100)
 

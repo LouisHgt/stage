@@ -41,7 +41,7 @@ class DataBaseModel():
                 conn.load_extension('mod_spatialite')
                 
 
-                cursor = conn.cursor()
+                cursor = self.init_spacialite_cursor(conn)
                 
                 # Initialisation des metadonnées
                 cursor.execute("SELECT InitSpatialMetadata(1)")
@@ -79,6 +79,53 @@ class DataBaseModel():
         return emplacement_bd
           
           
+          
+          
+          
+          
+          
+    def create_table_type_etendu(self):
+        """
+            Création de la table site_etendu
+            table qui fait le lien entre les types de batiments et leur nomenclature associee
+            Ex : camp -> camping
+        """
+        # Récupération de la couche
+        couche_type_etendu = self.coucheModel.getCoucheFromNom('type_etendu')
+        
+        
+        # Création d'un dictionnaire dans lequel on va stocker
+        # en key le code et en value le type d'etablissement
+        types = []
+        
+        for feature in couche_type_etendu.getFeatures():
+            types.append((feature['code'], feature['nom']))
+
+        
+        # Requetes
+        sql_create = f"""
+        DROP TABLE IF EXISTS type_etendu;
+        
+        CREATE TABLE type_etendu (
+            code TEXT NOT NULL,
+            nom TEXT NOT NULL
+        );
+        """
+        
+        sql_insert = f"INSERT INTO \"type_etendu\" (\"code\", \"nom\") VALUES (?, ?)"
+        print(sql_insert)
+        print(types)
+        
+        # Création de la table type_etendu
+        try:
+            with sqlite3.connect(self.emplacement_bd) as conn:
+                cursor = self.init_spacialite_cursor(conn)
+                
+                cursor.executescript(sql_create)
+                
+                cursor.executemany(sql_insert, types)
+        except Exception as e:
+            print(f"Erreur lors de la creation de la table type_etendu :{e}")
           
           
           
@@ -290,7 +337,29 @@ class DataBaseModel():
     
 
     
-    
+    def get_sites_retenus(self):
+        """
+            Recuperation des sites retenus
+            -> liste finale qui contient les sites qui apparaitrons dans le bilan
+            Pour que cette methode soit lancée, il faut qu'il existe les tables:
+            status_scenario, status_sensibilite, sites, type_etendu.
+        """
+        
+        
+        # Requete
+        # Emplacement de la requete
+        emplacement_requete = os.path.join(
+            os.path.dirname(__file__),
+            '..',
+            'sql',
+            'site_retenu.sql'
+            )
+        self.coucheModel.getSqlQuery(emplacement_requete)
+        
+        
+        # Création de la table
+        
+        
     
     
     

@@ -26,7 +26,7 @@ class CoucheModel():
     def getCoucheFromNom(self, nom_couche):
         """Récupère la couche QGIS depuis son nom."""
         couche = self.project.mapLayersByName(nom_couche)
-        if couche:
+        if couche is not None:
             return couche[0]
         else:
             print('pas de couche avec ce nom : ' + nom_couche)
@@ -362,7 +362,7 @@ class CoucheModel():
 
 
 
-    def createSiteRetenu(self):
+    def createSiteRetenu(self, sites_retenus):
         """Crée la couche site_retenu via requête SQL sur status_sensibilite."""
 
         # Couche de sortie
@@ -373,71 +373,7 @@ class CoucheModel():
             self.configModel.getFromConfig('nom_couche_site_retenu') + '.shp'
         )
 
-        # Couches d'entrée
-        status_sentibilite_path = os.path.join(
-            os.path.dirname(__file__),
-            '..',
-            self.configModel.getFromConfig('emplacement_couche_status_sensibilite'),
-            self.configModel.getFromConfig('nom_couche_status_sensibilite') + '.shp'
-        )
-        status_sentibilite_layer = QgsVectorLayer(status_sentibilite_path, "status_sentibilite_layer", "ogr")
-        
-        status_scenario_path = os.path.join(
-            os.path.dirname(__file__),
-            '..',
-            self.configModel.getFromConfig('emplacement_couche_status_scenario'),
-            self.configModel.getFromConfig('nom_couche_status_scenario') + '.shp'
-        )
-        status_scenario_layer = QgsVectorLayer(status_scenario_path, "status_scenario_path", "ogr")
-
-        sites_layer = self.getCoucheLocationFromNom('sites_tries')
-        
-        types_layer = self.getCoucheLocationFromNom('type_etendu')
-        
-        # Vérification existence fichier source
-        if not os.path.exists(status_sentibilite_path):
-            raise FileNotFoundError(f"Fichier d'entrée pour SQL non trouvé: {status_sentibilite_path}")
-
-
-        requete_path = os.path.join(os.path.dirname(__file__), '..', 'sql', self.configModel.getFromConfig('requete_formulaire'))
-        
-        requete = self.getSqlQuery(requete_path)
-        result = None
-
-        try:
-            # Exécution de l'algorithme Processing
-            result = processing.run(
-                "qgis:executesql",
-                {
-                    'INPUT_DATASOURCES': [
-                        sites_layer,
-                        types_layer,
-                        status_sentibilite_layer,
-                        status_scenario_layer
-                    ],
-                    'INPUT_QUERY': requete,
-                    'INPUT_UID_FIELD': '',
-                    'INPUT_GEOMETRY_FIELD': '',
-                    'INPUT_GEOMETRY_TYPE': 0,
-                    'INPUT_GEOMETRY_CRS': None,
-                    'OUTPUT': 'TEMPORARY_OUTPUT'
-                }
-            )
             
-            print(self.getCoucheFromNom("sites_tries").id())
-            self.project.removeMapLayer(self.getCoucheFromNom("sites_tries").id())
-
-            # On écrit la couche en fichier
-            self.writeLayer(result['OUTPUT'], site_retenu_path)
-            
-
-        except Exception as e:
-            print(f"ERREUR execution SQL sur {status_sentibilite_path} vers {site_retenu_path}: {e}")
-            raise
-        finally:
-            del status_sentibilite_layer
-            del status_scenario_layer
-            del result
             
             
             
