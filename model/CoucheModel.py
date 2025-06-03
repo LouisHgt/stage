@@ -90,8 +90,7 @@ class CoucheModel():
                    
             del couche_fichier
             
-            print(type(couche_memoire))
-            print(couche_memoire.featureCount())
+
             return couche_memoire
             
         except Exception as e:
@@ -365,10 +364,8 @@ class CoucheModel():
 
 
     def createSiteRetenu(self, sites_retenus):
-        """Crée la couche site_retenu via requête SQL sur status_sensibilite."""
+        """Crée la couche site_retenu à partir d'une liste de tuples -> sites_retenus"""
 
-        print(sites_retenus)
-        print(len(sites_retenus))
 
         # Couche de sortie
         site_retenu_path = os.path.join(

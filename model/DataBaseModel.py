@@ -365,7 +365,6 @@ class DataBaseModel():
                 cursor.execute(sql_select)
                 
                 data = cursor.fetchall()
-                print(type(data))
                 return data
         except Exception as e:
             print(f"Erreur lors du select des sites_retenus :{e}")
