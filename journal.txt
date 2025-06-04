@@ -119,3 +119,5 @@ dans une table à son nom. Il faut seulement que la couche possède les attribut
 fasse un methode qui recupère les données d'une couche seulement avec son nom.
 
 26/05 Suppression des tables au lancement si elles existaient encore.
+
+04/05 types à exclure :

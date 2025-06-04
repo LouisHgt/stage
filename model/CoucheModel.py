@@ -1,5 +1,4 @@
 import os
-import sqlite3
 
 from .ConfigModel import ConfigModel
 from qgis import processing # type: ignore
@@ -89,6 +88,7 @@ class CoucheModel():
             
                    
             del couche_fichier
+            couche_fichier = None
             
 
             return couche_memoire
@@ -222,6 +222,13 @@ class CoucheModel():
     def clearTmpFolder(self):
         """Supprime tous les fichiers du dossier tmp."""
         tmp_path = os.path.join(os.path.dirname(__file__), '..',  'tmp')
+        
+        # Supression des sites retenus
+        try:
+            QgsVectorFileWriter.deleteShapeFile(tmp_path + "\\site_retenu.shp")
+        except Exception as e:
+            print(f"exception lors de la suppression des sites_retenus :{e}")
+            raise
         if os.path.exists(tmp_path):
             for file_name in os.listdir(tmp_path):
                 file_path = os.path.join(tmp_path, file_name)
@@ -230,12 +237,14 @@ class CoucheModel():
                         os.remove(file_path)
                 except Exception as e:
                     print(f" Erreur lors de la suppression du fichier {file_path} : {e}")
+                    raise
         else:
             # Créer le dossier si nécessaire
             try:
                 os.makedirs(tmp_path)
             except OSError as e:
                  print(f"Erreur lors de la création du dossier {tmp_path} : {e}")
+                 raise
 
 
 

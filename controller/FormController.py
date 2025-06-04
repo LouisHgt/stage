@@ -23,12 +23,27 @@ class FormController():
         self.rapportController.setDialog(self.dialog)
         self.current_task = None
     
+    
+    
+    
+    
+    
+    
+    
+    
     def setupFormulaires(self):
         """Configure les formulaires."""
         self.formView.setupFormulaireScenario(self)
         self.formView.setupFormulaireSensibilite()
         self.formView.setupCanvas()
         self.formView.setupButtons(self)
+        
+        
+        
+        
+        
+        
+        
         
     def reinitialiserPressed(self):
         '''
@@ -54,6 +69,14 @@ class FormController():
                         comboBox = row_formulaire.itemAt(j).widget()
                         comboBox.setCurrentIndex(comboBox.count() - 1)
      
+     
+     
+     
+     
+     
+     
+     
+     
     def indiceStringToInt(self, indice_string):
         if indice_string == "Q10":
             return 10
@@ -72,6 +95,16 @@ class FormController():
         else:
             return 0
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     def normalizeData(self, data):
         """
             Prend en argument les valeurs du formulaire et renvoie
@@ -83,19 +116,45 @@ class FormController():
             
         return data
                
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
     def upperList(self, list):
+        """
+        Renvoie une liste de string en majuscule
+        """
         new_list = []
         
+        print("je suis dans upper")
         for elt in list:
             if type(elt) == str:
                 new_list.append(elt.upper())
 
         return new_list
 
+
+
+
+
+
+
+
     def sauvegarderBassinPressed(self, bouton):
+        """
+        Methode appellée quand on appuie sur le bouton pour sauvegarder les 
+        indices correspondants aux bassins dans la couche Bassins versants
+        """
         
         try:
-            # On desactive le bouon le temps du traitement
+            # On desactive le bouton le temps du traitement
             bouton.setEnabled(False)
             bouton.setText("Traitement...")
             bouton.repaint()
@@ -111,6 +170,16 @@ class FormController():
         except Exception as e:
             print("Probleme rencontré lors de la sauvegarde des occurences de bassins")
             print(e)
+            raise
+            
+            
+            
+            
+            
+            
+            
+            
+            
             
     def handleOccurBassinChanged(self, occur, lib_bassin):
         """

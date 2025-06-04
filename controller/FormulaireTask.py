@@ -5,7 +5,10 @@ from qgis.PyQt.QtCore import pyqtSignal # type: ignore
 from ..model.DataBaseModel import DataBaseModel
 
 class FormulaireTask(QgsTask):
-    """Tâche QGIS pour générer le rapport en arrière-plan."""
+    """
+    Tâche QGIS qui traite les données afin de récupérer les sites
+    retenus
+    """
 
     # Signal de fin de tache
     task_finished = pyqtSignal(bool)   
@@ -30,9 +33,9 @@ class FormulaireTask(QgsTask):
 
         
         
+        
     def run(self):
         """Le code exécuté en arrière-plan. DOIT retourner True en cas de succès, False sinon."""
-        QgsMessageLog.logMessage("Début de la tâche de recuperation des données selon le formulaire.", "MonPlugin", Qgis.Info)
         try:
             total_steps = 9 # Nombre total d'étapes pour la progression
             current_step = 0
@@ -121,7 +124,6 @@ class FormulaireTask(QgsTask):
             
             
             
-            
 
 
             # Étape 8: Requete finale des sites retenus
@@ -129,6 +131,7 @@ class FormulaireTask(QgsTask):
             sites_retenus = dataBaseModel.get_sites_retenus()
             current_step += 1
             self.setProgress(current_step / total_steps * 100)
+
 
 
 
@@ -145,7 +148,6 @@ class FormulaireTask(QgsTask):
 
         except Exception as e:
             self.exception = e # Stocker l'exception pour l'afficher dans finished()
-            QgsMessageLog.logMessage(f"Erreur pendant la tâche : {e}", "MonPlugin", Qgis.Critical)
             return False # Échec
 
 
@@ -159,10 +161,8 @@ class FormulaireTask(QgsTask):
             # La tâche a échoué (run a retourné False) ou a été annulée
             if self.exception:
                 # Une exception s'est produite
-                QgsMessageLog.logMessage(f"La tâche a échoué : {self.exception}", "MonPlugin", Qgis.Critical)
                 QtWidgets.QMessageBox.critical(self.dialog, "Erreur de Tâche", f"Une erreur est survenue durant la génération :\n\n{self.exception}")
             elif self.isCanceled():
-                QgsMessageLog.logMessage("La tâche a été annulée par l'utilisateur.", "MonPlugin", Qgis.Warning)
                 QtWidgets.QMessageBox.warning(self.dialog, "Tâche Annulée", "La génération du rapport a été annulée.")
             else:
                 # Échec inconnu

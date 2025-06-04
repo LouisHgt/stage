@@ -126,6 +126,7 @@ class DataBaseModel():
                 cursor.executemany(sql_insert, types)
         except Exception as e:
             print(f"Erreur lors de la creation de la table type_etendu :{e}")
+            raise
           
           
           
@@ -368,6 +369,7 @@ class DataBaseModel():
                 return data
         except Exception as e:
             print(f"Erreur lors du select des sites_retenus :{e}")
+            raise
         
         
     

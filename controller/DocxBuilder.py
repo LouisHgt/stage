@@ -11,6 +11,12 @@ class DocxBuilder():
     def __init__(self):
         pass
     
+    
+    
+    
+    
+    
+    
     def initDoc(self):
         self.document = docx.Document()
         
@@ -23,6 +29,16 @@ class DocxBuilder():
         
         self.document.add_page_break()
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     def writeDoc(self, rapport_path):
         
         try:
@@ -34,6 +50,13 @@ class DocxBuilder():
         finally:
             del self.document
         
+    
+    
+    
+    
+    
+    
+    
     
     def addParagraph(self, elt, niveau):
         """
@@ -50,8 +73,11 @@ class DocxBuilder():
             print("Erreur lors de la creation du paragraphe dans addParagraph")
             raise
     
-    def addHyperlink(paragraph, elt):
-        pass
+    
+    
+
+
+
     
     def apply_style_to_paragraph(self, paragraph, level):
         para_format = paragraph.paragraph_format

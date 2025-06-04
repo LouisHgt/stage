@@ -10,7 +10,6 @@ from qgis.PyQt import uic, QtWidgets, QtGui # type: ignore
 from qgis.gui import QgsMapCanvas # type: ignore
 
 from ..controller.WheelEventFilter import WheelEventFilter
-from ..controller.ChangeEventFilter import ChangeEventFilter
 
 
 
