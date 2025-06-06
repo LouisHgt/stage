@@ -10,11 +10,19 @@ class RapportController():
         self.coucheModel = couche_model_inst
         self.docxBuilder = DocxBuilder()
         
+        
+        
     def setFormView(self, formView):
         self.formView = formView
         
+        
+        
+        
     def setDialog(self, dialog):
         self.dialog = dialog
+        
+        
+        
         
     def buildRapport(self):
         # On importe docx dans la methode pour eviter les conflits avec le garbage collector
@@ -54,6 +62,7 @@ class RapportController():
         
         
         
+        
     def buildDocxRecursive(self, couche,  liste_elements):
         """Fonction recursive qui parcours pour un elt d'un niveau les elt du niveau +1"""
         
@@ -77,6 +86,8 @@ class RapportController():
             self.buildDocxRecursive(couche, nv_liste)
             self.list.pop()
             
+
+
 
 
     def convertToPdf(self):
@@ -106,6 +117,9 @@ class RapportController():
             print("Erreur lors de la conversion du docx en pdf")
             print(e)
             raise
+        
+        
+        
         
     def handleFormTaskFinished(self, success):
         """

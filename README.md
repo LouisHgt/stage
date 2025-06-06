@@ -92,6 +92,60 @@ Le plugin est structuré selon le modèle Modèle-Vue-Contrôleur (MVC) :
 
 Les fichiers principaux à la racine (`DDTM_GenerationRapport.py`, `__init__.py`, `DDTM_GenerationRapport_dialog.py`) servent à l'initialisation et à l'intégration du plugin dans QGIS.
 
+
+
+## Gestion des données
+
+Le plugin traite les données d'entrée (sites à enjeux) dans cet ordre :
+
+* Nettoyage du dossier stockant les fichiers temporaires : `tmp/` (CoucheModel.clearTmpFolder())
+
+
+* Initialisation de la base de données spacialite :tmp/base_de_donnee (DataBaseModel.init_database())
+-> Utilisation de la requete : `sql/init_tables.sql`
+
+
+* Création de la **table** `type_etendu` (DataBaseModel.create_table_type_etendu())
+Cette table stocke la nomenclature des types de sites utilisés pour trier les sites.
+
+Attributs : `id` | `code` | `nom`
+
+
+* Création des **tables** `status_sensibilite` et `status_scenario` (DatabaseModel.create_table_status_scenario & DatabaseModel.create_table_status_sensibilite)
+Ces tables stockent l'état des formulaires au moment de la validation de l'utilisateur.
+
+Attributs status_scenario : `nom_bassin` | `indice`
+Attributs status_sensibilite : `id_type` | `etat_type`
+
+
+* Création de la **table** `sites_bases_sdis_filtre` à partir de la couche `sites_bases_sdis_filtre` 
+(CoucheModel.get_sites_from_couche(), DataBaseModel.create_table_sites())
+Cette table stocke les sites de la couche `sites_bases_sdis_filtre`
+
+Attributs : `NOM` | `TYPE` | `COMMUNE` | `BASSIN` | `FREQ` | `GEOM`
+
+
+* Création de la **table** `sites` (DataBaseModel.create_table_sites())
+Cette table sert à stocker l'ensembles des sites qu'on souhaite avoir dans notre requete finale.
+Pour l'instant, elle est donc une copie de `sites_bases_sdis_filtre`, car c'est notre seule tables d'entrée.
+On pourrait par exemple rajouter à `sites` une table `camping` si besoin.
+
+Attributs : `NOM` | `TYPE` | `COMMUNE` | `BASSIN` | `FREQ` | `GEOM`
+
+
+* Création de la **couche** `sites_retenus` : `tmp/sites_retenus.*`(DataBaseModel.get_sites_retenus(), CoucheModel.createSiteRetenu())
+-> Utilisation de la requete : `sql/site_retenu.sql`
+Cette couche stocke l'ensemble des sites retenus comme "à risque"
+selon le scenario indiqué dans le formulaire
+
+Attributs : `nv0` | `nv1` | `nv2` | `nv3`
+`nv0` : Bassin versant
+`nv1` : Commune
+`nv2` : Type d'établissement
+`nv3` : Nom de l'établissement
+
+
+
 ## Auteur
 
 *   **Louis Huguet** - (lshgt@hotmail.fr)

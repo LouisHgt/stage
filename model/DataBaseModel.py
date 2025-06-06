@@ -54,6 +54,7 @@ class DataBaseModel():
     
     
     
+    
     def init_spacialite_cursor(self, connection):
         connection.enable_load_extension(True)
         connection.load_extension('mod_spatialite')
