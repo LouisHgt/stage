@@ -133,7 +133,6 @@ class FormController():
         """
         new_list = []
         
-        print("je suis dans upper")
         for elt in list:
             if type(elt) == str:
                 new_list.append(elt.upper())
