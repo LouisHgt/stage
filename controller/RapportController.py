@@ -2,6 +2,8 @@ import os
 
 from .DocxBuilder import DocxBuilder
 
+from qgis.PyQt import QtWidgets # type: ignore
+
 class RapportController():
     def __init__(self, config_model_inst, couche_model_inst):
         self.configModel = config_model_inst
@@ -18,7 +20,7 @@ class RapportController():
         # On importe docx dans la methode pour eviter les conflits avec le garbage collector
         
         """
-            Recupere les données d'entrée de la table 'site retenu' et crée un docx avec
+            Recupere les données d'entrée de la table 'site_retenu' et crée un docx avec
         """
         
         # Recuparation de l'emplacement du rapport et de son nom
@@ -26,12 +28,10 @@ class RapportController():
         nom_rapport = self.configModel.getFromConfig("nom_rapport")
         
         rapport_path = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + ".docx"
-        pdf_path = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + ".pdf"
 
         # Instaciation du doc
         self.docxBuilder.initDoc()
-        
-
+    
         
         # Recuperation de la couche site_retenu
         emplacement_couche_site_retenu = self.configModel.getFromConfig('emplacement_couche_site_retenu')
@@ -48,7 +48,7 @@ class RapportController():
         
         self.docxBuilder.writeDoc(rapport_path)
             
-        print("rapport ecrit")
+        print("Rapport écrit")
 
         
         
@@ -64,6 +64,7 @@ class RapportController():
                 self.docxBuilder.addParagraph(elt, current_nv)
             return
         
+        # On parcour chaque element d'entrée
         for elt in liste_elements:
 
             self.list.append(elt)
@@ -85,13 +86,20 @@ class RapportController():
             nom_rapport = self.configModel.getFromConfig("nom_rapport")
             
             
-            fichier_docx_entree = "\"" + os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + ".docx\""
-            dossier_pdf_sortie = "\"" + os.path.join(os.path.dirname(__file__), '..', emplacement_rapport) + "\""
+            fichier_docx_entree = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport, nom_rapport) + ".docx"
+            fichier_docx_entree = "\"" + fichier_docx_entree + "\""
+            
+            dossier_pdf_sortie = os.path.join(os.path.dirname(__file__), '..', emplacement_rapport)
+            dossier_pdf_sortie = "\"" + dossier_pdf_sortie + "\""
         
             lo_path = "\"C:\\Program Files\\LibreOffice\\program\\soffice.exe\""
+            
             bat_path = os.path.join(os.path.dirname(__file__), '..', 'etc', 'convertToPdf.bat')
 
-            command = bat_path + " " + fichier_docx_entree + " " + dossier_pdf_sortie + " " + lo_path
+            space = " "
+            command = bat_path + space + fichier_docx_entree + space + dossier_pdf_sortie + space + lo_path
+            # print(command)
+            
             os.system(command)
             
         except Exception as e:
@@ -106,9 +114,15 @@ class RapportController():
         try:
             self.buildRapport()
             
+            pdfCheckBox = self.formView.dialog.findChild(QtWidgets.QCheckBox, 'pdfCheckBox')
+                    
             # Conversion en pdf si précisé dans le config
-            if self.configModel.getFromConfig("convertir_en_pdf") == "1":
+            if pdfCheckBox.isChecked():
                 self.convertToPdf()
+            
+            path = r"C:\Users\louis.huguet\Travail\Plugins\DDTM06_GenerationRapport\output"
+            os.startfile(path)
+            
         except Exception as e:
             print("erreur lors de l'ecriture du doc ou du pdf dans le handlerFormTaskFinished")
             print(e)

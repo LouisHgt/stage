@@ -1,9 +1,9 @@
-import docx
+import docx # type: ignore
 
-from docx.shared import Pt, RGBColor, Inches # Pour les unités et couleurs
-from docx.enum.text import WD_PARAGRAPH_ALIGNMENT # Pour l'alignement (si besoin)
-from docx.oxml.ns import qn
-from docx.oxml import OxmlElement
+from docx.shared import Pt, RGBColor, Inches # type: ignore
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT # type: ignore
+from docx.oxml.ns import qn # type: ignore
+from docx.oxml import OxmlElement # type: ignore
 
 
 class DocxBuilder():
@@ -11,8 +11,33 @@ class DocxBuilder():
     def __init__(self):
         pass
     
+    
+    
+    
+    
+    
+    
     def initDoc(self):
         self.document = docx.Document()
+        
+        titre = self.document.add_heading("Sites sensibles", level=0)
+        titre.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+        
+        p = self.document.add_paragraph("Voici un récapitulatif des sites concernés par le scenario indiqué.")
+        font = p.runs[0]
+        font.size = Pt(20)
+        
+        self.document.add_page_break()
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     def writeDoc(self, rapport_path):
         
@@ -26,6 +51,13 @@ class DocxBuilder():
             del self.document
         
     
+    
+    
+    
+    
+    
+    
+    
     def addParagraph(self, elt, niveau):
         """
             Prend en argument un document, l'élément à ajouter
@@ -33,7 +65,6 @@ class DocxBuilder():
             
             Renvoie le document modifié
         """
-        
         try:
             p = self.document.add_paragraph(elt)
             
@@ -41,6 +72,12 @@ class DocxBuilder():
         except Exception as e:
             print("Erreur lors de la creation du paragraphe dans addParagraph")
             raise
+    
+    
+    
+
+
+
     
     def apply_style_to_paragraph(self, paragraph, level):
         para_format = paragraph.paragraph_format

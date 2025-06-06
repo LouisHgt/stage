@@ -6,6 +6,7 @@ Ce plugin pour QGIS permet de générer un rapport (format DOCX) répertoriant l
 
 *   **Interface Utilisateur Intuitive:**
     *   Sélection du scénario d'inondation (ex: Q10, Q100, AZI) pour chaque bassin versant pertinent.
+    *   Visualisation du bassin séléctionné.
     *   Sélection des types de bâtiments à inclure dans l'analyse via des cases à cocher (gestion de la sensibilité).
 *   **Traitement Efficace:**
     *   Utilisation de tâches en arrière-plan (`QgsTask`) pour les opérations potentiellement longues, évitant ainsi de figer l'interface de QGIS.
@@ -18,7 +19,8 @@ Ce plugin pour QGIS permet de générer un rapport (format DOCX) répertoriant l
     *   Styles appliqués aux différents niveaux de titres pour une meilleure lisibilité.
 *   **Configuration Flexible:**
     *   Utilisation d'un fichier de configuration (`etc/Config.cfg`) pour définir les noms des couches source, les libellés, les indices de retour, les chemins de sortie, etc., permettant une adaptation facile à différents contextes de données sans modifier le code.
-*   **(Optionnel/Futur)** Possibilité de convertir le rapport DOCX en PDF via LibreOffice (le code est présent mais l'activation dépend de la configuration et de l'installation de LibreOffice).
+*   **Conversion PDF** 
+    *   Possibilité de convertir le rapport DOCX en PDF via LibreOffice (le code est présent mais l'activation dépend de la configuration et de l'installation de LibreOffice).
 
 ## Prérequis
 
@@ -51,11 +53,13 @@ Ce plugin pour QGIS permet de générer un rapport (format DOCX) répertoriant l
 4.  **Configurer la Sensibilité:**
     *   Dans l'onglet "Sensibilité des sites", cochez les cases correspondant aux types de bâtiments que vous souhaitez inclure dans le rapport. Décochez ceux à exclure.
 5.  **Valider et Générer:**
+    *   Précisez si vous voulez la conversion PDF.
     *   Cliquez sur le bouton `Valider`.
     *   Le plugin va maintenant traiter les données en arrière-plan. Une barre de progression s'affichera pour indiquer l'avancement.
 6.  **Résultat:**
     *   Une fois le traitement terminé, la fenêtre du plugin se fermera.
     *   Le rapport DOCX (`rapportRDI.docx` par défaut) sera généré dans le dossier `output/` (ou le chemin défini dans `Config.cfg`).
+    *   Une copie en PDF de ce rapport se trouve au meme endroit si vous avez coché la case "Générer PDF"
     *   La couche `site_retenu.shp` contenant les géométries et attributs des sites sélectionnés sera créée dans le dossier `tmp/`.
 
 ## Configuration (`etc/Config.cfg`)
@@ -71,7 +75,8 @@ Ce fichier est crucial pour adapter le plugin à vos données spécifiques.
     *   `nom_couche_status_scenario`, `emplacement_couche_status_scenario`: Nom et dossier (relatif) pour la couche temporaire de scénario.
     *   `nom_couche_site_retenu`, `emplacement_couche_site_retenu`: Nom et dossier (relatif) pour la couche résultat des sites retenus.
     *   `emplacement_rapport`, `nom_rapport`: Dossier (relatif) et nom (sans extension) du fichier DOCX généré.
-    *   `convertir_en_pdf`: (Non utilisé actuellement) Flag pour activer la conversion PDF.
+    *   `convertir_en_pdf`: Flag pour activer la conversion PDF par défaut (elle sera toujours selectionnable
+    lors de la validation du formulaire).
 *   **Section `[SQL]`:**
     *   `requete_formulaire`: Nom du fichier `.sql` (dans le dossier `sql/`) contenant la requête utilisée pour sélectionner les sites retenus.
 
@@ -86,10 +91,6 @@ Le plugin est structuré selon le modèle Modèle-Vue-Contrôleur (MVC) :
 *   **`controller/`**: Orchestre les interactions entre la vue et le modèle, gère les tâches en arrière-plan et la génération du rapport (`formController.py`, `formulaireTask.py`, `rapportController.py`).
 
 Les fichiers principaux à la racine (`DDTM_GenerationRapport.py`, `__init__.py`, `DDTM_GenerationRapport_dialog.py`) servent à l'initialisation et à l'intégration du plugin dans QGIS.
-
-## Licence
-
-Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier selon les termes de la Licence Publique Générale GNU telle que publiée par la Free Software Foundation ; soit la version 2 de la Licence, soit (à votre choix) toute version ultérieure.
 
 ## Auteur
 

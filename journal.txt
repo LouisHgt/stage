@@ -68,4 +68,56 @@ aux commandes subprocess. C'est un probleme de droits.
 
 28/04 J'ai créé un readme, nettoyé mon code, supprimé les fichiers inutiles. Je suis en train de choisir si je cherche un moyen de convertir mon docx en pdf
 ou si je créer directement le pdf. Le probleme est que la création de pdf ne se fait pas comme celle du docx. Cela voudrait dire qu'il serait compliqué
-de faire correspondre les deux documents. -> FPDF2
+de faire correspondre les deux documents. -> FPDF2. Finalement, j'ai trouvé qu'il est possible de lancer la commande libre office pour generer le pdf
+avec al commande os.system(). J'ai donc implementé la conversion de document avec cette commande.
+
+29/04 J'ai ajouté une checkbox pour que l'utilisateur puisse selectionner si il veut une conversion pdf ou pas.
+Je vais mtn essayer que les noms des sites puissent etre cliquable pour qu'on puisse rechercher facilement le site sur internet.
+
+05/05 J'ai plusieurs choix : soit je choisis de développer l'option de pouvoir cliquer sur les noms des sites pour lancer la rechercher
+, soit je choisis d'implementer le choix de n'afficher que certains niveaux. Je dois aussi voir la facon dont Bernard veut que 
+les sites soient classés.
+
+06/05 Aujourd'hui j'ai rajouté un canvas sur mon plugin à gauche. J'ai aussi du empecher l'utilisateur de scroll et 
+et selectionner une zone sur la carte quand l'utilisateur mets sa souris sur une ligne du formulaire.
+Pour ca, j'ai créer des eventFilters personnalisés pour intercepter les evenements et les gérer 
+(ne rien faire dans le cas du scroll, ou selectionner une zone dans le cas du hover).
+Je dois encore charger les geometries au debut lancement du plugin pour rendre la selection de la zone plus fluide.
+
+07/05 Hier j'ai fini d'implementer le chargement des geometries au lancement du plugin. Ainsi, au lieu de selectionner
+des elements de la couche directement, je surligne la geometrie associée à l'element de la couche et ca rend l'application 
+beaucoup plus fluide. Ce matin, j'ai corrigé les doublons de noms de communes (ex CAGNES-SUR-MER, CAGNES SUR MER, cagnes sur mer)
+en normalisant directement la sortie de la requete SQL (UPPER(), REPLACE()). J'avais essayé de stocker aussi le code INSEE de la
+commune pour trier les sites en finction de ce code, mais ca rendait le code extremement compliqué car la construction du docx
+se basait sur le nombre d'attributs de la table de sortie du formulaire, donc autant regler le probleme dans un niveau plus profond
+du code.
+
+12/05 Aujourd'hui je vais travailler sur un systeme de persistance dans lequel l'utilisateur pourra sauvegarder une configuration
+de formulaire (ex: un scenario meteo precis) et le reutiliser plus tard.
+
+13/05 Trier les types de sites par ordre alphabetique
+Preparer l'exclusion de bassins. Sauvegarder les bassins et leur occur dans bassin versant avec un bouton.
+Sauvegarder les sites et leur etat (coché ou pas) dans une autre table. Créer une interface de gestion des sauvegardes.
+Sauvegarde des occurences de bassins finie.
+
+16/05 Aujourd'hui, je vais afficher les bassins selectionnés avec la couleur de leur occurence. J'ai du changer la methode de surlignage.
+Je créer maintenant un QgsRubberBand par bassin, que je stocke dans un dictionnaire, et je l'utilise
+pour afficher la couleur.
+
+19/05 Expliquer le MCD (comment les données sont gérées, utilisées et leur formes)
+
+21/05 Inversion du code couleur et simplification de la methode d'appel
+de highlight. Tri des bassins et des types de sites par ordre alphabetique.
+Ajout d'une couche intrermediaire pour trier les sites et les groupement de sites
+
+22/05 Aujourd'hui, face aux problemes d'ouvertures et de fermeture de fichiers lors des requetes
+sql de QGis, j'ai décidé de changer la facon dont je stocke les données. Je créer mtn une base de donnée,
+cet qui va grandement simplifier les manipulations des données. J'utilise la librairie sqlite.
+
+23/05 Aujourd'hui j'ai fais une methode qui prend le nom d'une couche en argument et qui stocke ses données
+dans une table à son nom. Il faut seulement que la couche possède les attributs requis, et que je
+fasse un methode qui recupère les données d'une couche seulement avec son nom.
+
+26/05 Suppression des tables au lancement si elles existaient encore.
+
+04/05 types à exclure :
