@@ -1,2 +1,0 @@
-SELECT *
-FROM input1
