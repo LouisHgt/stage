@@ -147,6 +147,34 @@
              <item>
               <layout class="QFormLayout" name="formulaire_sensibilite"/>
              </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <item>
+                <widget class="QPushButton" name="bouton_decocher">
+                 <property name="text">
+                  <string>Décocher</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="bouton_cocher">
+                 <property name="text">
+                  <string>Cocher</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="bouton_filtre">
+                 <property name="text">
+                  <string>Filtre RDI</string>
+                 </property>
+                 <property name="shortcut">
+                  <string>Ctrl+S</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
             </layout>
            </widget>
           </item>

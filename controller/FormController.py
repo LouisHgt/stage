@@ -52,7 +52,7 @@ class FormController():
         '''
         
         # Récupération du formulaire scenario
-        formulaire = self.formView.getFormulaire()
+        formulaire = self.formView.getFormulaire('formulaire_scenario')
         # Nbr de ligne du formulaire
         nbr_rows = formulaire.rowCount()
         
@@ -73,6 +73,54 @@ class FormController():
      
      
      
+    def setSensibilite(self, state):
+        """
+        Methode qui set toutes les cases à true ou false en fonction du status passé en argument
+        """
+        
+        # Récupération du formulaire
+        formulaire = self.formView.getFormulaire('formulaire_sensibilite')
+        nbr_rows = formulaire.rowCount()
+
+        
+        # On parcours les elements du formulaire (row * 2 car deux elements par ligne)
+        for i in range(nbr_rows * 2):
+            
+            # On récupère la ligne du formulaire
+            elt_formulaire = formulaire.itemAt(i).widget()
+
+            if isinstance(elt_formulaire, QtWidgets.QCheckBox):
+                elt_formulaire.setChecked(state)
+            
+    
+    def stringToInt(self, listOfString):
+        listOfInt = []
+        
+        for string in listOfString:
+            listOfInt.append(int(string))
+        
+        return listOfInt
+    
+    
+    def setFiltreSensibilite(self):
+        # Les types à cocher
+        types_coches = self.configModel.getFromConfig('types_coches')
+        types_coches = self.stringToInt(types_coches)
+        
+        # Récupération du formulaire
+        formulaire = self.formView.getFormulaire('formulaire_sensibilite')
+        nbr_rows = formulaire.rowCount()
+            
+        for i in range(nbr_rows * 2):
+            
+            # On récupère la ligne du formulaire
+            elt_formulaire = formulaire.itemAt(i).widget()
+            
+            if isinstance(elt_formulaire, QtWidgets.QCheckBox):
+                if i / 2 + 1 in types_coches:
+                    elt_formulaire.setChecked(True)
+                else:
+                    elt_formulaire.setChecked(False)
      
      
      

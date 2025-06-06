@@ -34,8 +34,10 @@ class FormView():
         # Stocker le canvas créé
         self.canvas = None
 
-    def createRubberBand(self):
-        return
+
+
+
+
     def getComboBoxValues(self):
         """Récupère les valeurs sélectionnées dans les QComboBox."""
         values = {}
@@ -43,14 +45,23 @@ class FormView():
             values[bassin] = comboBox.currentText()
         return values
 
+
+
+
     def getCheckboxValues(self): 
         values = {}
         for type, checkBox in self.dialog.checkboxes.items():
             values[type] = checkBox.isChecked()
         return values
         
-    def getFormulaire(self):
-        return self.dialog.findChild(QtWidgets.QFormLayout, 'formulaire_scenario')
+        
+        
+        
+    def getFormulaire(self, nom_formulaire):
+        return self.dialog.findChild(QtWidgets.QFormLayout, nom_formulaire)
+        
+        
+        
         
         
     def highlightBassin(self, lib_bassin, couleur = None):
@@ -330,3 +341,15 @@ class FormView():
             pdfCheckBox.setChecked(True)
         else:
             pdfCheckBox.setChecked(False)
+            
+        # Boutons scenario sensibilite
+        bouton_decocher = self.dialog.findChild(QtWidgets.QPushButton, 'bouton_decocher')
+        bouton_cocher = self.dialog.findChild(QtWidgets.QPushButton, 'bouton_cocher')
+        bouton_filtre = self.dialog.findChild(QtWidgets.QPushButton, 'bouton_filtre')
+        
+        
+        # Liaison aux methodes gerant l'appui des boutons
+        bouton_decocher.clicked.connect(lambda: formController.setSensibilite(False))
+        bouton_cocher.clicked.connect(lambda: formController.setSensibilite(True))
+        bouton_filtre.clicked.connect(lambda: formController.setFiltreSensibilite())
+        
