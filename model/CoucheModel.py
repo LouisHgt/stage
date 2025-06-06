@@ -10,6 +10,8 @@ from qgis.core import ( # type: ignore
 )
 from qgis.PyQt.QtCore import QVariant # type: ignore
 
+
+
 class CoucheModel():
 
     def __init__(self):
