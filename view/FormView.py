@@ -260,6 +260,7 @@ class FormView():
             else:
                 nom_couche_type = nom_couche_type  # Récupérer la première valeur
             
+            print(project.mapLayersByName(nom_couche_type))
             couche_types = project.mapLayersByName(nom_couche_type)[0]
             
             (types, codes) = self.mapTypes(couche_types)
