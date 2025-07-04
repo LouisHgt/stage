@@ -22,7 +22,6 @@ class PluginController():
         
         # Chargement de la couche dans le projet
         QgsProject.instance().addMapLayer(vlayer)
-        print("la couche est chargée")
         
         # Lancement du formulaire
         try:
