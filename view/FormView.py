@@ -104,7 +104,7 @@ class FormView():
             couche_fond = self.coucheModel.getCoucheFromNom('N_ORTHO_2023_COUL_006')
             couche_bassin = self.coucheModel.getCoucheFromNom('Bassins versants')
             couche_cours_eau = self.coucheModel.getCoucheFromNom('Cours_d_eau_principaux')
-            if not couche_fond.isValid() and not couche_bassin.isValid():
+            if not couche_fond.isValid() and not couche_bassin.isValid() and not couche_cours_eau.isValid():
                 print('pas valide')
             
             # Creation du canvas
