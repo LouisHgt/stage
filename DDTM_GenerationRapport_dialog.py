@@ -24,6 +24,7 @@
 
 import os
 from .controller.FormController import FormController
+from .controller.PluginController import PluginController
 
 # --- Imports Qt ---
 from qgis.PyQt import uic # type: ignore 
@@ -42,10 +43,10 @@ class DDTM_GenerationRapportDialog(QtWidgets.QDialog, FORM_CLASS):
 
         
         # Instancier le contrôleur en passant les instances
-        self.formController = FormController(self, couche_model_inst, config_model_inst, rapport_controller_inst)
+        self.pluginController = PluginController(self, couche_model_inst, config_model_inst, rapport_controller_inst)
 
         try:
-            self.formController.setupFormulaires()
+            self.pluginController.initPlugin()
         except Exception as e:
             print(f"Erreur constructeur Dialog: {e}")
             self.close()
