@@ -10,6 +10,7 @@ from qgis.PyQt import uic, QtWidgets, QtGui # type: ignore
 from qgis.gui import QgsMapCanvas # type: ignore
 
 from ..controller.WheelEventFilter import WheelEventFilter
+from ..model.ConfigModel import ConfigModel
 
 
 
@@ -98,12 +99,13 @@ class FormView():
     
     def setupCanvas(self):
         """Setup du canvas"""
+        configModel = ConfigModel()
         
         try:
             # Gestion des couches
-            couche_fond = self.coucheModel.getCoucheFromNom('N_ORTHO_2023_COUL_006')
-            couche_bassin = self.coucheModel.getCoucheFromNom('Bassins versants')
-            couche_cours_eau = self.coucheModel.getCoucheFromNom('Cours d\'eau principaux')
+            couche_fond = self.coucheModel.getCoucheFromNom(configModel.getFromConfig('nom_couche_fond'))
+            couche_bassin = self.coucheModel.getCoucheFromNom(configModel.getFromConfig('nom_couche_bassins'))
+            couche_cours_eau = self.coucheModel.getCoucheFromNom(configModel.getFromConfig('nom_couche_cours_d_eau'))
             if not couche_fond.isValid() and not couche_bassin.isValid() and not couche_cours_eau.isValid():
                 print('pas valide')
             
