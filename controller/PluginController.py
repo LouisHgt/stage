@@ -30,5 +30,6 @@ class PluginController():
         except Exception as e:
             print("Erreur lors du lancement du formulaire")
             print(e)
+            raise
     
     
