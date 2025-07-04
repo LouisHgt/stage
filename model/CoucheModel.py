@@ -81,6 +81,24 @@ class CoucheModel:
 
 
 
+    def remove_and(self, text):
+        """
+        Supprime la sous-chaîne " AND " de la fin d'une chaîne, si elle est présente.
+        """
+        
+        suffix = " AND "
+        if text.endswith(suffix):
+            # Retourne la chaîne jusqu'au début du suffixe trouvé
+            return text[:-len(suffix)]
+        else:
+            # Retourne la chaîne originale si elle ne se termine pas par le suffixe
+            return text
+        
+        
+
+
+
+
     def getFilteredNiveau(self, couche, liste_elt=[]):
         nv = len(liste_elt)
         current_attribut = 'nv' + str(nv)
