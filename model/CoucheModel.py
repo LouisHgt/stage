@@ -25,7 +25,7 @@ class CoucheModel:
     def getCoucheFromNom(self, nom_couche):
         """Récupère la couche QGIS depuis son nom."""
         couche = self.project.mapLayersByName(nom_couche)
-        print(couche)
+        print(couche + nom_couche)
         if couche is not None:
             return couche[0]
         else:
