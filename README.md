@@ -19,7 +19,7 @@ Ce plugin pour QGIS permet de générer un rapport (format DOCX) répertoriant l
     *   Styles appliqués aux différents niveaux de titres pour une meilleure lisibilité.
 *   **Configuration Flexible:**
     *   Utilisation d'un fichier de configuration (`etc/Config.cfg`) pour définir les noms des couches source, les libellés, les indices de retour, les chemins de sortie, etc., permettant une adaptation facile à différents contextes de données sans modifier le code.
-*   **Conversion PDF** 
+*   **Conversion PDF**
     *   Possibilité de convertir le rapport DOCX en PDF via LibreOffice (le code est présent mais l'activation dépend de la configuration et de l'installation de LibreOffice).
 
 ## Prérequis
@@ -27,7 +27,24 @@ Ce plugin pour QGIS permet de générer un rapport (format DOCX) répertoriant l
 *   **QGIS:** Version 3.0 ou supérieure.
 *   **Bibliothèque Python:** `python-docx` doit être installée dans l'environnement Python de QGIS.
 *   **(Optionnel pour PDF)** LibreOffice installé et accessible via la ligne de commande (`soffice`).
-*   **Couches de Données Source:** Les couches QGIS nécessaires (Bassins versants, Sites de base avec informations d'inondation, Couche de typologie des sites) doivent être chargées dans le projet QGIS et leurs noms/champs doivent correspondre à ceux spécifiés dans `etc/Config.cfg`.
+*   **Couches de Données Source:** Pour que le plugin fonctionne, les couches suivantes doivent être impérativement chargées dans le projet QGIS avant de lancer l'outil. Les noms exacts utilisés par le plugin sont configurables dans `etc/Config.cfg`, mais les champs requis sont fixes.
+
+    *   **1. Bassins Versants** : Une couche polygonale représentant les bassins versants.
+        *   **Attributs requis** :
+            *   `LIB`: Le nom ou libellé du bassin versant (ex: "Bassin de la Brague").
+            *   `OCCUR`: Les périodes de retour disponibles pour ce bassin (ex: "Q10, Q100, Q1000").
+
+    *   **2. Sites à Risque (RDI)** : Une couche de points représentant les sites à enjeux. La couche source est `SITES_BASE_SDIS` sur laquelle un filtre est appliqué pour ne conserver que les sites de type "RDI".
+        *   **Attributs requis** :
+            *   `NOM`: Le nom de l'établissement ou du site.
+            *   `COMMUNE`: Le nom de la commune où se situe le site.
+            *   `TYPE`: Le type d'établissement (ex: "ECOLE", "CAMPING").
+            *   `SECT_INOND`: Le secteur d'inondation auquel le site appartient.
+            *   `FREQ_INOND`: La fréquence d'inondation associée au site.
+
+    *   **3. Couches de contexte** :
+        *   `Cours d'eau principaux`: Couche linéaire des cours d'eau pour la visualisation.
+        *   `N_ORTHO_2023_COUL_006`: Fond de plan orthophotographique pour le contexte visuel.
 
 ## Installation
 
@@ -44,8 +61,8 @@ Ce plugin pour QGIS permet de générer un rapport (format DOCX) répertoriant l
 ## Utilisation
 
 1.  **Préparation:**
-    *   Lancez QGIS et chargez votre projet contenant les couches de données source requises (Bassins Versants, Sites, Types).
-    *   Assurez-vous que le fichier `etc/Config.cfg` est correctement configuré pour correspondre aux noms exacts de vos couches et des champs pertinents.
+    *   Lancez QGIS et chargez votre projet contenant les couches de données source requises (Bassins Versants, Sites, etc.).
+    *   Assurez-vous que le fichier `etc/Config.cfg` est correctement configuré pour correspondre aux noms exacts de vos couches dans le projet.
 2.  **Lancer le Plugin:**
     *   Cliquez sur l'icône du plugin "DDTM Génération Rapport" ![Icône](icon.png) dans la barre d'outils des extensions, ou allez dans le menu `Extensions` > `Génération du rapport PDF` > `génerer un rapport`.
 3.  **Configurer le Scénario:**
@@ -59,7 +76,7 @@ Ce plugin pour QGIS permet de générer un rapport (format DOCX) répertoriant l
 6.  **Résultat:**
     *   Une fois le traitement terminé, la fenêtre du plugin se fermera.
     *   Le rapport DOCX (`rapportRDI.docx` par défaut) sera généré dans le dossier `output/` (ou le chemin défini dans `Config.cfg`).
-    *   Une copie en PDF de ce rapport se trouve au meme endroit si vous avez coché la case "Générer PDF"
+    *   Une copie en PDF de ce rapport se trouve au meme endroit si vous avez coché la case "Générer PDF".
     *   La couche `site_retenu.shp` contenant les géométries et attributs des sites sélectionnés sera créée dans le dossier `tmp/`.
 
 ## Configuration (`etc/Config.cfg`)
@@ -75,8 +92,7 @@ Ce fichier est crucial pour adapter le plugin à vos données spécifiques.
     *   `nom_couche_status_scenario`, `emplacement_couche_status_scenario`: Nom et dossier (relatif) pour la couche temporaire de scénario.
     *   `nom_couche_site_retenu`, `emplacement_couche_site_retenu`: Nom et dossier (relatif) pour la couche résultat des sites retenus.
     *   `emplacement_rapport`, `nom_rapport`: Dossier (relatif) et nom (sans extension) du fichier DOCX généré.
-    *   `convertir_en_pdf`: Flag pour activer la conversion PDF par défaut (elle sera toujours selectionnable
-    lors de la validation du formulaire).
+    *   `convertir_en_pdf`: Flag pour activer la conversion PDF par défaut (elle sera toujours selectionnable lors de la validation du formulaire).
 *   **Section `[SQL]`:**
     *   `requete_formulaire`: Nom du fichier `.sql` (dans le dossier `sql/`) contenant la requête utilisée pour sélectionner les sites retenus.
 
@@ -92,59 +108,22 @@ Le plugin est structuré selon le modèle Modèle-Vue-Contrôleur (MVC) :
 
 Les fichiers principaux à la racine (`DDTM_GenerationRapport.py`, `__init__.py`, `DDTM_GenerationRapport_dialog.py`) servent à l'initialisation et à l'intégration du plugin dans QGIS.
 
-
-
 ## Gestion des données
 
 Le plugin traite les données d'entrée (sites à enjeux) dans cet ordre :
 
-* Nettoyage du dossier stockant les fichiers temporaires : `tmp/` (CoucheModel.clearTmpFolder())
-
-
-* Initialisation de la base de données spacialite :tmp/base_de_donnee (DataBaseModel.init_database())
--> Utilisation de la requete : `sql/init_tables.sql`
-
-
-* Création de la **table** `type_etendu` (DataBaseModel.create_table_type_etendu())
-Cette table stocke la nomenclature des types de sites utilisés pour trier les sites.
-
-Attributs : `id` | `code` | `nom`
-
-
-* Création des **tables** `status_sensibilite` et `status_scenario` (DatabaseModel.create_table_status_scenario & DatabaseModel.create_table_status_sensibilite)
-Ces tables stockent l'état des formulaires au moment de la validation de l'utilisateur.
-
-Attributs status_scenario : `nom_bassin` | `indice`
-Attributs status_sensibilite : `id_type` | `etat_type`
-
-
-* Création de la **table** `sites_bases_sdis_filtre` à partir de la couche `sites_bases_sdis_filtre` 
-(CoucheModel.get_sites_from_couche(), DataBaseModel.create_table_sites())
-Cette table stocke les sites de la couche `sites_bases_sdis_filtre`
-
-Attributs : `NOM` | `TYPE` | `COMMUNE` | `BASSIN` | `FREQ` | `GEOM`
-
-
-* Création de la **table** `sites` (DataBaseModel.create_table_sites())
-Cette table sert à stocker l'ensembles des sites qu'on souhaite avoir dans notre requete finale.
-Pour l'instant, elle est donc une copie de `sites_bases_sdis_filtre`, car c'est notre seule tables d'entrée.
-On pourrait par exemple rajouter à `sites` une table `camping` si besoin.
-
-Attributs : `NOM` | `TYPE` | `COMMUNE` | `BASSIN` | `FREQ` | `GEOM`
-
-
-* Création de la **couche** `sites_retenus` : `tmp/sites_retenus.*`(DataBaseModel.get_sites_retenus(), CoucheModel.createSiteRetenu())
--> Utilisation de la requete : `sql/site_retenu.sql`
-Cette couche stocke l'ensemble des sites retenus comme "à risque"
-selon le scenario indiqué dans le formulaire
-
-Attributs : `nv0` | `nv1` | `nv2` | `nv3`
-`nv0` : Bassin versant
-`nv1` : Commune
-`nv2` : Type d'établissement
-`nv3` : Nom de l'établissement
-
-
+*   Nettoyage du dossier stockant les fichiers temporaires : `tmp/` (CoucheModel.clearTmpFolder())
+*   Initialisation de la base de données spacialite :tmp/base_de_donnee (DataBaseModel.init_database()) -> Utilisation de la requete : `sql/init_tables.sql`
+*   Création de la **table** `type_etendu` (DataBaseModel.create_table_type_etendu()) Cette table stocke la nomenclature des types de sites utilisés pour trier les sites.
+    Attributs : `id` | `code` | `nom`
+*   Création des **tables** `status_sensibilite` et `status_scenario` (DatabaseModel.create_table_status_scenario & DatabaseModel.create_table_status_sensibilite) Ces tables stockent l'état des formulaires au moment de la validation de l'utilisateur.
+    Attributs status_scenario : `nom_bassin` | `indice` Attributs status_sensibilite : `id_type` | `etat_type`
+*   Création de la **table** `sites_bases_sdis_filtre` à partir de la couche `sites_bases_sdis_filtre` (CoucheModel.get_sites_from_couche(), DataBaseModel.create_table_sites()) Cette table stocke les sites de la couche `sites_bases_sdis_filtre`
+    Attributs : `NOM` | `TYPE` | `COMMUNE` | `BASSIN` | `FREQ` | `GEOM`
+*   Création de la **table** `sites` (DataBaseModel.create_table_sites()) Cette table sert à stocker l'ensembles des sites qu'on souhaite avoir dans notre requete finale. Pour l'instant, elle est donc une copie de `sites_bases_sdis_filtre`, car c'est notre seule tables d'entrée. On pourrait par exemple rajouter à `sites` une table `camping` si besoin.
+    Attributs : `NOM` | `TYPE` | `COMMUNE` | `BASSIN` | `FREQ` | `GEOM`
+*   Création de la **couche** `sites_retenus` : `tmp/sites_retenus.*`(DataBaseModel.get_sites_retenus(), CoucheModel.createSiteRetenu()) -> Utilisation de la requete : `sql/site_retenu.sql` Cette couche stocke l'ensemble des sites retenus comme "à risque" selon le scenario indiqué dans le formulaire
+    Attributs : `nv0` | `nv1` | `nv2` | `nv3` `nv0` : Bassin versant `nv1` : Commune `nv2` : Type d'établissement `nv3` : Nom de l'établissement
 
 ## Auteur
 
