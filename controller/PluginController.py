@@ -37,18 +37,3 @@ class PluginController():
     
     
     
-    def checkProject(self):
-        """
-            Fonction qui vérifie qu'un projet soit lancé 
-            et que les couches necessaires sont présentes
-        """
-        
-        project = QgsProject.instance()
-        
-        
-        # On vérifie si le chemin du fichier est vide
-        if not project.fileName():
-            print("Aucun projet chargé, ouvrir le projet RDI pour lancer le plugin")
-            return False
-        
-        return True

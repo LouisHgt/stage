@@ -48,19 +48,7 @@ class DDTM_GenerationRapportDialog(QtWidgets.QDialog, FORM_CLASS):
         self.pluginController = PluginController(self, couche_model_inst, config_model_inst, rapport_controller_inst)
 
         try:
-            
-            # On vérifie que le projet soit lancé, si non on informe l'utilisateur
-            if not self.pluginController.checkProject():
-                
-                parent.iface.messageBar().pushMessage(
-                "Action impossible",  # Titre du message
-                "Veuillez d'abord ouvrir ou sauvegarder un projet QGIS avant de lancer cet outil.", # Message
-                level=Qgis.Warning,  # Niveau de message (Warning, Info, Critical)
-                duration=7  # Le message disparaît après 7 secondes
-            )
-            else:
-                
-                self.pluginController.initPlugin()
+            self.pluginController.initPlugin()
         except Exception as e:
             print(f"Erreur constructeur Dialog: {e}")
             self.close()

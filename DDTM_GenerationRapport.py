@@ -33,6 +33,7 @@ import os.path
 from .model.CoucheModel import CoucheModel
 from .model.ConfigModel import ConfigModel
 from .controller.RapportController import RapportController
+from qgis.core import QgsProject, Qgis # type: ignore
 
 
 class DDTM_GenerationRapport:
@@ -194,9 +195,25 @@ class DDTM_GenerationRapport:
         """Run method that performs all the real work"""
 
         try:
+            
+            
+            # Vérification de la présence d'un projet lancé :
+            
+            project = QgsProject.instance()
+            if not project.fileName():
+                # 2. Si non, on informe l'utilisateur via la barre de message de QGIS.
+                self.iface.messageBar().pushMessage(
+                    "Action impossible",
+                    "Veuillez d'abord ouvrir ou sauvegarder un projet QGIS avant de lancer cet outil.",
+                    level=Qgis.Warning,
+                    duration=7
+                )
+                
+                return
+            
             # Create the dialog with elements (after translation) and keep reference
             # Only create GUI ONCE in callback, so that it will only load when the plugin is started
-            self.dlg = DDTM_GenerationRapportDialog(self.coucheModel, self.configModel, self.rapportController, parent=self.iface)
+            self.dlg = DDTM_GenerationRapportDialog(self.coucheModel, self.configModel, self.rapportController, parent=self.iface.mainWindow())
             print("Lancement du plugin DDTM_GenerationRapport")
             # show the dialog
             self.dlg.show()
