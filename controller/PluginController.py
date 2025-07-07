@@ -3,6 +3,7 @@ from ..model.CoucheModel import CoucheModel
 
 import os
 from qgis.core import QgsProject, QgsVectorLayer # type: ignore
+from qgis.PyQt.QtWidgets import QAction # type: ignore
 
 class PluginController():
     def __init__(self, dialog, couche_model_inst, config_model_inst, rapport_controller_inst):
@@ -12,6 +13,9 @@ class PluginController():
     
     
     def initPlugin(self):
+        
+        
+        
         
         # Récupération de la couche
         emplacement_type_etendu = os.path.join(os.path.dirname(__file__), '..', 'couches', 'type_etendu.shp')
@@ -32,3 +36,19 @@ class PluginController():
             raise
     
     
+    
+    def checkProject():
+        """
+            Fonction qui vérifie qu'un projet soit lancé 
+            et que les couches necessaires sont présentes
+        """
+        
+        project = QgsProject.instance()
+        
+        
+        # On vérifie si le chemin du fichier est vide
+        if not project.fileName():
+            print("Aucun projet chargé, ouvrir le projet RDI pour lancer le plugin")
+            return False
+        
+        return True

@@ -29,6 +29,8 @@ from .controller.PluginController import PluginController
 # --- Imports Qt ---
 from qgis.PyQt import uic # type: ignore 
 from qgis.PyQt import QtWidgets # type: ignore
+from qgis.core import QgsProject, Qgis # type: ignore
+
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from Qt Designer
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
@@ -46,7 +48,19 @@ class DDTM_GenerationRapportDialog(QtWidgets.QDialog, FORM_CLASS):
         self.pluginController = PluginController(self, couche_model_inst, config_model_inst, rapport_controller_inst)
 
         try:
-            self.pluginController.initPlugin()
+            
+            # On vérifie que le projet soit lancé, si non on informe l'utilisateur
+            if not self.pluginController.checkProject():
+                
+                self.iface.messageBar().pushMessage(
+                "Action impossible",  # Titre du message
+                "Veuillez d'abord ouvrir ou sauvegarder un projet QGIS avant de lancer cet outil.", # Message
+                level=Qgis.Warning,  # Niveau de message (Warning, Info, Critical)
+                duration=7  # Le message disparaît après 7 secondes
+            )
+            else:
+                
+                self.pluginController.initPlugin()
         except Exception as e:
             print(f"Erreur constructeur Dialog: {e}")
             self.close()
