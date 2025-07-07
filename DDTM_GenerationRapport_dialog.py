@@ -52,7 +52,7 @@ class DDTM_GenerationRapportDialog(QtWidgets.QDialog, FORM_CLASS):
             # On vérifie que le projet soit lancé, si non on informe l'utilisateur
             if not self.pluginController.checkProject():
                 
-                self.iface.messageBar().pushMessage(
+                parent.iface.messageBar().pushMessage(
                 "Action impossible",  # Titre du message
                 "Veuillez d'abord ouvrir ou sauvegarder un projet QGIS avant de lancer cet outil.", # Message
                 level=Qgis.Warning,  # Niveau de message (Warning, Info, Critical)
