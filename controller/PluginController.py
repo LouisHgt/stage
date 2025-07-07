@@ -37,7 +37,7 @@ class PluginController():
     
     
     
-    def checkProject():
+    def checkProject(self):
         """
             Fonction qui vérifie qu'un projet soit lancé 
             et que les couches necessaires sont présentes
