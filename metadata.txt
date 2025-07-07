@@ -3,7 +3,7 @@
 # This file should be included when you package your plugin.# Mandatory items:
 
 [general]
-name=DDTM-06-GenerationRapport
+name=DDTM-06 - GenerationRapport
 qgisMinimumVersion=3.0
 description=Génère un rapport PDF
 version=0.1

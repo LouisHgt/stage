@@ -134,7 +134,7 @@ class RapportController():
             if pdfCheckBox.isChecked():
                 self.convertToPdf()
             
-            path = r"C:\Users\louis.huguet\Travail\Plugins\DDTM06_GenerationRapport\output"
+            path = os.path.join(os.path.dirname(__file__), '..', 'output')
             os.startfile(path)
             
         except Exception as e:
