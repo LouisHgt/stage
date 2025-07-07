@@ -196,7 +196,7 @@ class DDTM_GenerationRapport:
         try:
             # Create the dialog with elements (after translation) and keep reference
             # Only create GUI ONCE in callback, so that it will only load when the plugin is started
-            self.dlg = DDTM_GenerationRapportDialog(self.coucheModel, self.configModel, self.rapportController, parent=self.iface.mainWindow())
+            self.dlg = DDTM_GenerationRapportDialog(self.coucheModel, self.configModel, self.rapportController, parent=self.iface)
             print("Lancement du plugin DDTM_GenerationRapport")
             # show the dialog
             self.dlg.show()
