@@ -1,3 +1,4 @@
+// DDTM_GenerationRapport.py
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
@@ -29,6 +30,9 @@ from qgis.PyQt.QtWidgets import QAction # type: ignore
 from .resources import *
 # Import the code for the dialog
 from .DDTM_GenerationRapport_dialog import DDTM_GenerationRapportDialog
+# DEBUT MODIFICATION: Importer la nouvelle classe de dialogue
+from .config_dialog import ConfigDialog
+# FIN MODIFICATION
 import os.path
 from .model.CoucheModel import CoucheModel
 from .model.ConfigModel import ConfigModel
@@ -168,14 +172,30 @@ class DDTM_GenerationRapport:
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
+        
+        # --- DEBUT MODIFICATION: Ajout d'un nouveau bouton ---
 
+        # Action principale (existante)
         icon_path = ':/plugins/DDTM_GenerationRapport/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'génerer un rapport'),
+            text=self.tr(u'Générer un rapport'), # Texte plus clair
             callback=self.run,
             parent=self.iface.mainWindow())
 
+        # Nouvelle action pour la nouvelle boîte de dialogue
+        # NOTE: Créez une icône 'icon_settings.png', ajoutez-la à resources.qrc et recompilez resources.py
+        # ou réutilisez l'icône existante pour tester.
+        settings_icon_path = ':/plugins/DDTM_GenerationRapport/icon.png' 
+        self.add_action(
+            settings_icon_path, 
+            text=self.tr(u'Configurer le plugin'),
+            callback=self.open_config_dialog, # Appel à la nouvelle méthode
+            parent=self.iface.mainWindow(),
+            add_to_toolbar=True) # Mettre `False` si vous ne le voulez que dans le menu
+
+        # --- FIN MODIFICATION ---
+        
         # will be set False in run()
         self.first_start = True
 
@@ -184,7 +204,7 @@ class DDTM_GenerationRapport:
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
             self.iface.removePluginMenu(
-                self.tr(u'&DDTM_GenerationRapport'),
+                self.tr(u'&Génération du rapport PDF'), # Le nom du menu doit correspondre à celui dans initGui
                 action)
             self.iface.removeToolBarIcon(action)
         
@@ -228,5 +248,26 @@ class DDTM_GenerationRapport:
         except Exception as e:
             print(f"Une erreur s'est produite dans la méthode run : {e}")
             return
-        
-        
+    
+    # --- DEBUT MODIFICATION: Nouvelle méthode pour lancer la boîte de dialogue de config ---
+    def open_config_dialog(self):
+        """
+        Ouvre la boîte de dialogue de configuration.
+        """
+        try:
+            # Créer une instance de votre nouvelle boîte de dialogue
+            # On passe la fenêtre principale de QGIS comme parent
+            # et le modèle de configuration si nécessaire.
+            config_dlg = ConfigDialog(parent=self.iface.mainWindow(), config_model=self.configModel)
+            
+            # Affiche la boîte de dialogue de manière modale (bloque le reste de QGIS)
+            config_dlg.exec_()
+            
+            # Après la fermeture de la boîte, vous pouvez exécuter du code ici si besoin,
+            # par exemple, recharger une configuration qui a été modifiée.
+            print("Boîte de dialogue de configuration fermée.")
+
+        except Exception as e:
+            print(f"Une erreur s'est produite en ouvrant la config dialog : {e}")
+            return
+    # --- FIN MODIFICATION ---
