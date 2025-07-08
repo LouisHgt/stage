@@ -16,20 +16,11 @@ class FormController():
         self.configModel = config_model_inst
         self.rapportController = rapport_controller_inst
         
-
         # Instancier la vue en passant les instances
         self.formView = FormView(dialog, self.coucheModel, self.configModel, self.rapportController)
         self.rapportController.setFormView(self.formView) # Passage de formView à rapportController
         self.rapportController.setDialog(self.dialog)
         self.current_task = None
-    
-    
-    
-    
-    
-    
-    
-    
     
     def setupFormulaires(self):
         """Configure les formulaires."""
@@ -38,176 +29,96 @@ class FormController():
         self.formView.setupCanvas()
         self.formView.setupButtons(self)
         
-        
-        
-        
-        
-        
-        
-        
     def reinitialiserPressed(self):
         '''
             Remets toutes les comboBox du formulaire scenario
             à 'Vide'
         '''
-        
-        # Récupération du formulaire scenario
         formulaire = self.formView.getFormulaire('formulaire_scenario')
-        # Nbr de ligne du formulaire
         nbr_rows = formulaire.rowCount()
         
-        # On parcours les lignes du formulaire
         for i in range(nbr_rows):
-            
-            # On récupère l'élément qui possede la comboBox
             row_formulaire = formulaire.itemAt(i).widget().layout()
             
-            # On récupère la comboBox et on la met sur son dernier indice -> 'Vide'
             if isinstance(row_formulaire, QtWidgets.QHBoxLayout):
                 for j in range(row_formulaire.count()):
                     if isinstance(row_formulaire.itemAt(j).widget(), QtWidgets.QComboBox):
                         comboBox = row_formulaire.itemAt(j).widget()
                         comboBox.setCurrentIndex(comboBox.count() - 1)
      
-     
-     
-     
-     
     def setSensibilite(self, state):
         """
         Methode qui set toutes les cases à true ou false en fonction du status passé en argument
         """
-        
-        # Récupération du formulaire
         formulaire = self.formView.getFormulaire('formulaire_sensibilite')
         nbr_rows = formulaire.rowCount()
 
-        
-        # On parcours les elements du formulaire (row * 2 car deux elements par ligne)
-        for i in range(nbr_rows * 2):
+        for i in range(formulaire.count()):
+            # Le layout est un QFormLayout, les widgets sont accessibles via itemAt(i).widget()
+            widget = formulaire.itemAt(i).widget()
+            if isinstance(widget, QtWidgets.QCheckBox):
+                widget.setChecked(state)
             
-            # On récupère la ligne du formulaire
-            elt_formulaire = formulaire.itemAt(i).widget()
-
-            if isinstance(elt_formulaire, QtWidgets.QCheckBox):
-                elt_formulaire.setChecked(state)
-            
-    
     def stringToInt(self, listOfString):
         listOfInt = []
-        
         for string in listOfString:
-            listOfInt.append(int(string))
-        
+            if string.strip().isdigit():
+                listOfInt.append(int(string.strip()))
         return listOfInt
     
-    
     def setFiltreSensibilite(self):
-        # Les types à cocher
-        types_coches = self.configModel.getFromConfig('types_coches')
+        # --- DEBUT MODIFICATION ---
+        # Les types à cocher, récupérés comme une liste
+        types_coches = self.configModel.getFromConfig('types_coches', as_list=True)
+        # --- FIN MODIFICATION ---
         types_coches = self.stringToInt(types_coches)
         
-        # Récupération du formulaire
         formulaire = self.formView.getFormulaire('formulaire_sensibilite')
-        nbr_rows = formulaire.rowCount()
             
-        for i in range(nbr_rows * 2):
-            
-            # On récupère la ligne du formulaire
-            elt_formulaire = formulaire.itemAt(i).widget()
-            
-            if isinstance(elt_formulaire, QtWidgets.QCheckBox):
-                if i / 2 + 1 in types_coches:
-                    elt_formulaire.setChecked(True)
-                else:
-                    elt_formulaire.setChecked(False)
-     
-     
-     
+        # Parcourir les QCheckBox stockées dans la vue
+        for id_type, checkbox in self.formView.dialog.checkboxes.items():
+            if id_type in types_coches:
+                checkbox.setChecked(True)
+            else:
+                checkbox.setChecked(False)
      
     def indiceStringToInt(self, indice_string):
-        if indice_string == "Q10":
-            return 10
-        elif indice_string == "Q20":
-            return 20
-        elif indice_string == "Q50":
-            return 50
-        elif indice_string == "Q100":
-            return 100
-        elif indice_string == "Qex":
-            return 1000
-        elif indice_string == "AZI":
-            return 10000
-        elif indice_string == "Vide":
-            return 0
-        else:
-            return 0
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        if indice_string == "Q10": return 10
+        elif indice_string == "Q20": return 20
+        elif indice_string == "Q50": return 50
+        elif indice_string == "Q100": return 100
+        elif indice_string == "Qex": return 1000
+        elif indice_string == "AZI": return 10000
+        else: return 0
     
     def normalizeData(self, data):
         """
             Prend en argument les valeurs du formulaire et renvoie
             un dictionnaire avec les occurences en int
         """
-        
+        normalized = {}
         for key, val in data.items():
-            data[key] = self.indiceStringToInt(val)
-            
-        return data
+            normalized[key] = self.indiceStringToInt(val)
+        return normalized
                
-               
-               
-               
-               
-               
-               
-               
-               
-               
-               
-               
-    def upperList(self, list):
+    def upperList(self, lst):
         """
-        Renvoie une liste de string en majuscule
+        Renvoie une liste de string en majuscule, en gérant les chaînes vides
         """
-        new_list = []
-        
-        for elt in list:
-            if type(elt) == str:
-                new_list.append(elt.upper())
-
-        return new_list
-
-
-
-
-
-
-
+        return [elt.upper() for elt in lst if isinstance(elt, str) and elt.strip()]
 
     def sauvegarderBassinPressed(self, bouton):
         """
         Methode appellée quand on appuie sur le bouton pour sauvegarder les 
         indices correspondants aux bassins dans la couche Bassins versants
         """
-        
         try:
-            # On desactive le bouton le temps du traitement
             bouton.setEnabled(False)
             bouton.setText("Traitement...")
             bouton.repaint()
             
-            # Recuperation des données necessaire à la sauvegarde de la couche
-            couche_sauvegarde = self.coucheModel.getCoucheFromNom('Bassins versants')
+            nom_couche_bassins = self.configModel.getFromConfig('nom_couche_bassins')
+            couche_sauvegarde = self.coucheModel.getCoucheFromNom(nom_couche_bassins)
             comboBoxValues = self.formView.getComboBoxValues()
             comboBoxValues = self.normalizeData(comboBoxValues)
             
@@ -215,26 +126,15 @@ class FormController():
             bouton.setEnabled(True)
             bouton.setText("Sauvegarder")
         except Exception as e:
-            print("Probleme rencontré lors de la sauvegarde des occurences de bassins")
-            print(e)
+            print(f"Probleme rencontré lors de la sauvegarde des occurences de bassins: {e}")
             raise
-            
-            
-            
-            
-            
-            
-            
-            
-            
             
     def handleOccurBassinChanged(self, occur, lib_bassin):
         """
             Appelle la methode de la vue qui surligne le bassin en fonction d'un nom de bassin
             et d'une couleur
         """
-        
-        opacite = int(self.configModel.getFromConfig("opacite"))
+        opacite = int(self.configModel.getFromConfig("opacite") or 100)
         
         couleurs_dic = {
             "Q10": QtGui.QColor(12, 238, 254, opacite),
@@ -254,7 +154,6 @@ class FormController():
         else:
             self.formView.highlightBassin(lib_bassin, couleur)
             
-        
     def pressed(self, boutonValider):
         """
             Affiche les données et les inscrit dans des couches
@@ -265,10 +164,9 @@ class FormController():
         boutonValider.setText('Traitement...')
         self.formView.setupProgressBar()
 
-        # Récupérer les valeurs nécessaires du formulaire
         combo_values = self.formView.getComboBoxValues()
         checkbox_values = self.formView.getCheckboxValues()             
-        # 3. Créer l'instance de la tâche
+        
         task_description = "Génération du rapport DDTM"
         self.current_task = FormulaireTask(
             task_description,
@@ -278,10 +176,6 @@ class FormController():
             self.dialog
         )
 
-        # Liaison de la tâche aux handlers
         self.current_task.progressChanged.connect(self.formView.handleUpdateProgressBar)
         self.current_task.task_finished.connect(self.rapportController.handleFormTaskFinished)
-        # Ajouter la tâche au gestionnaire de tâches de QGIS
         QgsApplication.taskManager().addTask(self.current_task)
-        
-    

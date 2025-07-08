@@ -44,7 +44,7 @@ class ConfigDialog(QtWidgets.QDialog, FORM_CLASS):
         """
         # Adaptez les clés ici pour qu'elles correspondent EXACTEMENT à votre fichier .cfg
         # J'ai mis des exemples basés sur votre README
-        self.lineEdit_sites.setText(self.configModel.getFromConfig('nom_couche_sites_entree')) 
+        self.lineEdit_sites.setText(self.configModel.getFromConfig('nom_couche_sites')) 
         self.lineEdit_bassins.setText(self.configModel.getFromConfig('nom_couche_bassins'))
         self.lineEdit_fond.setText(self.configModel.getFromConfig('nom_couche_fond'))
         self.lineEdit_cours_eau.setText(self.configModel.getFromConfig('nom_couche_cours_d_eau'))
