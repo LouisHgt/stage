@@ -1,14 +1,7 @@
-from time import sleep
 import os
-
-# --- Imports QGIS ---
 from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes # type: ignore
 from qgis.gui import QgsMapCanvas, QgsRubberBand # type: ignore
-
-# --- Imports Qt ---
 from qgis.PyQt import uic, QtWidgets, QtGui # type: ignore
-from qgis.gui import QgsMapCanvas # type: ignore
-
 from ..controller.WheelEventFilter import WheelEventFilter
 from ..model.ConfigModel import ConfigModel
 
@@ -18,22 +11,14 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 class FormView():
     
     def __init__(self, dialog, couche_model_inst, config_model_inst, rapport_controller_inst):
-        self.dialog = dialog # Référence à la fenêtre UI
-        # Stocker les instances
+        self.dialog = dialog
         self.coucheModel = couche_model_inst
         self.configModel = config_model_inst
-        
-        # Stocker les eventFilters
         self.hover_filters = []
-        
-        # Stocker les rubberBands
         self.rubber_bands = {}
-        
-        # Stocker le canvas créé
         self.canvas = None
 
     def getComboBoxValues(self):
-        """Récupère les valeurs sélectionnées dans les QComboBox."""
         values = {}
         for bassin, comboBox in self.dialog.combo_boxes.items():
             values[bassin] = comboBox.currentText()
@@ -48,11 +33,7 @@ class FormView():
     def getFormulaire(self, nom_formulaire):
         return self.dialog.findChild(QtWidgets.QFormLayout, nom_formulaire)
         
-    def highlightBassin(self, lib_bassin, couleur = None):
-        """
-            Highlight une zone si le libelé est précisé,
-            sinon ne higlight rien
-        """  
+    def highlightBassin(self, lib_bassin, couleur=None):
         if lib_bassin in self.rubber_bands:
             current_rubber = self.rubber_bands.get(lib_bassin)
         else :
@@ -62,12 +43,11 @@ class FormView():
             self.rubber_bands[lib_bassin] = current_rubber
         
         current_rubber.hide()
-        if couleur != None:
+        if couleur is not None:
             current_rubber.setColor(couleur)
             current_rubber.show()
 
     def setupCanvas(self):
-        """Setup du canvas"""
         try:
             couche_fond = self.coucheModel.getCoucheFromNom(self.configModel.getFromConfig('nom_couche_fond'))
             couche_bassin = self.coucheModel.getCoucheFromNom(self.configModel.getFromConfig('nom_couche_bassins'))
@@ -75,7 +55,6 @@ class FormView():
             
             if not all([couche_fond, couche_bassin, couche_cours_eau]) or not all([l.isValid() for l in [couche_fond, couche_bassin, couche_cours_eau]]):
                 print('Une ou plusieurs couches de contexte sont invalides ou non trouvées.')
-                # Optionnel: on peut décider de ne pas afficher le canvas si les couches manquent.
                 return
 
             self.canvas = QgsMapCanvas()
@@ -95,28 +74,20 @@ class FormView():
             print(f"Erreur lors de la création du canvas : {e}")
 
     def setupFormulaireScenario(self, formController):
-        """Setup du formulaire de scenario."""
         try:
             container_scenario = self.dialog.findChild(QtWidgets.QWidget, 'container_scenario')
-            
-            # --- DEBUT MODIFICATION ---
-            # Recuperation des indices en spécifiant qu'on veut une liste
             indices = self.configModel.getFromConfig('indices', as_list=True)
-            # --- FIN MODIFICATION ---
             
             nom_couche_bassins = self.configModel.getFromConfig('nom_couche_bassins')
             libelle_bassins = self.configModel.getFromConfig('libelle_couche_bassins')
             
             bassins_versants = self.coucheModel.getCoucheFromNom(nom_couche_bassins)
-            
             if not bassins_versants:
                 print(f"La couche des bassins '{nom_couche_bassins}' n'a pas été trouvée.")
                 return
 
             bassins = []
-            # --- DEBUT MODIFICATION ---
             bassins_retires = formController.upperList(self.configModel.getFromConfig("bassins_retires", as_list=True))
-            # --- FIN MODIFICATION ---
             self.bassins_geom = {}
             
             for feature in bassins_versants.getFeatures():
@@ -152,7 +123,6 @@ class FormView():
                     lambda new_text, lib_bassin=label.text(): 
                         formController.handleOccurBassinChanged(new_text, lib_bassin)
                 )
-
                 self.dialog.combo_boxes[bassin] = comboBox
                 formulaire.addRow(row_widget)
         except Exception as e:
@@ -161,16 +131,11 @@ class FormView():
             raise
 
     def mapTypes(self, couche_type):
-        colonne_id = "id"
-        colonne_nom = "nom"
-        colonne_code = "code"
-        
         codes = {}
         types = {}
         for feature in couche_type.getFeatures():
-            types[feature[colonne_id]] = feature[colonne_nom]
-            codes[feature[colonne_id]] = feature[colonne_code]
-
+            types[feature["id"]] = feature["nom"]
+            codes[feature["id"]] = feature["code"]
         return (types, codes)
         
     def setupFormulaireSensibilite(self):
@@ -192,10 +157,7 @@ class FormView():
             types = dict(sorted(types.items(), key=lambda item: item[1]))
             
             self.dialog.checkboxes = {}
-            
-            # --- DEBUT MODIFICATION ---
             types_retires = self.configModel.getFromConfig("types_retires", as_list=True)
-            # --- FIN MODIFICATION ---
             
             for id, nom in types.items():
                 if codes.get(id) not in types_retires:
@@ -221,7 +183,6 @@ class FormView():
         pdfCheckBox.hide()
         
         containerFooter = self.dialog.findChild(QtWidgets.QVBoxLayout, 'container_footer')
-                
         self.progressBar = QtWidgets.QProgressBar()
         self.progressBar.setMinimum(0)
         self.progressBar.setMaximum(100)

@@ -1,29 +1,25 @@
-from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication # type: ignore
-from qgis.PyQt.QtGui import QIcon # type: ignore
-from qgis.PyQt.QtWidgets import QAction # type: ignore
+from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication # type: ignore 
+from qgis.PyQt.QtGui import QIcon # type: ignore 
+from qgis.PyQt.QtWidgets import QAction # type: ignore 
 
-# Initialize Qt resources from file resources.py
 from .resources import *
-# Import the code for the dialog
 from .DDTM_GenerationRapport_dialog import DDTM_GenerationRapportDialog
 from .config_dialog import ConfigDialog
 import os.path
 from .model.CoucheModel import CoucheModel
 from .model.ConfigModel import ConfigModel
 from .controller.RapportController import RapportController
-from qgis.core import QgsProject, Qgis # type: ignore
+
+from qgis.core import QgsProject, Qgis # type: ignore 
 
 
 class DDTM_GenerationRapport:
     """QGIS Plugin Implementation."""
 
     def __init__(self, iface):
-        """ ... (la méthode __init__ reste identique) ... """
-        # Save reference to the QGIS interface
+        """Constructor."""
         self.iface = iface
-        # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
-        # initialize locale
         locale = QSettings().value('locale/userLocale')[0:2]
         locale_path = os.path.join(
             self.plugin_dir,
@@ -35,24 +31,17 @@ class DDTM_GenerationRapport:
             self.translator.load(locale_path)
             QCoreApplication.installTranslator(self.translator)
 
-        # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&Génération du rapport PDF')
-
-        # Check if plugin was started the first time in current QGIS session
-        # Must be set in initGui() to survive plugin reloads
         self.first_start = None
         
-        # Instanciation des objets MVC
         self.configModel = ConfigModel()
         self.coucheModel = CoucheModel()
         self.rapportController = RapportController(self.configModel, self.coucheModel)
 
-
     def tr(self, message):
-        """ ... (la méthode tr reste identique) ... """
+        """Get the translation for a string using Qt translation API."""
         return QCoreApplication.translate('DDTM_GenerationRapport', message)
-
 
     def add_action(
         self,
@@ -65,7 +54,7 @@ class DDTM_GenerationRapport:
         status_tip=None,
         whats_this=None,
         parent=None):
-        """ ... (la méthode add_action reste identique) ... """
+        """Add a toolbar icon to the toolbar."""
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
         action.triggered.connect(callback)
@@ -89,8 +78,7 @@ class DDTM_GenerationRapport:
         return action
 
     def initGui(self):
-        """ ... (la méthode initGui reste identique) ... """
-        # Action principale (existante)
+        """Create the menu entries and toolbar icons inside the QGIS GUI."""
         icon_path = ':/plugins/DDTM_GenerationRapport/icon.png'
         self.add_action(
             icon_path,
@@ -98,7 +86,6 @@ class DDTM_GenerationRapport:
             callback=self.run,
             parent=self.iface.mainWindow())
 
-        # Nouvelle action pour la boîte de dialogue de configuration
         settings_icon_path = ':/plugins/DDTM_GenerationRapport/icon_settings.png' 
         self.add_action(
             settings_icon_path, 
@@ -109,9 +96,8 @@ class DDTM_GenerationRapport:
 
         self.first_start = True
 
-
     def unload(self):
-        """ ... (la méthode unload reste identique) ... """
+        """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
             self.iface.removePluginMenu(
                 self.tr(u'&Génération du rapport PDF'),
@@ -120,7 +106,7 @@ class DDTM_GenerationRapport:
         self.coucheModel.clearTmpFolder()
 
     def run(self):
-        """ ... (la méthode run reste identique) ... """
+        """Run method that performs all the real work"""
         try:
             project = QgsProject.instance()
             if not project.fileName():
@@ -144,24 +130,18 @@ class DDTM_GenerationRapport:
             print(f"Une erreur s'est produite dans la méthode run : {e}")
             return
     
-    # --- DEBUT MODIFICATION ---
     def open_config_dialog(self):
         """
         Ouvre la boîte de dialogue de configuration.
         """
         try:
-            # Créer une instance de votre nouvelle boîte de dialogue en passant iface
             config_dlg = ConfigDialog(
                 parent=self.iface.mainWindow(), 
-                iface=self.iface,  # <-- ON AJOUTE iface ICI
+                iface=self.iface,
                 config_model=self.configModel
             )
-            
             config_dlg.exec_()
-            
             print("Boîte de dialogue de configuration fermée.")
-
         except Exception as e:
             print(f"Une erreur s'est produite en ouvrant la config dialog : {e}")
             return
-    # --- FIN MODIFICATION ---
