@@ -36,7 +36,7 @@ class ConfigDialog(QtWidgets.QDialog, FORM_CLASS):
         """
         Charge les valeurs du fichier de configuration et les affiche dans les LineEdits.
         """
-        self.lineEdit_sites.setText(self.configModel.getFromConfig('nom_couche_sites_entree')) 
+        self.lineEdit_sites.setText(self.configModel.getFromConfig('nom_couche_sites')) 
         self.lineEdit_bassins.setText(self.configModel.getFromConfig('nom_couche_bassins'))
         self.lineEdit_fond.setText(self.configModel.getFromConfig('nom_couche_fond'))
         self.lineEdit_cours_eau.setText(self.configModel.getFromConfig('nom_couche_cours_d_eau'))
