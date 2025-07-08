@@ -26,7 +26,7 @@ class ConfigDialog(QtWidgets.QDialog, FORM_CLASS):
         # Le QDialogButtonBox est déjà connecté pour fermer la fenêtre via le .ui
         # (slots accept() et reject())
         
-        print("Nouvelle boîte de dialogue de configuration initialisée.")
+        print("Boîte de dialogue de configuration initialisée.")
 
         # Ici, vous pouvez ajouter la logique pour charger des paramètres
         # depuis self.configModel et les afficher dans des widgets.

@@ -172,9 +172,8 @@ class DDTM_GenerationRapport:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
         
-        # --- DEBUT MODIFICATION: Ajout d'un nouveau bouton ---
 
-        # Action principale (existante)
+        # Action principale
         icon_path = ':/plugins/DDTM_GenerationRapport/icon.png'
         self.add_action(
             icon_path,
@@ -185,7 +184,7 @@ class DDTM_GenerationRapport:
         # Nouvelle action pour la nouvelle boîte de dialogue
         # NOTE: Créez une icône 'icon_settings.png', ajoutez-la à resources.qrc et recompilez resources.py
         # ou réutilisez l'icône existante pour tester.
-        settings_icon_path = ':/plugins/DDTM_GenerationRapport/icon.png' 
+        settings_icon_path = ':/plugins/DDTM_GenerationRapport/icon_settings.png' 
         self.add_action(
             settings_icon_path, 
             text=self.tr(u'Configurer le plugin'),
