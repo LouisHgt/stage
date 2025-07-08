@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>600</width>
+    <height>400</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,15 +15,102 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Ceci est la nouvelle boîte de dialogue de configuration.
-Vous pouvez ajouter vos paramètres ici.</string>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Configuration des couches</string>
      </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_sites">
+        <property name="text">
+         <string>Couche des sites :</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="lineEdit_sites"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="label_sites_info">
+        <property name="text">
+         <string><i>Requiert les champs : NOM, COMMUNE, TYPE, SECT_INOND, FREQ_INOND</i></string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_bassins">
+        <property name="text">
+         <string>Couche des bassins versants :</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="lineEdit_bassins"/>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="label_bassins_info">
+        <property name="text">
+         <string><i>Requiert les champs : LIB, OCCUR</i></string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_fond">
+        <property name="text">
+         <string>Couche de fond de carte :</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="lineEdit_fond"/>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_cours_eau">
+        <property name="text">
+         <string>Couche des cours d'eau :</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLineEdit" name="lineEdit_cours_eau"/>
+      </item>
+     </layout>
     </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Configuration du rapport</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_nom_rapport">
+        <property name="text">
+         <string>Nom du fichier de rapport :</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="lineEdit_nom_rapport"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
